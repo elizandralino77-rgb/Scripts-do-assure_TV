@@ -448,9 +448,13 @@ addSkinButton("Asa de Anjo", 192557913)
 addSkinButton("Abóbora", 132809431)
 addSkinButton("Chapéu", 305888394)
 addSkinButton("Pombo", 134936622364544)
+addSkinButton("pé gigante 1", 140311311736304)
+addSkinButton("pé gigante 2", 94880807456770)
+addSkinButton("unhas grandes ", 135726095366567)
+addSkinButton("mão grandes ", 12725518393)
 
-SkinsTab:AddButton({
-    Name = "666",
+
+  Name = "666",
     Callback = function()
 
         local Wear = game:GetService("ReplicatedStorage").Remotes.Wear
