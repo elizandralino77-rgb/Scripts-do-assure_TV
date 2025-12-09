@@ -453,8 +453,8 @@ addSkinButton("pé gigante 2", 94880807456770)
 addSkinButton("unhas grandes ", 135726095366567)
 addSkinButton("mão grandes ", 12725518393)
 
-
-  Name = "666",
+SkinsTab:AddButton({
+ Name = "666",
     Callback = function()
 
         local Wear = game:GetService("ReplicatedStorage").Remotes.Wear
