@@ -902,7 +902,7 @@ TeleportTab:AddButton({
 ----------------------------------------------------------
 local MapTab = Window:MakeTab({
     Name = "Mapa",
-    Icon = "rbxassetid://12755989530"
+    Icon = "rbxassetid://11345509329"
 })
 
 ----------------------------------------------------------
@@ -1144,5 +1144,306 @@ MapTab:AddButton({
                 launchMeteor(CFrame.new(startPos),target,RandomGen:NextNumber(MIN_TRAVEL_DURATION,MAX_TRAVEL_DURATION))
             end
         end)
+    end
+})
+
+
+-- Criar Aba "Tela"
+local TelaTab = Window:MakeTab({
+    Name = "Tela",
+    Icon = "rbxassetid://6031075938" -- ícone genérico
+})
+
+-- Função auxiliar para executar scripts LocalScript de forma segura
+local function executarScript(scriptString)
+    local func, err = loadstring(scriptString)
+    if func then
+        func()
+    else
+        warn("Erro ao carregar o script: "..err)
+    end
+end
+
+----------------------------------------------------------
+-- BOTÕES
+----------------------------------------------------------
+
+-- 1️⃣ Realista
+TelaTab:AddButton({
+    Name = "Realista",
+    Callback = function()
+        executarScript([[
+local Lighting = game:GetService("Lighting")
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+-- Iluminação avançada
+Lighting.Technology = Enum.Technology.Future 
+Lighting.Brightness = 2.0
+Lighting.ExposureCompensation = -0.1
+Lighting.GlobalShadows = true
+Lighting.OutdoorAmbient = Color3.fromRGB(120, 120, 120)
+Lighting.Ambient = Color3.fromRGB(80, 80, 80)
+Lighting.GeographicLatitude = 40
+
+-- Pós-processamento
+local colorCorrection = Instance.new("ColorCorrectionEffect")
+colorCorrection.Contrast = 0.3
+colorCorrection.Saturation = 0.4
+colorCorrection.TintColor = Color3.fromRGB(255,255,255)
+colorCorrection.Parent = Lighting
+
+local bloom = Instance.new("BloomEffect")
+bloom.Intensity = 0.15
+bloom.Size = 25
+bloom.Threshold = 1.0
+bloom.Parent = Lighting
+
+Instance.new("SunRaysEffect", Lighting).Intensity = 0.2
+Instance.new("VignetteEffect", Lighting).Intensity = 0.1
+
+-- Reflexo no personagem
+localPlayer.CharacterAdded:Connect(function(character)
+    for _, part in ipairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Material = Enum.Material.SmoothPlastic
+            part.Reflectance = 0.2
+        end
+    end
+end)
+print("Configurações de Realismo aplicadas.")
+        ]])
+    end
+})
+
+-- 2️⃣ Cartoon
+TelaTab:AddButton({
+    Name = "Cartoon",
+    Callback = function()
+        executarScript([[
+local Lighting = game:GetService("Lighting")
+Lighting.GlobalShadows = false
+Lighting.Ambient = Color3.fromRGB(200,200,200)
+Lighting.OutdoorAmbient = Color3.fromRGB(150,150,150)
+Lighting.Brightness = 2
+Lighting.Technology = Enum.Technology.Voxel
+
+local colorCorrection = Lighting:FindFirstChild("CartoonColorEffect")
+if not colorCorrection then
+    colorCorrection = Instance.new("ColorCorrectionEffect")
+    colorCorrection.Name = "CartoonColorEffect"
+    colorCorrection.Parent = Lighting
+end
+colorCorrection.Saturation = 0.5
+colorCorrection.Contrast = 0.1
+
+local bloomEffect = Lighting:FindFirstChild("CartoonBloomEffect")
+if not bloomEffect then
+    bloomEffect = Instance.new("BloomEffect")
+    bloomEffect.Name = "CartoonBloomEffect"
+    bloomEffect.Parent = Lighting
+end
+bloomEffect.Intensity = 0.5
+bloomEffect.Size = 10
+bloomEffect.Threshold = 1.2
+
+print("Efeito Cartoon aplicado!")
+        ]])
+    end
+})
+
+-- 3️⃣ Estilo Anime
+TelaTab:AddButton({
+    Name = "Estilo Anime",
+    Callback = function()
+        executarScript([[
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+Lighting.Technology = Enum.Technology.Future
+Lighting.GlobalShadows = true
+Lighting.Ambient = Color3.fromRGB(220,220,220)
+Lighting.OutdoorAmbient = Color3.fromRGB(180,180,180)
+Lighting.Brightness = 3
+Lighting.TimeOfDay = "16:00:00"
+Lighting.GeographicLatitude = 40
+
+local function getOrCreateEffect(class,name)
+    local effect = Lighting:FindFirstChild(name)
+    if not effect then
+        effect = Instance.new(class)
+        effect.Name = name
+        effect.Parent = Lighting
+    end
+    return effect
+end
+
+local cc = getOrCreateEffect("ColorCorrectionEffect","AnimeHyperColor")
+cc.Saturation = 0.5
+cc.Contrast = 0.2
+cc.TintColor = Color3.fromRGB(240,240,255)
+
+local bloom = getOrCreateEffect("BloomEffect","AnimeMaxBloom")
+bloom.Intensity = 1.2
+bloom.Size = 24
+bloom.Threshold = 0.7
+
+local dof = getOrCreateEffect("DepthOfFieldEffect","AnimeMaxDof")
+dof.FarIntensity = 1.0
+dof.FocusDistance = 15
+dof.InFocusRadius = 3
+dof.Enabled = true
+
+local sun = getOrCreateEffect("SunRaysEffect","AnimeStrongSunRays")
+sun.Intensity = 0.25
+sun.Spread = 1.0
+
+print("Efeito Anime aplicado!")
+        ]])
+    end
+})
+
+-- 4️⃣ Melhorar FPS
+TelaTab:AddButton({
+    Name = "Melhorar FPS",
+    Callback = function()
+        executarScript([[
+local Lighting = game:GetService("Lighting")
+local Workspace = game:GetService("Workspace")
+
+Lighting.Technology = Enum.Technology.Compatibility
+Lighting.GlobalShadows = false
+Lighting.Brightness = 1
+Lighting.Ambient = Color3.fromRGB(128,128,128)
+Lighting.OutdoorAmbient = Color3.fromRGB(128,128,128)
+Lighting.FogEnd = 999999
+Lighting.ColorShift_Bottom = Color3.fromRGB(0,0,0)
+Lighting.ColorShift_Top = Color3.fromRGB(0,0,0)
+
+for _,effect in pairs({"BloomEffect","ColorCorrectionEffect","DepthOfFieldEffect","SunRaysEffect","BlurEffect","OutlineEffect"}) do
+    local e = Lighting:FindFirstChild(effect)
+    if e then e:Destroy() end
+end
+
+for _,obj in pairs(Workspace:GetDescendants()) do
+    if obj:IsA("ParticleEmitter") or obj:IsA("Fire") or obj:IsA("Smoke") or obj:IsA("Sparkles") then
+        obj.Enabled = false
+    elseif obj:IsA("MeshPart") then
+        obj.Reflectance = 0
+    elseif obj:IsA("Decal") then
+        obj.Transparency = 1
+    elseif obj:IsA("BasePart") then
+        obj.Material = Enum.Material.Plastic
+        obj.Reflectance = 0
+    end
+end
+
+Settings().Rendering.TextureQuality = Enum.TextureQuality.Low
+
+print("FPS otimizado!")
+        ]])
+    end
+})
+
+-- 5️⃣ Cinematográfico
+TelaTab:AddButton({
+    Name = "Cinematográfico",
+    Callback = function()
+        executarScript([[
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+local function getOrCreateEffect(class,name)
+    local effect = Lighting:FindFirstChild(name)
+    if not effect then
+        effect = Instance.new(class)
+        effect.Name = name
+        effect.Parent = Lighting
+    end
+    return effect
+end
+
+Lighting.Technology = Enum.Technology.Future
+Lighting.GlobalShadows = true
+Lighting.Ambient = Color3.fromRGB(50,50,50)
+Lighting.OutdoorAmbient = Color3.fromRGB(100,100,100)
+Lighting.Brightness = 1
+Lighting.TimeOfDay = "07:30:00"
+Lighting.GeographicLatitude = 10
+
+local dof = getOrCreateEffect("DepthOfFieldEffect","CinematicDof")
+dof.FarIntensity = 0.4
+dof.FocusDistance = 30
+dof.InFocusRadius = 10
+dof.Enabled = true
+
+local bloom = getOrCreateEffect("BloomEffect","CinematicBloom")
+bloom.Intensity = 0.5
+bloom.Size = 15
+bloom.Threshold = 1.0
+
+local cc = getOrCreateEffect("ColorCorrectionEffect","CinematicColorGrade")
+cc.Saturation = 0.05
+cc.Contrast = 0.35
+cc.TintColor = Color3.fromRGB(245,245,245)
+
+local sun = getOrCreateEffect("SunRaysEffect","CinematicSunRays")
+sun.Intensity = 0.12
+sun.Spread = 0.8
+
+Settings().Rendering.TextureQuality = Enum.TextureQuality.High
+Settings().Rendering.GraphicsMode = Enum.GraphicsMode.DirectX11
+
+print("Modo Cinematográfico ativado!")
+        ]])
+    end
+})
+
+-- 6️⃣ Terror
+TelaTab:AddButton({
+    Name = "Terror",
+    Callback = function()
+        executarScript([[
+local Lighting = game:GetService("Lighting")
+
+local function getOrCreateEffect(class,name)
+    local effect = Lighting:FindFirstChild(name)
+    if not effect then
+        effect = Instance.new(class)
+        effect.Name = name
+        effect.Parent = Lighting
+    end
+    return effect
+end
+
+Lighting.Technology = Enum.Technology.ShadowMap
+Lighting.GlobalShadows = true
+Lighting.Ambient = Color3.fromRGB(120,130,120)
+Lighting.OutdoorAmbient = Color3.fromRGB(150,160,150)
+Lighting.Brightness = 1.0
+Lighting.TimeOfDay = "18:00:00"
+
+local cc = getOrCreateEffect("ColorCorrectionEffect","TerrorVisualColor")
+cc.Saturation = -0.5
+cc.Contrast = 0.4
+cc.TintColor = Color3.fromRGB(150,150,180)
+
+Lighting.FogStart = 20
+Lighting.FogEnd = 80
+Lighting.FogColor = Color3.fromRGB(100,100,100)
+
+local bloom = getOrCreateEffect("BloomEffect","TerrorVisualBloom")
+bloom.Intensity = 0.3
+bloom.Size = 10
+bloom.Threshold = 1.0
+
+local blur = getOrCreateEffect("BlurEffect","TerrorVisualBlur")
+blur.Size = 2.0
+
+print("Modo Terror ativado!")
+        ]])
     end
 })
