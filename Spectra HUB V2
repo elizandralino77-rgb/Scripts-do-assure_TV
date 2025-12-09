@@ -339,6 +339,76 @@ TrollTab:AddToggle({
     end
 })
 
+----------------------------------------------------------
+-- AJUSTES DO MOVIMENTO (MAIS FRENTE + MAIS RÁPIDO)
+----------------------------------------------------------
+local FRONT_OFFSET = 0.35      -- um pouquinho mais pra frente
+local BACK_OFFSET = -3.5
+local SPEED = 0.75             -- um pouco mais rápido
+
+----------------------------------------------------------
+-- LOOP SUAVE DE GRUDE + OSCILAÇÃO
+----------------------------------------------------------
+task.spawn(function()
+    while task.wait() do
+        if followOscillation and selectedPlayer then
+
+            local target = Players:FindFirstChild(selectedPlayer)
+            if not target then continue end
+
+            local targetChar = target.Character
+            local targetHRP = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
+            if not targetHRP then continue end
+
+            local myChar = plr.Character
+            local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+            if not myHRP then continue end
+
+            ------------------------------------------------------
+            -- MOVER UM POUQUINHO MAIS PRA FRENTE (0.35 studs)
+            ------------------------------------------------------
+            local frontPos = targetHRP.CFrame * CFrame.new(0, 0, -FRONT_OFFSET)
+            myHRP.CFrame = myHRP.CFrame:Lerp(frontPos, SPEED)
+            task.wait(0.35)
+            if not followOscillation then continue end
+
+            ------------------------------------------------------
+            -- MOVER PARA TRÁS
+            ------------------------------------------------------
+            local backPos = targetHRP.CFrame * CFrame.new(0, 0, -BACK_OFFSET)
+            myHRP.CFrame = myHRP.CFrame:Lerp(backPos, SPEED)
+            task.wait(0.35)
+        end
+    end
+end)
+
+
+----------------------------------------------------------
+-- TOGGLE DE ATIVAR O MODO "GRUDAR NO PLAYER"
+----------------------------------------------------------
+TrollTab:AddToggle({
+    Name = "Seguir Frente/Trás no Player (ON/OFF)",
+    Default = false,
+    Callback = function(state)
+        followOscillation = state
+
+        if state then
+            local target = Players:FindFirstChild(selectedPlayer)
+            if target and target.Character then
+                local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                local thrp = target.Character:FindFirstChild("HumanoidRootPart")
+
+                if hrp and thrp then
+                    ----------------------------------------------------------
+                    -- TELEPORTA APENAS UMA VEZ (GRUDAR INICIAL)
+                    ----------------------------------------------------------
+                    hrp.CFrame = thrp.CFrame * CFrame.new(0, 0, -3.5)
+                end
+            end
+        end
+    end
+})
+
 -- ====================== ABA SKINS =====================
 
 local SkinsTab = Window:MakeTab({
