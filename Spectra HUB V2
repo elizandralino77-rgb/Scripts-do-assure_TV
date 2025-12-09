@@ -453,30 +453,7 @@ addSkinButton("pé gigante 2", 94880807456770)
 addSkinButton("unhas grandes ", 135726095366567)
 addSkinButton("mão grandes ", 12725518393)
 
-SkinsTab:AddButton({
- Name = "666",
-    Callback = function()
 
-        local Wear = game:GetService("ReplicatedStorage").Remotes.Wear
-
-        Wear:InvokeServer(89739702589003)
-        Wear:InvokeServer(18262052743)
-        Wear:InvokeServer(4716946122)
-        Wear:InvokeServer(72464041244217)
-        Wear:InvokeServer(79825138414359)
-        Wear:InvokeServer(136373242716774)
-        Wear:InvokeServer(123618360141697)
-        Wear:InvokeServer(14289986202)
-        Wear:InvokeServer(118574218129658)
-        Wear:InvokeServer(4754787124)
-        Wear:InvokeServer(892268340)
-        Wear:InvokeServer(892267099)
-        Wear:InvokeServer(892265784)
-        Wear:InvokeServer(892267917)
-        Wear:InvokeServer(892267521)
-
-    end
-})
 
 SkinsTab:AddButton({
     Name = "Black Doctor",
