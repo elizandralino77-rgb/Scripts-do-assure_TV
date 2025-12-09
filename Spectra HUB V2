@@ -409,6 +409,16 @@ TrollTab:AddToggle({
     end
 })
 
+--========================================================--
+-- BOTÃO SKYBOX
+--========================================================--
+TrollTab:AddButton({
+    Name = "Skybox",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Fe-Brookhaven-skybox-script-73292"))()
+    end
+})
+
 -- ====================== ABA SKINS =====================
 
 local SkinsTab = Window:MakeTab({
