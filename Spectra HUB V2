@@ -895,3 +895,254 @@ TeleportTab:AddButton({
         end
     end
 })
+
+
+----------------------------------------------------------
+-- ABA MAPA
+----------------------------------------------------------
+local MapTab = Window:MakeTab({
+    Name = "Mapa",
+    Icon = "rbxassetid://12755989530"
+})
+
+----------------------------------------------------------
+-- FUNÇÃO AUXILIAR: Spawnar modelo com imagem e som
+----------------------------------------------------------
+local function spawnModelWithEffect(modelId, imageId, audioId, offsetVector, teleportToModel, effectTime)
+    effectTime = effectTime or 1
+
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    local playerGui = plr:WaitForChild("PlayerGui")
+    local Workspace = game:GetService("Workspace")
+
+    -- posição de spawn
+    local spawnPos = hrp.Position + hrp.CFrame.LookVector * 5
+    if offsetVector then spawnPos = spawnPos + offsetVector end
+
+    -- carregar modelo
+    local model = game:GetObjects("rbxassetid://" .. modelId)[1]
+    if not model then
+        warn("Não foi possível carregar o modelo: " .. modelId)
+        return
+    end
+    model.Parent = Workspace
+
+    -- mover modelo para spawnPos
+    local primary = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+    if primary then
+        local offset = spawnPos - primary.Position
+        for _, part in ipairs(model:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CFrame = part.CFrame + offset
+            end
+        end
+
+        if teleportToModel then
+            hrp.CFrame = primary.CFrame + Vector3.new(0, 5, 0)
+        end
+    end
+
+    -- criar GUI com imagem
+    if imageId then
+        local gui = Instance.new("ScreenGui")
+        gui.Name = "SpawnEffectGui"
+        gui.ResetOnSpawn = false
+        gui.Parent = playerGui
+
+        local img = Instance.new("ImageLabel")
+        img.Parent = gui
+        img.BackgroundTransparency = 1
+        img.Image = "rbxassetid://" .. imageId
+        img.AnchorPoint = Vector2.new(0.5, 0.5)
+        img.Position = UDim2.new(0.5, 0, 0.5, 0)
+        img.Size = UDim2.new(0, 900, 0, 900)
+
+        task.spawn(function()
+            local startTime = tick()
+            while tick() - startTime < effectTime do
+                local t = (tick() - startTime) / effectTime
+                img.Size = UDim2.new(0, 900 * (1 - t), 0, 900 * (1 - t))
+                task.wait()
+            end
+            gui:Destroy()
+        end)
+    end
+
+    -- tocar som
+    if audioId then
+        local sound = Instance.new("Sound")
+        sound.Parent = hrp
+        sound.SoundId = "rbxassetid://" .. audioId
+        sound.Volume = 10
+        sound:Play()
+    end
+end
+
+----------------------------------------------------------
+-- BOTÕES COM MODELOS, IMAGEM E SOM
+----------------------------------------------------------
+-- Gojo
+MapTab:AddButton({
+    Name = "Gojo",
+    Callback = function()
+        spawnModelWithEffect(1573855941, 5951710415, 6667923288, Vector3.new(0,3000,0), true, 0.8)
+    end
+})
+
+-- Kamui
+MapTab:AddButton({
+    Name = "Kamui",
+    Callback = function()
+        spawnModelWithEffect(14386841380, 99283216497149, 116124941252598, Vector3.new(0,3000,0), true, 1)
+    end
+})
+
+-- Labirinto
+MapTab:AddButton({
+    Name = "Labirinto",
+    Callback = function()
+        spawnModelWithEffect(18349406804, nil, nil, Vector3.new(0,3000,0), true)
+    end
+})
+
+-- Parkour
+MapTab:AddButton({
+    Name = "Parkour",
+    Callback = function()
+        spawnModelWithEffect(128296739409495, nil, nil, nil, false)
+    end
+})
+
+-- Chroma Key
+MapTab:AddButton({
+    Name = "Chroma Key",
+    Callback = function()
+        spawnModelWithEffect(1099645962, nil, nil, nil, false)
+    end
+})
+
+----------------------------------------------------------
+-- BOTÕES DE METEOROS
+----------------------------------------------------------
+-- Bola de Fogo
+MapTab:AddButton({
+    Name = "Bola ",
+    Callback = function()
+        spawn(function()
+            local Players = game:GetService("Players")
+            local Workspace = game:GetService("Workspace")
+            local TweenService = game:GetService("TweenService")
+            local Debris = game:GetService("Debris")
+
+            local LocalPlayer = Players.LocalPlayer
+            local PlayerChar = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+            local METEOR_SIZE = Vector3.new(25,25,25)
+            local METEOR_COLOR = Color3.fromRGB(150,150,150)
+            local TRAVEL_DURATION = 60
+            local START_DISTANCE = 500
+            local EXPLOSION_RADIUS = 100
+            local EXPLOSION_DURATION = 10
+            local MeteorPart
+
+            local function createMeteor(startCFrame)
+                local part = Instance.new("Part")
+                part.Size = METEOR_SIZE
+                part.Color = METEOR_COLOR
+                part.Material = Enum.Material.Basalt
+                part.Shape = Enum.PartType.Ball
+                part.Anchored = true
+                part.CanCollide = false
+                part.CFrame = startCFrame
+                part.Parent = Workspace
+                return part
+            end
+
+            local function createExplosionEffect(position)
+                local flashPart = Instance.new("Part")
+                flashPart.Size = Vector3.new(EXPLOSION_RADIUS*2,EXPLOSION_RADIUS*2,EXPLOSION_RADIUS*2)
+                flashPart.CFrame = CFrame.new(position)
+                flashPart.Anchored = true
+                flashPart.CanCollide = false
+                flashPart.Transparency = 1
+                flashPart.Parent = Workspace
+                Debris:AddItem(flashPart, EXPLOSION_DURATION)
+            end
+
+            local function startMeteorEvent()
+                local rootPart = PlayerChar:WaitForChild("HumanoidRootPart")
+                local targetPosition = rootPart.Position
+                local startCFrame = CFrame.new(targetPosition + Vector3.new(0, START_DISTANCE,0))
+                MeteorPart = createMeteor(startCFrame)
+                local tween = TweenService:Create(MeteorPart,TweenInfo.new(TRAVEL_DURATION,Enum.EasingStyle.Linear),{CFrame=CFrame.new(targetPosition)})
+                tween:Play()
+                tween.Completed:Once(function()
+                    createExplosionEffect(targetPosition)
+                    MeteorPart:Destroy()
+                    MeteorPart=nil
+                end)
+            end
+
+            startMeteorEvent()
+        end)
+    end
+})
+
+-- Bolas  KKK
+MapTab:AddButton({
+    Name = "Bolas KKK",
+    Callback = function()
+        spawn(function()
+            local Players = game:GetService("Players")
+            local Workspace = game:GetService("Workspace")
+            local TweenService = game:GetService("TweenService")
+            local RandomGen = Random.new()
+            local PlayerChar = plr.Character or plr.CharacterAdded:Wait()
+
+            local NUMBER_OF_METEORS = 80
+            local DISPERSION_RADIUS = 300
+            local METEOR_SIZE = Vector3.new(25,25,25)
+            local METEOR_COLOR = Color3.fromRGB(80,80,80)
+            local MIN_START_HEIGHT = 400
+            local MAX_START_HEIGHT = 800
+            local START_HORIZONTAL_SPREAD = 150
+            local MIN_TRAVEL_DURATION = 40
+            local MAX_TRAVEL_DURATION = 80
+
+            local function createMeteor(startCFrame)
+                local part = Instance.new("Part")
+                part.Size = METEOR_SIZE
+                part.Color = METEOR_COLOR
+                part.Shape = Enum.PartType.Ball
+                part.Anchored = true
+                part.CanCollide = false
+                part.CFrame = startCFrame
+                part.Parent = Workspace
+                return part
+            end
+
+            local function launchMeteor(startCFrame,targetPos,duration)
+                local meteor = createMeteor(startCFrame)
+                local tween = TweenService:Create(meteor,TweenInfo.new(duration,Enum.EasingStyle.Linear),{CFrame=CFrame.new(targetPos)})
+                tween:Play()
+                tween.Completed:Once(function()
+                    meteor:Destroy()
+                end)
+            end
+
+            local rootPart = PlayerChar:WaitForChild("HumanoidRootPart")
+            local center = rootPart.Position
+            for i=1,NUMBER_OF_METEORS do
+                local angle = RandomGen:NextNumber()*2*math.pi
+                local dist = RandomGen:NextNumber()*DISPERSION_RADIUS
+                local target = center + Vector3.new(math.cos(angle)*dist,0,math.sin(angle)*dist)
+                local height = RandomGen:NextNumber(MIN_START_HEIGHT,MAX_START_HEIGHT)
+                local offsetX = RandomGen:NextNumber(-START_HORIZONTAL_SPREAD,START_HORIZONTAL_SPREAD)
+                local offsetZ = RandomGen:NextNumber(-START_HORIZONTAL_SPREAD,START_HORIZONTAL_SPREAD)
+                local startPos = target + Vector3.new(offsetX,height,offsetZ)
+                launchMeteor(CFrame.new(startPos),target,RandomGen:NextNumber(MIN_TRAVEL_DURATION,MAX_TRAVEL_DURATION))
+            end
+        end)
+    end
+})
