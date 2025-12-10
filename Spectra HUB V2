@@ -809,52 +809,6 @@ SpawnTab:AddDropdown({
     end
 })
 
--- Botão Spawn Item
-SpawnTab:AddButton({
-    Name = "Spawn Item",
-    Callback = function()
-        if selectedItem and items[selectedItem] then
-            local args = {
-                [1] = "PickingTools",
-                [2] = items[selectedItem]
-            }
-            local remote = game:GetService("ReplicatedStorage").RE:FindFirstChild("1Too1l")
-            if remote then
-                remote:InvokeServer(unpack(args))
-            end
-        end
-    end
-})
-
--- Função para pegar o nome do jogador atual
-local function getPlayerName()
-    return game.Players.LocalPlayer.Name
-end
-
--- Função para criar botão que dispara evento
-local function createToolButton(name)
-    PlayerTab:AddButton({
-        Name = name,
-        Callback = function()
-            local args = {
-                [1] = "AcceptedToolToServer",
-                [2] = name,
-                [3] = game.Players:WaitForChild(getPlayerName())
-            }
-            game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t"):FireServer(unpack(args))
-        end
-    })
-end
-
--- Adicionar todos os botões
-createToolButton("EggLauncher")
-createToolButton("Cannon")
-createToolButton("Glider")
-createToolButton("UraniumRod")
-createToolButton("Water Balloon")
-createToolButton("Chainsaw") -- Novo botão adicionado
-
-
 -- =========================
 -- Aba Teleporte
 -- =========================
@@ -1964,3 +1918,44 @@ abaESPS:AddSlider({
 })
 
 print("Spectra ESP Finalizado: Nome + Dias + Box 3D (Highlight), Rainbow, cores, visível atrás de paredes, R6/R15.")
+
+
+
+
+
+
+----------------------------------------------------------
+-- ABA limitados
+----------------------------------------------------------
+local PlayerTab = Window:MakeTab({
+    Name = "Limited",
+    Icon = "rbxassetid://113114601887005"
+})
+
+-- Função para pegar o nome do jogador atual
+local function getPlayerName()
+    return game.Players.LocalPlayer.Name
+end
+
+-- Função para criar botão que dispara evento
+local function createToolButton(name)
+    PlayerTab:AddButton({
+        Name = name,
+        Callback = function()
+            local args = {
+                [1] = "AcceptedToolToServer",
+                [2] = name,
+                [3] = game.Players:WaitForChild(getPlayerName())
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t"):FireServer(unpack(args))
+        end
+    })
+end
+
+-- Adicionar todos os botões
+createToolButton("EggLauncher")
+createToolButton("Cannon")
+createToolButton("Glider")
+createToolButton("UraniumRod")
+createToolButton("Water Balloon")
+createToolButton("Chainsaw") -- Novo botão adicionado
