@@ -826,6 +826,34 @@ SpawnTab:AddButton({
     end
 })
 
+-- Função para pegar o nome do jogador atual
+local function getPlayerName()
+    return game.Players.LocalPlayer.Name
+end
+
+-- Função para criar botão que dispara evento
+local function createToolButton(name)
+    PlayerTab:AddButton({
+        Name = name,
+        Callback = function()
+            local args = {
+                [1] = "AcceptedToolToServer",
+                [2] = name,
+                [3] = game.Players:WaitForChild(getPlayerName())
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t"):FireServer(unpack(args))
+        end
+    })
+end
+
+-- Adicionar todos os botões
+createToolButton("EggLauncher")
+createToolButton("Cannon")
+createToolButton("Glider")
+createToolButton("UraniumRod")
+createToolButton("Water Balloon")
+createToolButton("Chainsaw") -- Novo botão adicionado
+
 
 -- =========================
 -- Aba Teleporte
