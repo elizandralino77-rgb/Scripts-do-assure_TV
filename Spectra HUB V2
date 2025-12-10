@@ -1662,3 +1662,277 @@ AddBodyButton("Sem blusa", {
     }
 })
 
+
+
+----------------------------------------------------
+-- Aba ESPS
+----------------------------------------------------
+local abaESPS = Window:MakeTab({
+    Name = "ESPS",
+    Icon = "rbxassetid://6523858394"
+})
+
+----------------------------------------------------
+-- Serviços e variáveis
+----------------------------------------------------
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+
+-- Estado global
+local NAME_ESP_ENABLED = false
+local BOX_ESP_ENABLED = false
+local RAINBOW_MODE = false
+local SELECTED_COLOR = Color3.fromRGB(255,255,255)
+local FONT_SIZE = 18
+
+-- Tables para ESPs
+local NameESPs = {} -- player -> {BillboardGui, Label}
+local BoxESPs = {}  -- player -> Highlight
+
+----------------------------------------------------
+-- Lista de cores
+----------------------------------------------------
+local cores = {
+    ["Rainbow"] = "rainbow",
+    ["Vermelho"] = Color3.fromRGB(255,0,0),
+    ["Azul"] = Color3.fromRGB(0,0,255),
+    ["Verde"] = Color3.fromRGB(0,255,0),
+    ["Roxo"] = Color3.fromRGB(170,0,255),
+    ["Amarelo"] = Color3.fromRGB(255,255,0),
+    ["Branco"] = Color3.fromRGB(255,255,255),
+    ["Preto"] = Color3.fromRGB(0,0,0),
+    ["Ciano"] = Color3.fromRGB(0,255,255),
+    ["Laranja"] = Color3.fromRGB(255,140,0),
+    ["Rosa"] = Color3.fromRGB(255,105,180),
+    ["Marrom"] = Color3.fromRGB(150,75,0),
+    ["Cinza"] = Color3.fromRGB(128,128,128),
+    ["Dourado"] = Color3.fromRGB(212,175,55),
+    ["Verde Escuro"] = Color3.fromRGB(0,100,0),
+    ["Azul Claro"] = Color3.fromRGB(135,206,235),
+    ["Magenta"] = Color3.fromRGB(255,0,255)
+}
+local colorSelectedName = "Branco"
+
+----------------------------------------------------
+-- Funções utilitárias
+----------------------------------------------------
+local function GetAccountAgeDays(player)
+    return tostring(player.AccountAge or 0)
+end
+
+local function CreateNameESP(player)
+    if not player.Character or NameESPs[player] then return end
+    local head = player.Character:FindFirstChild("Head")
+    if not head then return end
+
+    local bill = Instance.new("BillboardGui")
+    bill.Name = "Spectra_NameESP"
+    bill.Adornee = head
+    bill.Size = UDim2.new(0,200,0,50)
+    bill.StudsOffset = Vector3.new(0,2.5,0)
+    bill.AlwaysOnTop = true
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1,0,1,0)
+    label.BackgroundTransparency = 1
+    label.TextScaled = false
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = FONT_SIZE
+    label.TextStrokeTransparency = 0.2
+    label.Text = player.Name.." | "..GetAccountAgeDays(player).." dias"
+    if not RAINBOW_MODE then label.TextColor3 = SELECTED_COLOR end
+    label.Parent = bill
+
+    bill.Parent = head
+    NameESPs[player] = {Bill=bill, Label=label}
+
+    player.CharacterAdded:Connect(function()
+        task.wait(0.8)
+        if NAME_ESP_ENABLED then
+            if NameESPs[player] and NameESPs[player].Bill then NameESPs[player].Bill:Destroy() end
+            NameESPs[player] = nil
+            CreateNameESP(player)
+        end
+    end)
+end
+
+local function RemoveNameESP(player)
+    if NameESPs[player] then
+        pcall(function() NameESPs[player].Bill:Destroy() end)
+        NameESPs[player] = nil
+    end
+end
+
+----------------------------------------------------
+-- ESP Box 3D com Highlight
+----------------------------------------------------
+local function CreateBoxESP(player)
+    if not player.Character or BoxESPs[player] then return end
+    local model = player.Character
+    local highlight = Instance.new("Highlight")
+    highlight.Adornee = model
+    highlight.FillTransparency = 1 -- invisível dentro
+    highlight.OutlineTransparency = 0
+    highlight.OutlineColor = SELECTED_COLOR
+    highlight.Parent = Workspace
+    BoxESPs[player] = highlight
+
+    player.CharacterAdded:Connect(function()
+        task.wait(0.8)
+        if BOX_ESP_ENABLED then
+            RemoveBoxESP(player)
+            CreateBoxESP(player)
+        end
+    end)
+end
+
+local function RemoveBoxESP(player)
+    if BoxESPs[player] then
+        pcall(function() BoxESPs[player]:Destroy() end)
+        BoxESPs[player] = nil
+    end
+end
+
+----------------------------------------------------
+-- Ativar / Desativar ESPs
+----------------------------------------------------
+local function EnableNameESPs()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then CreateNameESP(plr) end
+    end
+end
+
+local function DisableNameESPs()
+    for plr,_ in pairs(NameESPs) do RemoveNameESP(plr) end
+end
+
+local function EnableBoxESPs()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then CreateBoxESP(plr) end
+    end
+end
+
+local function DisableBoxESPs()
+    for plr,_ in pairs(BoxESPs) do RemoveBoxESP(plr) end
+end
+
+----------------------------------------------------
+-- Atualização por frame (Rainbow e cores)
+----------------------------------------------------
+RunService.RenderStepped:Connect(function()
+    local hue = (tick()%5)/5
+    for plr,data in pairs(NameESPs) do
+        if data and data.Label then
+            data.Label.Text = plr.Name.." | "..GetAccountAgeDays(plr).." dias"
+            data.Label.TextSize = FONT_SIZE
+            if RAINBOW_MODE then
+                data.Label.TextColor3 = Color3.fromHSV(hue,1,1)
+            else
+                data.Label.TextColor3 = SELECTED_COLOR
+            end
+        end
+    end
+    for plr,highlight in pairs(BoxESPs) do
+        if highlight then
+            if RAINBOW_MODE then
+                highlight.OutlineColor = Color3.fromHSV(hue,1,1)
+            else
+                highlight.OutlineColor = SELECTED_COLOR
+            end
+        end
+    end
+end)
+
+----------------------------------------------------
+-- Players joining/leaving
+----------------------------------------------------
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        task.wait(0.8)
+        if NAME_ESP_ENABLED then CreateNameESP(player) end
+        if BOX_ESP_ENABLED then CreateBoxESP(player) end
+    end)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    RemoveNameESP(player)
+    RemoveBoxESP(player)
+end)
+
+for _,plr in pairs(Players:GetPlayers()) do
+    if plr ~= LocalPlayer then
+        plr.CharacterAdded:Connect(function()
+            task.wait(0.8)
+            if NAME_ESP_ENABLED then CreateNameESP(plr) end
+            if BOX_ESP_ENABLED then CreateBoxESP(plr) end
+        end)
+    end
+end
+
+----------------------------------------------------
+-- GUI Controls
+----------------------------------------------------
+-- Nome ESP Toggle
+abaESPS:AddToggle({
+    Name = "ESP Nome ON/OFF",
+    Default = false,
+    Callback = function(state)
+        NAME_ESP_ENABLED = state
+        if state then EnableNameESPs() else DisableNameESPs() end
+    end
+})
+
+-- Box ESP Toggle
+abaESPS:AddToggle({
+    Name = "ESP Box ON/OFF",
+    Default = false,
+    Callback = function(state)
+        BOX_ESP_ENABLED = state
+        if state then EnableBoxESPs() else DisableBoxESPs() end
+    end
+})
+
+-- Color Dropdown
+local options = {}
+for k,_ in pairs(cores) do table.insert(options,k) end
+table.sort(options)
+
+abaESPS:AddDropdown({
+    Name = "Escolher Cor",
+    Default = "Branco",
+    Options = options,
+    Callback = function(selected)
+        colorSelectedName = selected
+        -- Atualiza cor imediatamente
+        if colorSelectedName == "Rainbow" then
+            RAINBOW_MODE = true
+        else
+            RAINBOW_MODE = false
+            SELECTED_COLOR = cores[colorSelectedName] or Color3.fromRGB(255,255,255)
+            for _,data in pairs(NameESPs) do
+                if data and data.Label then data.Label.TextColor3 = SELECTED_COLOR end
+            end
+            for _,highlight in pairs(BoxESPs) do
+                if highlight then highlight.OutlineColor = SELECTED_COLOR end
+            end
+        end
+    end
+})
+
+-- Slider tamanho
+abaESPS:AddSlider({
+    Name = "Tamanho do Nome + Dias",
+    Min = 10,
+    Max = 40,
+    Default = FONT_SIZE,
+    Callback = function(size)
+        FONT_SIZE = size
+        for _,data in pairs(NameESPs) do
+            if data and data.Label then data.Label.TextSize = FONT_SIZE end
+        end
+    end
+})
+
+print("Spectra ESP Finalizado: Nome + Dias + Box 3D (Highlight), Rainbow, cores, visível atrás de paredes, R6/R15.")
