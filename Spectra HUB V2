@@ -1982,3 +1982,158 @@ createToolButton("Water Balloon")
 createToolButton("Chainsaw") -- Novo botão adicionado
 
 
+
+
+----------------------------------------------------------
+-- ABA PLAYER
+----------------------------------------------------------
+
+local PlayerTab = Window:MakeTab({
+    Name = "Player",
+    Icon = "rbxassetid://123973218785851"
+})
+
+----------------------------------------------------------
+-- LISTA DE MÚSICAS FUNK
+----------------------------------------------------------
+
+local MusicList = {
+    ["Música 1"] = "131847084942844",
+    ["Música 2"] = "139693447546059",
+    ["Música 3"] = "72182615662988",
+    ["Música 4"] = "79120642849019",
+    ["Música 5"] = "119020235792430",
+    ["Música 6"] = "104417510874127",
+    ["Música 7"] = "95046091312570",
+    ["Música 8"] = "93146696739126",
+    ["Música 9"] = "76312991186384",
+    ["Música 10"] = "83064304128519",
+    ["Música 11"] = "139745829218874",
+    ["Música 12"] = "81700399219236",
+    ["Música 13"] = "92492039534399",
+    ["Música 14"] = "138830667342178",
+    ["Música 16"] = "75800874324383",
+    ["Música 17"] = "85342086082111",
+    ["Música 18"] = "113300606282180",
+    ["Música 19"] = "124085422276732",
+    ["Música 20"] = "97011217688307",
+    ["Música 21"] = "139147474886402",
+    ["Música 22"] = "79349174602261",
+    ["Música 23"] = "93928823862203",
+    ["Música 24"] = "121187736532042",
+    ["Música 25"] = "129546408528391",
+    ["Música 26"] = "112143944982807",
+    ["Música 27"] = "131891110268352",
+    ["Música 29"] = "104481380959795",
+    ["Música 30"] = "110860247960302",
+
+    -- NOVAS FUNK
+    ["Música 31"] = "93590122047380",
+    ["Música 32"] = "106958630419629",
+    ["Música 33"] = "111318048787674",
+    ["Música 34"] = "132082397247824",
+    ["Música 35"] = "104621031886653",
+    ["Música 36"] = "99695831392938",
+    ["Música 37"] = "122039107528238",
+    ["Música 38"] = "104828343009296",
+    ["Música 39"] = "85182585406642",
+}
+
+local MusicNames = {}
+for name,_ in pairs(MusicList) do table.insert(MusicNames, name) end
+local SelectedMusicID = MusicList["Música 1"]
+
+----------------------------------------------------------
+-- DROPDOWN FUNK
+----------------------------------------------------------
+
+PlayerTab:AddDropdown({
+    Name = "Músicas de Funk",
+    Default = "Música 1",
+    Options = MusicNames,
+    Callback = function(option)
+        SelectedMusicID = MusicList[option]
+    end
+})
+
+----------------------------------------------------------
+-- BOTÃO PLAY FUNK
+----------------------------------------------------------
+
+PlayerTab:AddButton({
+    Name = "Play Music (Funk)",
+    Callback = function()
+
+        game.ReplicatedStorage.RE.PlayerToolEvent:FireServer("ToolMusicText", SelectedMusicID)
+        game.ReplicatedStorage.RE:FindFirstChild("1Player1sHous1e"):FireServer("PickHouseMusicText", SelectedMusicID)
+        game.ReplicatedStorage.RE:FindFirstChild("1Player1sCa1r"):FireServer("VehicleMusicPlay", SelectedMusicID)
+        game.ReplicatedStorage.RE:FindFirstChild("1NoMoto1rVehicle1s"):FireServer("PickingScooterMusicText", SelectedMusicID)
+
+    end
+})
+
+----------------------------------------------------------
+-- LISTA DE MÚSICAS PHONK
+----------------------------------------------------------
+
+local PhonkList = {
+    ["Phonk 1"] = "117971716538048",
+    ["Phonk 2"] = "111151077918268",
+    ["Phonk 3"] = "100828493764353",
+    ["Phonk 4"] = "72208831321523",
+    ["Phonk 5"] = "121842269070019",
+    ["Phonk 6"] = "112821767085847",
+    ["Phonk 7"] = "87022583947683",
+    ["Phonk 8"] = "106185171358009",
+    ["Phonk 9"] = "88339486019486",
+    ["Phonk 10"] = "129057182599544",
+    ["Phonk 11"] = "82411642961457",
+    ["Phonk 12"] = "98337901681441",
+    ["Phonk 13"] = "110647877930724",
+    ["Phonk 14"] = "113072044238343",
+    ["Phonk 15"] = "140160495884365",
+    ["Phonk 16"] = "107260053679799",
+    ["Phonk 17"] = "120504339752285",
+    ["Phonk 18"] = "70626485375251",
+    ["Phonk 19"] = "74424698514019",
+    ["Phonk 20"] = "113768944849093",
+    ["Phonk 21"] = "81665575945119",
+    ["Phonk 22"] = "103409297553965",
+    ["Phonk 23"] = "117562011395992",
+    ["Phonk 24"] = "107424491541808",
+    ["Phonk 25"] = "79381341943021",
+    ["Phonk 26"] = "111668097052966",
+}
+
+local PhonkNames = {}
+for name,_ in pairs(PhonkList) do table.insert(PhonkNames, name) end
+local SelectedPhonkID = PhonkList["Phonk 1"]
+
+----------------------------------------------------------
+-- DROPDOWN PHONK
+----------------------------------------------------------
+
+PlayerTab:AddDropdown({
+    Name = "Músicas Phonk",
+    Default = "Phonk 1",
+    Options = PhonkNames,
+    Callback = function(option)
+        SelectedPhonkID = PhonkList[option]
+    end
+})
+
+----------------------------------------------------------
+-- BOTÃO PLAY PHONK
+----------------------------------------------------------
+
+PlayerTab:AddButton({
+    Name = "Play Music (Phonk)",
+    Callback = function()
+
+        game.ReplicatedStorage.RE.PlayerToolEvent:FireServer("ToolMusicText", SelectedPhonkID)
+        game.ReplicatedStorage.RE:FindFirstChild("1Player1sHous1e"):FireServer("PickHouseMusicText", SelectedPhonkID)
+        game.ReplicatedStorage.RE:FindFirstChild("1Player1sCa1r"):FireServer("VehicleMusicPlay", SelectedPhonkID)
+        game.ReplicatedStorage.RE:FindFirstChild("1NoMoto1rVehicle1s"):FireServer("PickingScooterMusicText", SelectedPhonkID)
+
+    end
+})
