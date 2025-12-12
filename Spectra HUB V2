@@ -339,6 +339,27 @@ TrollTab:AddToggle({
     end
 })
 
+--====================================================
+-- TELEPORTAR PARA O JOGADOR SELECIONADO
+--====================================================
+TrollTab:AddButton({
+    Name = "Teleportar para o Jogador",
+    Callback = function()
+        if not selectedPlayer then return end
+
+        local target = Players:FindFirstChild(selectedPlayer)
+        if target and target.Character then
+            local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
+            local char = plr.Character
+            local hum = char and char:FindFirstChild("HumanoidRootPart")
+
+            if targetHRP and hum then
+                hum.CFrame = targetHRP.CFrame
+            end
+        end
+    end
+})
+
 ----------------------------------------------------------
 -- AJUSTES DO MOVIMENTO (MAIS FRENTE + MAIS RÁPIDO)
 ----------------------------------------------------------
