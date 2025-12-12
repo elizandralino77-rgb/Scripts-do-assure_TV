@@ -1982,9 +1982,11 @@ createToolButton("Water Balloon")
 createToolButton("Chainsaw") -- Novo botão adicionado
 
 
-
+----------------------------------------------------------
+-- Botão: Itens ALL (dá todos pra VOCÊ)
+----------------------------------------------------------
 PlayerTab:AddButton({
-    Name = "pegar todos os Itens ",
+    Name = "Itens ALL",
     Callback = function()
 
         local itens = {
