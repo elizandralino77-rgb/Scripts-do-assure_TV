@@ -1983,7 +1983,36 @@ createToolButton("Chainsaw") -- Novo botão adicionado
 
 
 
+PlayerTab:AddButton({
+    Name = "pegar todos os Itens ",
+    Callback = function()
 
+        local itens = {
+            "EggLauncher",
+            "Cannon",
+            "Glider",
+            "UraniumRod",
+            "Water Balloon",
+            "Chainsaw"
+        }
+
+        for _, nome in ipairs(itens) do
+
+            local args = {
+                [1] = "AcceptedToolToServer",
+                [2] = nome,
+                [3] = getPlayer()
+            }
+
+            game:GetService("ReplicatedStorage")
+            :WaitForChild("RE")
+            :WaitForChild("1Playe1rTrigge1rEven1t")
+            :FireServer(unpack(args))
+
+            task.wait(0.1)
+        end
+    end
+})
 
 
 ----------------------------------------------------------
