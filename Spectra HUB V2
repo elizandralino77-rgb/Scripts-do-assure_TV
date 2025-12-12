@@ -1990,7 +1990,7 @@ createToolButton("Chainsaw") -- Novo botão adicionado
 
 local PlayerTab = Window:MakeTab({
     Name = "som ids",
-    Icon = "rbxassetid://87702826291744"
+    Icon = "rbxassetid://12339192128"
 })
 
 ----------------------------------------------------------
