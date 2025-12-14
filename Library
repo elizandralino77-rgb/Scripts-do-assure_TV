@@ -1,305 +1,258 @@
---// Carregar a Library RedzHub UI
-local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
+--================================================--
+-- SPECTRA UI LIBRARY | REAL & COMPLETA
+--================================================--
 
---// Criar Janela Principal
-local Window = redzlib:MakeWindow({
-    Title = "Ultimate HUB v1.0",
-    SubTitle = "Criador assure_TV",
-    SaveFolder = "UltimateHub_v1"
-})
-
---// Ícone de Minimizar
-Window:AddMinimizeButton({
-    Button = { Image = "rbxassetid://103350505967355", BackgroundTransparency = 0 },
-    Corner = { CornerRadius = UDim.new(35, 1) },
-})
-
-----------------------------------------------------------
--- VARIÁVEIS GLOBAIS
-----------------------------------------------------------
+-- SERVICES
 local Players = game:GetService("Players")
-local plr = Players.LocalPlayer
-local Workspace = game:GetService("Workspace")
-local UserInput = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
 
--- Player Stats
-local currentSpeed = 16
-local currentJump = 50
-local currentGrav = Workspace.Gravity
-local infinityJumpEnabled = false
-local noclipEnabled = false
-local humanoid
+local Player = Players.LocalPlayer
 
--- Selected player for troll features
-local selectedPlayer = nil
-local killing = false
-local noclipKillEnabled = false
+--================================================--
+-- LIBRARY CORE
+--================================================--
+local Library = {
+    Flags = {},
+    Items = {},
+    Theme = {
+        Background = Color3.fromRGB(15,15,15),
+        Dark = Color3.fromRGB(20,20,20),
+        Light = Color3.fromRGB(30,30,30),
+        Accent = Color3.fromRGB(0,120,255),
+        Text = Color3.fromRGB(235,235,235),
+        Muted = Color3.fromRGB(150,150,150),
+        Danger = Color3.fromRGB(220,60,60)
+    }
+}
 
--- Função para pegar humanoid
-local function getHumanoid()
-    if plr.Character then
-        return plr.Character:FindFirstChildOfClass("Humanoid")
-    end
+--================================================--
+-- UTILS
+--================================================--
+local function Tween(o,p,t)
+    TweenService:Create(
+        o,
+        TweenInfo.new(t or 0.2,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),
+        p
+    ):Play()
 end
 
--- Atualizar stats ao respawn
-plr.CharacterAdded:Connect(function(char)
-    task.wait(0.3)
-    humanoid = char:WaitForChild("Humanoid")
-    humanoid.UseJumpPower = true
-    humanoid.WalkSpeed = currentSpeed
-    humanoid.JumpPower = currentJump
-    Workspace.Gravity = currentGrav
-end)
-
-----------------------------------------------------------
--- ABA PLAYER
-----------------------------------------------------------
-local PlayerTab = Window:MakeTab({
-    Name = "Player",
-    Icon = "rbxassetid://123973218785851"
-})
-
--- WalkSpeed Slider
-local SpeedSlider = PlayerTab:AddSlider({
-    Name = "Speed",
-    Min = 16,
-    Max = 500,
-    Default = currentSpeed,
-    Increment = 1,
-    Callback = function(value)
-        currentSpeed = value
-        local hum = getHumanoid()
-        if hum then hum.WalkSpeed = value end
-    end
-})
-
--- Jump Power Slider
-local JumpSlider = PlayerTab:AddSlider({
-    Name = "Jump Power",
-    Min = 50,
-    Max = 500,
-    Default = currentJump,
-    Increment = 1,
-    Callback = function(value)
-        currentJump = value
-        local hum = getHumanoid()
-        if hum then
-            hum.UseJumpPower = true
-            hum.JumpPower = value
-        end
-    end
-})
-
--- Gravity Slider
-local GravitySlider = PlayerTab:AddSlider({
-    Name = "Gravity",
-    Min = 0,
-    Max = 1000,
-    Default = currentGrav,
-    Increment = 1,
-    Callback = function(value)
-        currentGrav = value
-        Workspace.Gravity = value
-    end
-})
-
--- Reset Player Stats Button
-PlayerTab:AddButton({
-    Name = "Reset Stats",
-    Callback = function()
-        currentSpeed = 16
-        currentJump = 50
-        currentGrav = 196
-
-        local hum = getHumanoid()
-        if hum then
-            hum.WalkSpeed = currentSpeed
-            hum.UseJumpPower = true
-            hum.JumpPower = currentJump
-        end
-        Workspace.Gravity = currentGrav
-
-        SpeedSlider:Set(currentSpeed)
-        JumpSlider:Set(currentJump)
-        GravitySlider:Set(currentGrav)
-    end
-})
-
--- Infinity Jump Toggle
-PlayerTab:AddToggle({
-    Name = "Infinity Jump",
-    Default = false,
-    Callback = function(state)
-        infinityJumpEnabled = state
-    end
-})
-
-UserInput.JumpRequest:Connect(function()
-    if infinityJumpEnabled then
-        local hum = getHumanoid()
-        if hum then
-            hum:ChangeState(Enum.HumanoidStateType.Jumping)
-        end
-    end
-end)
-
--- NoClip Toggle
-PlayerTab:AddToggle({
-    Name = "NoClip",
-    Default = false,
-    Callback = function(state)
-        noclipEnabled = state
-    end
-})
-
-RunService.Stepped:Connect(function()
-    if noclipEnabled and plr.Character then
-        for _, part in ipairs(plr.Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
-            end
-        end
-    end
-end)
-
-----------------------------------------------------------
--- ABA TROLL
-----------------------------------------------------------
-local TrollTab = Window:MakeTab({
-    Name = "Troll",
-    Icon = "rbxassetid://12755989530"
-})
-
--- Função para pegar lista de jogadores
-local function getPlayerNames()
-    local names = {}
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= plr then
-            table.insert(names, p.Name)
-        end
-    end
-    return names
+local function Corner(o,r)
+    local c = Instance.new("UICorner",o)
+    c.CornerRadius = UDim.new(0,r or 6)
+    return c
 end
 
--- Função para criar Dropdown
-local function createDropdown()
-    if TrollTab.Dropdown then
-        TrollTab.Dropdown:Destroy()
-    end
-
-    TrollTab.Dropdown = TrollTab:AddDropdown({
-        Name = "Selecionar Player",
-        Options = getPlayerNames(),
-        Callback = function(value)
-            selectedPlayer = value
-        end
-    })
-
-    selectedPlayer = nil
+local function Stroke(o,c)
+    local s = Instance.new("UIStroke",o)
+    s.Color = c
+    s.Thickness = 1
+    s.Transparency = 0.5
+    return s
 end
 
--- Criar dropdown inicial
-createDropdown()
-
--- Atualizar lista de jogadores
-TrollTab:AddButton({
-    Name = "Atualizar Lista",
-    Callback = function()
-        createDropdown()
-    end
-})
-
--- Kill Player Script
-TrollTab:AddButton({
-    Name = "Kill Player (Teleport + NoClip)",
-    Callback = function()
-        if not selectedPlayer then return end
-        killing = true
-        noclipKillEnabled = true
-
-        -- PickingTools script
-        local args = { [1] = "PickingTools", [2] = "Couch" }
-        if ReplicatedStorage.RE:FindFirstChild("1Too1l") then
-            ReplicatedStorage.RE:FindFirstChild("1Too1l"):InvokeServer(unpack(args))
+local function Drag(frame,handle)
+    handle = handle or frame
+    local drag,start,pos
+    handle.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            drag = true
+            start = i.Position
+            pos = frame.Position
         end
+    end)
+    UserInputService.InputChanged:Connect(function(i)
+        if drag and i.UserInputType == Enum.UserInputType.MouseMovement then
+            local d = i.Position - start
+            frame.Position = UDim2.new(pos.X.Scale,pos.X.Offset+d.X,pos.Y.Scale,pos.Y.Offset+d.Y)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then drag=false end
+    end)
+end
 
-        task.spawn(function()
-            while killing do
-                local target = Players:FindFirstChild(selectedPlayer)
-                local char = plr.Character
-                local hum = char and char:FindFirstChild("HumanoidRootPart")
-                if target and target.Character and hum then
-                    local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
-                    if targetHRP then
-                        local offsets = {
-                            Vector3.new(0,5,0), Vector3.new(0,-5,0),
-                            Vector3.new(5,0,0), Vector3.new(-5,0,0)
-                        }
-                        for _, offset in ipairs(offsets) do
-                            if not killing then break end
-                            hum.CFrame = CFrame.new(targetHRP.Position + offset, targetHRP.Position)
-                            task.wait(0.01)
-                        end
-                    end
-                end
-                task.wait(0.1)
-            end
+--================================================--
+-- NOTIFY
+--================================================--
+function Library:Notify(text)
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification",{
+            Title="Spectra UI",
+            Text=text,
+            Duration=3
+        })
+    end)
+end
+
+--================================================--
+-- WINDOW
+--================================================--
+function Library:CreateWindow(cfg)
+    cfg = cfg or {}
+
+    local Gui = Instance.new("ScreenGui")
+    Gui.Name = "SpectraUI"
+    Gui.ResetOnSpawn = false
+    Gui.Parent = game.CoreGui
+
+    local Main = Instance.new("Frame",Gui)
+    Main.Size = UDim2.new(0,560,0,380)
+    Main.Position = UDim2.new(0.5,-280,0.5,-190)
+    Main.BackgroundColor3 = self.Theme.Background
+    Main.BorderSizePixel = 0
+    Corner(Main,10)
+
+    -- TOPBAR
+    local Top = Instance.new("Frame",Main)
+    Top.Size = UDim2.new(1,0,0,42)
+    Top.BackgroundColor3 = self.Theme.Dark
+    Top.BorderSizePixel = 0
+    Corner(Top,10)
+
+    local Title = Instance.new("TextLabel",Top)
+    Title.Size = UDim2.new(1,-100,1,0)
+    Title.Position = UDim2.new(0,12,0,0)
+    Title.BackgroundTransparency = 1
+    Title.Text = cfg.Title or "Spectra UI"
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 14
+    Title.TextColor3 = self.Theme.Text
+    Title.TextXAlignment = Left
+
+    Drag(Main,Top)
+
+    -- SIDEBAR
+    local Side = Instance.new("Frame",Main)
+    Side.Position = UDim2.new(0,0,0,42)
+    Side.Size = UDim2.new(0,130,1,-42)
+    Side.BackgroundColor3 = self.Theme.Dark
+    Side.BorderSizePixel = 0
+
+    local TabsLayout = Instance.new("UIListLayout",Side)
+    TabsLayout.Padding = UDim.new(0,4)
+
+    -- CONTENT
+    local Content = Instance.new("Frame",Main)
+    Content.Position = UDim2.new(0,130,0,42)
+    Content.Size = UDim2.new(1,-130,1,-42)
+    Content.BackgroundTransparency = 1
+
+    local CurrentTab
+
+    local Window = {}
+
+    --================================================--
+    -- TAB
+    --================================================--
+    function Window:AddTab(name)
+        local Btn = Instance.new("TextButton",Side)
+        Btn.Size = UDim2.new(1,-8,0,34)
+        Btn.Text = name
+        Btn.Font = Enum.Font.GothamBold
+        Btn.TextSize = 11
+        Btn.TextColor3 = Library.Theme.Muted
+        Btn.BackgroundColor3 = Library.Theme.Light
+        Btn.BorderSizePixel = 0
+        Corner(Btn,6)
+
+        local Page = Instance.new("ScrollingFrame",Content)
+        Page.Size = UDim2.new(1,0,1,0)
+        Page.CanvasSize = UDim2.new(0,0,0,0)
+        Page.ScrollBarThickness = 4
+        Page.Visible = false
+        Page.BackgroundTransparency = 1
+
+        local Layout = Instance.new("UIListLayout",Page)
+        Layout.Padding = UDim.new(0,6)
+        Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            Page.CanvasSize = UDim2.new(0,0,0,Layout.AbsoluteContentSize.Y+6)
         end)
+
+        Btn.MouseButton1Click:Connect(function()
+            if CurrentTab then
+                CurrentTab.Page.Visible=false
+                CurrentTab.Button.TextColor3=Library.Theme.Muted
+            end
+            Page.Visible=true
+            Btn.TextColor3=Library.Theme.Accent
+            CurrentTab={Page=Page,Button=Btn}
+        end)
+
+        if not CurrentTab then
+            Page.Visible=true
+            Btn.TextColor3=Library.Theme.Accent
+            CurrentTab={Page=Page,Button=Btn}
+        end
+
+        local Tab = {}
+
+        --================================================--
+        -- SECTION
+        --================================================--
+        function Tab:AddSection(title)
+            local Holder = Instance.new("Frame",Page)
+            Holder.Size = UDim2.new(1,-10,0,30)
+            Holder.AutomaticSize = Y
+            Holder.BackgroundColor3 = Library.Theme.Light
+            Holder.BorderSizePixel = 0
+            Corner(Holder,6)
+
+            local L = Instance.new("UIListLayout",Holder)
+            L.Padding = UDim.new(0,6)
+
+            local T = Instance.new("TextLabel",Holder)
+            T.Size = UDim2.new(1,0,0,24)
+            T.BackgroundTransparency = 1
+            T.Text = title
+            T.Font = Enum.Font.GothamBold
+            T.TextSize = 12
+            T.TextColor3 = Library.Theme.Text
+
+            local Section = {}
+
+            -- BUTTON
+            function Section:AddButton(cfg)
+                local B = Instance.new("TextButton",Holder)
+                B.Size = UDim2.new(1,-8,0,30)
+                B.Text = cfg.Title
+                B.Font = Enum.Font.Gotham
+                B.TextSize = 12
+                B.TextColor3 = Library.Theme.Text
+                B.BackgroundColor3 = Library.Theme.Dark
+                Corner(B,6)
+                B.MouseButton1Click:Connect(cfg.Callback or function()end)
+            end
+
+            -- TOGGLE
+            function Section:AddToggle(cfg)
+                Library.Flags[cfg.Flag]=cfg.Default or false
+
+                local Tgl = Instance.new("TextButton",Holder)
+                Tgl.Size = UDim2.new(1,-8,0,30)
+                Tgl.Text = cfg.Title
+                Tgl.Font = Enum.Font.Gotham
+                Tgl.TextSize = 12
+                Tgl.TextColor3 = Library.Theme.Text
+                Tgl.BackgroundColor3 = Library.Flags[cfg.Flag] and Library.Theme.Accent or Library.Theme.Dark
+                Corner(Tgl,6)
+
+                Tgl.MouseButton1Click:Connect(function()
+                    Library.Flags[cfg.Flag]=not Library.Flags[cfg.Flag]
+                    Tween(Tgl,{BackgroundColor3=Library.Flags[cfg.Flag] and Library.Theme.Accent or Library.Theme.Dark})
+                    if cfg.Callback then cfg.Callback(Library.Flags[cfg.Flag]) end
+                end)
+            end
+
+            return Section
+        end
+
+        return Tab
     end
-})
 
--- Outros Botões Úteis
-TrollTab:AddButton({ Name = "Shift Lock", Callback = function()
-    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Shift-lock-64302"))()
-end})
+    return Window
+end
 
-TrollTab:AddButton({ Name = "Fly", Callback = function()
-    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Gui-Fly-v3-37111"))()
-end})
-
-TrollTab:AddButton({ Name = "Infinite Yield", Callback = function()
-    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Infinite-yield-port-Vxeze-72354"))()
-end})
-
-TrollTab:AddButton({ Name = "Emotes", Callback = function()
-    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-7yd7-I-Emote-Script-48024"))()
-end})
-
-----------------------------------------------------------
--- ABA UTILITIES
-----------------------------------------------------------
-local UtilsTab = Window:MakeTab({
-    Name = "Utilities",
-    Icon = "rbxassetid://1337177622"
-})
-
-UtilsTab:AddButton({ Name = "Rejoin", Callback = function()
-    game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
-end})
-
-UtilsTab:AddButton({ Name = "Server Hop", Callback = function()
-    -- Você pode adicionar sua lógica de server hop
-end})
-
-UtilsTab:AddButton({ Name = "Copy Player Name", Callback = function()
-    setclipboard(plr.Name)
-end})
-
-----------------------------------------------------------
--- ABA CONFIG
-----------------------------------------------------------
-local ConfigTab = Window:MakeTab({
-    Name = "Config",
-    Icon = "rbxassetid://6023426910"
-})
-
-ConfigTab:AddButton({ Name = "Save Config", Callback = function()
-    print("Config Salva!")
-end})
-
-ConfigTab:AddButton({ Name = "Load Config", Callback = function()
-    print("Config Carregada!")
-end})
+return Library
