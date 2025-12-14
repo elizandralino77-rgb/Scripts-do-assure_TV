@@ -1,250 +1,150 @@
---[[
-    Peli Library v1.0
-    GUI Framework para Roblox
-    Features:
-    - Abas
-    - Toggles
-    - Sliders
-    - Color Pickers
-    - Text Inputs
-    - Notificações
-    - Custom Icon / Letter
-]]
+--// Carrega a Library
+local Library = {}
 
-local PeliLibrary = {}
-PeliLibrary.__index = PeliLibrary
-
-local TweenService = game:GetService("TweenService")
+--// Services
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local plr = Players.LocalPlayer
 
--- ===== CORE COLORS =====
-local COLORS = {
-    White = Color3.fromRGB(255, 255, 255),
-    Black = Color3.fromRGB(0, 0, 0),
-    Background = Color3.fromRGB(15, 15, 15),
-    DarkBG = Color3.fromRGB(25, 25, 25),
-    Frame = Color3.fromRGB(35, 35, 35),
-    Gray = Color3.fromRGB(50, 50, 50),
-    LightGray = Color3.fromRGB(160, 160, 160),
-    Green = Color3.fromRGB(80, 220, 100),
-    Red = Color3.fromRGB(220, 70, 70),
-    ActiveGreen = Color3.fromRGB(40, 100, 50),
-    ActiveRed = Color3.fromRGB(120, 35, 35),
-}
-
-local ColorPresets = {
-    {name = "White", r=255,g=255,b=255},
-    {name = "Red", r=255,g=70,b=70},
-    {name = "Green", r=70,g=255,b=100},
-    {name = "Blue", r=70,g=130,b=255},
-    {name = "Yellow", r=255,g=230,b=70},
-    {name = "Purple", r=180,g=70,b=255},
-    {name = "Cyan", r=70,g=230,b=255},
-    {name = "Orange", r=255,g=150,b=70},
-    {name = "Pink", r=255,g=120,b=200},
-    {name = "Gray", r=140,g=140,b=140},
-}
-
--- ===== HELPERS =====
-local function tween(obj, props, duration)
-    if not obj or not obj.Parent then return end
-    TweenService:Create(obj, TweenInfo.new(duration or 0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), props):Play()
-end
-
-local function createCorner(parent, radius)
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, radius or 12)
-    corner.Parent = parent
-    return corner
-end
-
-local function createStroke(parent, color, thickness, transparency)
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = color or COLORS.White
-    stroke.Thickness = thickness or 1.5
-    stroke.Transparency = transparency or 0.3
-    stroke.Parent = parent
-    return stroke
-end
-
-local function createGradient(parent, color1, color2, rotation)
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0, color1), ColorSequenceKeypoint.new(1, color2)}
-    gradient.Rotation = rotation or 90
-    gradient.Parent = parent
-    return gradient
-end
-
-local function notify(text)
-    pcall(function()
-        game.StarterGui:SetCore("SendNotification", {
-            Title = "PELI LIBRARY",
-            Text = text,
-            Duration = 2.5,
-            Icon = ""
-        })
-    end)
-end
-
--- ===== GUI CREATION =====
-function PeliLibrary.new(title)
-    local self = setmetatable({}, PeliLibrary)
-
+--// Main Window
+function Library:CreateWindow(title, toggleKey)
+    local Window = {}
+    
     -- ScreenGui
-    self.ScreenGui = Instance.new("ScreenGui")
-    self.ScreenGui.Name = title or "PeliLibrary"
-    self.ScreenGui.ResetOnSpawn = false
-    self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    self.ScreenGui.Parent = game.CoreGui
-
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = title:gsub(" ", "")
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = game.CoreGui
+    
     -- Main Frame
-    self.MainFrame = Instance.new("Frame")
-    self.MainFrame.Size = UDim2.new(0, 550, 0, 340)
-    self.MainFrame.Position = UDim2.new(0.5, -275, 0.5, -170)
-    self.MainFrame.BackgroundColor3 = COLORS.Background
-    self.MainFrame.BorderSizePixel = 0
-    self.MainFrame.Active = true
-    self.MainFrame.Draggable = true
-    self.MainFrame.ClipsDescendants = true
-    self.MainFrame.Parent = self.ScreenGui
-    createCorner(self.MainFrame, 18)
-    createStroke(self.MainFrame, COLORS.White, 2, 0)
-
-    -- Header
-    self.Header = Instance.new("Frame", self.MainFrame)
-    self.Header.Size = UDim2.new(1, 0, 0, 52)
-    self.Header.BackgroundColor3 = COLORS.White
-    self.Header.BorderSizePixel = 0
-    createCorner(self.Header, 18)
-    createGradient(self.Header, Color3.fromRGB(240, 240, 240), Color3.fromRGB(180, 180, 180))
-
-    self.TitleLabel = Instance.new("TextLabel", self.Header)
-    self.TitleLabel.Size = UDim2.new(1, -120, 1, 0)
-    self.TitleLabel.Position = UDim2.new(0, 10, 0, 0)
-    self.TitleLabel.BackgroundTransparency = 1
-    self.TitleLabel.Text = title or "PELI LIBRARY"
-    self.TitleLabel.TextColor3 = COLORS.Black
-    self.TitleLabel.Font = Enum.Font.GothamBlack
-    self.TitleLabel.TextSize = 17
-    self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-    -- Close Button
-    local closeBtn = Instance.new("TextButton", self.Header)
-    closeBtn.Size = UDim2.new(0, 28, 0, 28)
-    closeBtn.Position = UDim2.new(1, -38, 0.5, -14)
-    closeBtn.Text = "×"
-    closeBtn.BackgroundColor3 = COLORS.Red
-    closeBtn.TextColor3 = COLORS.White
-    closeBtn.Font = Enum.Font.GothamBold
-    closeBtn.TextSize = 18
-    createCorner(closeBtn, 8)
-    closeBtn.MouseButton1Click:Connect(function()
-        self.ScreenGui:Destroy()
-    end)
-
-    -- Sidebar
-    self.TabSidebar = Instance.new("Frame", self.MainFrame)
-    self.TabSidebar.Size = UDim2.new(0, 110, 0, 280)
-    self.TabSidebar.Position = UDim2.new(0, 5, 0, 56)
-    self.TabSidebar.BackgroundColor3 = COLORS.DarkBG
-    self.TabSidebar.BorderSizePixel = 0
-    createCorner(self.TabSidebar, 14)
-    createStroke(self.TabSidebar, COLORS.Gray, 1, 0.5)
-
-    self.TabButtons = {}
-    self.ContentArea = Instance.new("Frame", self.MainFrame)
-    self.ContentArea.Size = UDim2.new(0, 425, 0, 280)
-    self.ContentArea.Position = UDim2.new(0, 120, 0, 56)
-    self.ContentArea.BackgroundTransparency = 1
-    self.ContentArea.BorderSizePixel = 0
-
-    self.Tabs = {}
-    return self
-end
-
--- ===== TAB CREATION =====
-function PeliLibrary:AddTab(name)
-    local btn = Instance.new("TextButton", self.TabSidebar)
-    btn.Size = UDim2.new(1, -8, 0, 30)
-    btn.Position = UDim2.new(0, 4, 0, (#self.TabButtons)*34 + 4)
-    btn.Text = name
-    btn.BackgroundColor3 = COLORS.Frame
-    btn.TextColor3 = COLORS.LightGray
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 10
-    createCorner(btn, 8)
-    self.TabButtons[#self.TabButtons+1] = btn
-
-    local container = Instance.new("ScrollingFrame", self.ContentArea)
-    container.Size = UDim2.new(1, 0, 1, 0)
-    container.BackgroundTransparency = 1
-    container.BorderSizePixel = 0
-    container.ScrollBarThickness = 3
-    container.Visible = (#self.TabButtons==1)
-    self.Tabs[name] = container
-
-    btn.MouseButton1Click:Connect(function()
-        for _, c in pairs(self.Tabs) do c.Visible = false end
-        container.Visible = true
-        for _, b in pairs(self.TabButtons) do
-            b.BackgroundColor3 = COLORS.Frame
-            b.TextColor3 = COLORS.LightGray
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 500, 0, 400)
+    mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Visible = true
+    mainFrame.Parent = screenGui
+    
+    -- Title
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, 0, 0, 30)
+    titleLabel.Position = UDim2.new(0, 0, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = title
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 18
+    titleLabel.Parent = mainFrame
+    
+    -- Tabs container
+    local tabsFrame = Instance.new("Frame")
+    tabsFrame.Size = UDim2.new(1, 0, 1, -30)
+    tabsFrame.Position = UDim2.new(0, 0, 0, 30)
+    tabsFrame.BackgroundTransparency = 1
+    tabsFrame.Parent = mainFrame
+    
+    Window.Tabs = {}
+    
+    function Window:AddTab(tabName)
+        local Tab = {}
+        
+        local tabFrame = Instance.new("Frame")
+        tabFrame.Size = UDim2.new(1, 0, 1, 0)
+        tabFrame.BackgroundTransparency = 1
+        tabFrame.Visible = true
+        tabFrame.Parent = tabsFrame
+        
+        Tab.Sections = {}
+        
+        function Tab:AddSection(sectionName)
+            local Section = {}
+            local sectionFrame = Instance.new("Frame")
+            sectionFrame.Size = UDim2.new(1, -20, 0, 200)
+            sectionFrame.Position = UDim2.new(0, 10, 0, (#Tab.Sections)*210)
+            sectionFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            sectionFrame.BorderSizePixel = 0
+            sectionFrame.Parent = tabFrame
+            
+            -- Section title
+            local sectionLabel = Instance.new("TextLabel")
+            sectionLabel.Size = UDim2.new(1, -10, 0, 25)
+            sectionLabel.Position = UDim2.new(0, 5, 0, 5)
+            sectionLabel.BackgroundTransparency = 1
+            sectionLabel.Text = sectionName
+            sectionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+            sectionLabel.Font = Enum.Font.GothamBold
+            sectionLabel.TextSize = 14
+            sectionLabel.TextXAlignment = Enum.TextXAlignment.Left
+            sectionLabel.Parent = sectionFrame
+            
+            Section.Sliders = {}
+            
+            function Section:AddSlider(name, min, max, default, step, callback)
+                local Slider = {}
+                Slider.Value = default
+                
+                local sliderFrame = Instance.new("Frame")
+                sliderFrame.Size = UDim2.new(1, -10, 0, 40)
+                sliderFrame.Position = UDim2.new(0, 5, 0, 35 + (#Section.Sliders)*45)
+                sliderFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                sliderFrame.BorderSizePixel = 0
+                sliderFrame.Parent = sectionFrame
+                
+                local sliderLabel = Instance.new("TextLabel")
+                sliderLabel.Size = UDim2.new(0, 150, 1, 0)
+                sliderLabel.Position = UDim2.new(0, 5, 0, 0)
+                sliderLabel.BackgroundTransparency = 1
+                sliderLabel.Text = name.." : "..default
+                sliderLabel.TextColor3 = Color3.fromRGB(255,255,255)
+                sliderLabel.Font = Enum.Font.Gotham
+                sliderLabel.TextSize = 14
+                sliderLabel.TextXAlignment = Enum.TextXAlignment.Left
+                sliderLabel.Parent = sliderFrame
+                
+                local sliderBar = Instance.new("TextButton")
+                sliderBar.Size = UDim2.new(1, -160, 0, 20)
+                sliderBar.Position = UDim2.new(0, 155, 0, 10)
+                sliderBar.Text = ""
+                sliderBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+                sliderBar.Parent = sliderFrame
+                
+                -- Drag
+                local mouse = plr:GetMouse()
+                local dragging = false
+                
+                sliderBar.MouseButton1Down:Connect(function()
+                    dragging = true
+                end)
+                
+                mouse.Move:Connect(function()
+                    if dragging then
+                        local relativeX = math.clamp(mouse.X - sliderBar.AbsolutePosition.X,0,sliderBar.AbsoluteSize.X)
+                        local percent = relativeX / sliderBar.AbsoluteSize.X
+                        local value = math.floor(min + (max - min)*percent)
+                        Slider.Value = value
+                        sliderLabel.Text = name.." : "..value
+                        if callback then callback(value) end
+                    end
+                end)
+                
+                mouse.Button1Up:Connect(function()
+                    dragging = false
+                end)
+                
+                Section.Sliders[name] = Slider
+                return Slider
+            end
+            
+            Tab.Sections[sectionName] = Section
+            return Section
         end
-        btn.BackgroundColor3 = COLORS.White
-        btn.TextColor3 = COLORS.Black
-    end)
-
-    return container
+        
+        Window.Tabs[tabName] = Tab
+        return Tab
+    end
+    
+    return Window
 end
 
--- ===== UI ELEMENTS =====
-function PeliLibrary:CreateToggle(parent, label, default, callback)
-    local container = Instance.new("Frame", parent)
-    container.Size = UDim2.new(1, -12, 0, 38)
-    container.BackgroundColor3 = default and COLORS.ActiveRed or COLORS.ActiveGreen
-    container.BorderSizePixel = 0
-    createCorner(container, 10)
-    createStroke(container, default and COLORS.Red or COLORS.Green, 2, 0)
-
-    local toggleBtn = Instance.new("Frame", container)
-    toggleBtn.Size = UDim2.new(0, 34, 0, 26)
-    toggleBtn.Position = UDim2.new(1, -40, 0.5, -13)
-    toggleBtn.BackgroundColor3 = default and COLORS.Red or COLORS.Green
-    createCorner(toggleBtn, 8)
-
-    local toggleIcon = Instance.new("TextLabel", toggleBtn)
-    toggleIcon.Size = UDim2.new(1,0,1,0)
-    toggleIcon.BackgroundTransparency = 1
-    toggleIcon.Text = default and "×" or "✓"
-    toggleIcon.TextColor3 = COLORS.White
-    toggleIcon.Font = Enum.Font.GothamBold
-    toggleIcon.TextSize = 16
-
-    local labelTxt = Instance.new("TextLabel", container)
-    labelTxt.Size = UDim2.new(1, -55, 1, 0)
-    labelTxt.Position = UDim2.new(0, 10, 0, 0)
-    labelTxt.BackgroundTransparency = 1
-    labelTxt.Text = label
-    labelTxt.TextColor3 = COLORS.White
-    labelTxt.Font = Enum.Font.GothamSemibold
-    labelTxt.TextSize = 11
-    labelTxt.TextXAlignment = Enum.TextXAlignment.Left
-
-    local clickBtn = Instance.new("TextButton", container)
-    clickBtn.Size = UDim2.new(1,0,1,0)
-    clickBtn.BackgroundTransparency = 1
-    clickBtn.Text = ""
-    clickBtn.MouseButton1Click:Connect(function()
-        default = not default
-        container.BackgroundColor3 = default and COLORS.ActiveRed or COLORS.ActiveGreen
-        toggleBtn.BackgroundColor3 = default and COLORS.Red or COLORS.Green
-        toggleIcon.Text = default and "×" or "✓"
-        if callback then pcall(callback, default) end
-    end)
-
-    return container
-end
-
--- ===== RETURN LIBRARY =====
-return PeliLibrary
+--// Retorna Library
+return Library
