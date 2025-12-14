@@ -1,150 +1,305 @@
---// Carrega a Library
-local Library = {}
+--// Carregar a Library RedzHub UI
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
 
---// Services
+--// Criar Janela Principal
+local Window = redzlib:MakeWindow({
+    Title = "Ultimate HUB v1.0",
+    SubTitle = "Criador assure_TV",
+    SaveFolder = "UltimateHub_v1"
+})
+
+--// Ícone de Minimizar
+Window:AddMinimizeButton({
+    Button = { Image = "rbxassetid://103350505967355", BackgroundTransparency = 0 },
+    Corner = { CornerRadius = UDim.new(35, 1) },
+})
+
+----------------------------------------------------------
+-- VARIÁVEIS GLOBAIS
+----------------------------------------------------------
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local plr = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+local UserInput = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
---// Main Window
-function Library:CreateWindow(title, toggleKey)
-    local Window = {}
-    
-    -- ScreenGui
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = title:gsub(" ", "")
-    screenGui.ResetOnSpawn = false
-    screenGui.Parent = game.CoreGui
-    
-    -- Main Frame
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Size = UDim2.new(0, 500, 0, 400)
-    mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    mainFrame.BorderSizePixel = 0
-    mainFrame.Visible = true
-    mainFrame.Parent = screenGui
-    
-    -- Title
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1, 0, 0, 30)
-    titleLabel.Position = UDim2.new(0, 0, 0, 0)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = title
-    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextSize = 18
-    titleLabel.Parent = mainFrame
-    
-    -- Tabs container
-    local tabsFrame = Instance.new("Frame")
-    tabsFrame.Size = UDim2.new(1, 0, 1, -30)
-    tabsFrame.Position = UDim2.new(0, 0, 0, 30)
-    tabsFrame.BackgroundTransparency = 1
-    tabsFrame.Parent = mainFrame
-    
-    Window.Tabs = {}
-    
-    function Window:AddTab(tabName)
-        local Tab = {}
-        
-        local tabFrame = Instance.new("Frame")
-        tabFrame.Size = UDim2.new(1, 0, 1, 0)
-        tabFrame.BackgroundTransparency = 1
-        tabFrame.Visible = true
-        tabFrame.Parent = tabsFrame
-        
-        Tab.Sections = {}
-        
-        function Tab:AddSection(sectionName)
-            local Section = {}
-            local sectionFrame = Instance.new("Frame")
-            sectionFrame.Size = UDim2.new(1, -20, 0, 200)
-            sectionFrame.Position = UDim2.new(0, 10, 0, (#Tab.Sections)*210)
-            sectionFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-            sectionFrame.BorderSizePixel = 0
-            sectionFrame.Parent = tabFrame
-            
-            -- Section title
-            local sectionLabel = Instance.new("TextLabel")
-            sectionLabel.Size = UDim2.new(1, -10, 0, 25)
-            sectionLabel.Position = UDim2.new(0, 5, 0, 5)
-            sectionLabel.BackgroundTransparency = 1
-            sectionLabel.Text = sectionName
-            sectionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-            sectionLabel.Font = Enum.Font.GothamBold
-            sectionLabel.TextSize = 14
-            sectionLabel.TextXAlignment = Enum.TextXAlignment.Left
-            sectionLabel.Parent = sectionFrame
-            
-            Section.Sliders = {}
-            
-            function Section:AddSlider(name, min, max, default, step, callback)
-                local Slider = {}
-                Slider.Value = default
-                
-                local sliderFrame = Instance.new("Frame")
-                sliderFrame.Size = UDim2.new(1, -10, 0, 40)
-                sliderFrame.Position = UDim2.new(0, 5, 0, 35 + (#Section.Sliders)*45)
-                sliderFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-                sliderFrame.BorderSizePixel = 0
-                sliderFrame.Parent = sectionFrame
-                
-                local sliderLabel = Instance.new("TextLabel")
-                sliderLabel.Size = UDim2.new(0, 150, 1, 0)
-                sliderLabel.Position = UDim2.new(0, 5, 0, 0)
-                sliderLabel.BackgroundTransparency = 1
-                sliderLabel.Text = name.." : "..default
-                sliderLabel.TextColor3 = Color3.fromRGB(255,255,255)
-                sliderLabel.Font = Enum.Font.Gotham
-                sliderLabel.TextSize = 14
-                sliderLabel.TextXAlignment = Enum.TextXAlignment.Left
-                sliderLabel.Parent = sliderFrame
-                
-                local sliderBar = Instance.new("TextButton")
-                sliderBar.Size = UDim2.new(1, -160, 0, 20)
-                sliderBar.Position = UDim2.new(0, 155, 0, 10)
-                sliderBar.Text = ""
-                sliderBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-                sliderBar.Parent = sliderFrame
-                
-                -- Drag
-                local mouse = plr:GetMouse()
-                local dragging = false
-                
-                sliderBar.MouseButton1Down:Connect(function()
-                    dragging = true
-                end)
-                
-                mouse.Move:Connect(function()
-                    if dragging then
-                        local relativeX = math.clamp(mouse.X - sliderBar.AbsolutePosition.X,0,sliderBar.AbsoluteSize.X)
-                        local percent = relativeX / sliderBar.AbsoluteSize.X
-                        local value = math.floor(min + (max - min)*percent)
-                        Slider.Value = value
-                        sliderLabel.Text = name.." : "..value
-                        if callback then callback(value) end
-                    end
-                end)
-                
-                mouse.Button1Up:Connect(function()
-                    dragging = false
-                end)
-                
-                Section.Sliders[name] = Slider
-                return Slider
-            end
-            
-            Tab.Sections[sectionName] = Section
-            return Section
-        end
-        
-        Window.Tabs[tabName] = Tab
-        return Tab
+-- Player Stats
+local currentSpeed = 16
+local currentJump = 50
+local currentGrav = Workspace.Gravity
+local infinityJumpEnabled = false
+local noclipEnabled = false
+local humanoid
+
+-- Selected player for troll features
+local selectedPlayer = nil
+local killing = false
+local noclipKillEnabled = false
+
+-- Função para pegar humanoid
+local function getHumanoid()
+    if plr.Character then
+        return plr.Character:FindFirstChildOfClass("Humanoid")
     end
-    
-    return Window
 end
 
---// Retorna Library
-return Library
+-- Atualizar stats ao respawn
+plr.CharacterAdded:Connect(function(char)
+    task.wait(0.3)
+    humanoid = char:WaitForChild("Humanoid")
+    humanoid.UseJumpPower = true
+    humanoid.WalkSpeed = currentSpeed
+    humanoid.JumpPower = currentJump
+    Workspace.Gravity = currentGrav
+end)
+
+----------------------------------------------------------
+-- ABA PLAYER
+----------------------------------------------------------
+local PlayerTab = Window:MakeTab({
+    Name = "Player",
+    Icon = "rbxassetid://123973218785851"
+})
+
+-- WalkSpeed Slider
+local SpeedSlider = PlayerTab:AddSlider({
+    Name = "Speed",
+    Min = 16,
+    Max = 500,
+    Default = currentSpeed,
+    Increment = 1,
+    Callback = function(value)
+        currentSpeed = value
+        local hum = getHumanoid()
+        if hum then hum.WalkSpeed = value end
+    end
+})
+
+-- Jump Power Slider
+local JumpSlider = PlayerTab:AddSlider({
+    Name = "Jump Power",
+    Min = 50,
+    Max = 500,
+    Default = currentJump,
+    Increment = 1,
+    Callback = function(value)
+        currentJump = value
+        local hum = getHumanoid()
+        if hum then
+            hum.UseJumpPower = true
+            hum.JumpPower = value
+        end
+    end
+})
+
+-- Gravity Slider
+local GravitySlider = PlayerTab:AddSlider({
+    Name = "Gravity",
+    Min = 0,
+    Max = 1000,
+    Default = currentGrav,
+    Increment = 1,
+    Callback = function(value)
+        currentGrav = value
+        Workspace.Gravity = value
+    end
+})
+
+-- Reset Player Stats Button
+PlayerTab:AddButton({
+    Name = "Reset Stats",
+    Callback = function()
+        currentSpeed = 16
+        currentJump = 50
+        currentGrav = 196
+
+        local hum = getHumanoid()
+        if hum then
+            hum.WalkSpeed = currentSpeed
+            hum.UseJumpPower = true
+            hum.JumpPower = currentJump
+        end
+        Workspace.Gravity = currentGrav
+
+        SpeedSlider:Set(currentSpeed)
+        JumpSlider:Set(currentJump)
+        GravitySlider:Set(currentGrav)
+    end
+})
+
+-- Infinity Jump Toggle
+PlayerTab:AddToggle({
+    Name = "Infinity Jump",
+    Default = false,
+    Callback = function(state)
+        infinityJumpEnabled = state
+    end
+})
+
+UserInput.JumpRequest:Connect(function()
+    if infinityJumpEnabled then
+        local hum = getHumanoid()
+        if hum then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- NoClip Toggle
+PlayerTab:AddToggle({
+    Name = "NoClip",
+    Default = false,
+    Callback = function(state)
+        noclipEnabled = state
+    end
+})
+
+RunService.Stepped:Connect(function()
+    if noclipEnabled and plr.Character then
+        for _, part in ipairs(plr.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+----------------------------------------------------------
+-- ABA TROLL
+----------------------------------------------------------
+local TrollTab = Window:MakeTab({
+    Name = "Troll",
+    Icon = "rbxassetid://12755989530"
+})
+
+-- Função para pegar lista de jogadores
+local function getPlayerNames()
+    local names = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= plr then
+            table.insert(names, p.Name)
+        end
+    end
+    return names
+end
+
+-- Função para criar Dropdown
+local function createDropdown()
+    if TrollTab.Dropdown then
+        TrollTab.Dropdown:Destroy()
+    end
+
+    TrollTab.Dropdown = TrollTab:AddDropdown({
+        Name = "Selecionar Player",
+        Options = getPlayerNames(),
+        Callback = function(value)
+            selectedPlayer = value
+        end
+    })
+
+    selectedPlayer = nil
+end
+
+-- Criar dropdown inicial
+createDropdown()
+
+-- Atualizar lista de jogadores
+TrollTab:AddButton({
+    Name = "Atualizar Lista",
+    Callback = function()
+        createDropdown()
+    end
+})
+
+-- Kill Player Script
+TrollTab:AddButton({
+    Name = "Kill Player (Teleport + NoClip)",
+    Callback = function()
+        if not selectedPlayer then return end
+        killing = true
+        noclipKillEnabled = true
+
+        -- PickingTools script
+        local args = { [1] = "PickingTools", [2] = "Couch" }
+        if ReplicatedStorage.RE:FindFirstChild("1Too1l") then
+            ReplicatedStorage.RE:FindFirstChild("1Too1l"):InvokeServer(unpack(args))
+        end
+
+        task.spawn(function()
+            while killing do
+                local target = Players:FindFirstChild(selectedPlayer)
+                local char = plr.Character
+                local hum = char and char:FindFirstChild("HumanoidRootPart")
+                if target and target.Character and hum then
+                    local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
+                    if targetHRP then
+                        local offsets = {
+                            Vector3.new(0,5,0), Vector3.new(0,-5,0),
+                            Vector3.new(5,0,0), Vector3.new(-5,0,0)
+                        }
+                        for _, offset in ipairs(offsets) do
+                            if not killing then break end
+                            hum.CFrame = CFrame.new(targetHRP.Position + offset, targetHRP.Position)
+                            task.wait(0.01)
+                        end
+                    end
+                end
+                task.wait(0.1)
+            end
+        end)
+    end
+})
+
+-- Outros Botões Úteis
+TrollTab:AddButton({ Name = "Shift Lock", Callback = function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Shift-lock-64302"))()
+end})
+
+TrollTab:AddButton({ Name = "Fly", Callback = function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Gui-Fly-v3-37111"))()
+end})
+
+TrollTab:AddButton({ Name = "Infinite Yield", Callback = function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Infinite-yield-port-Vxeze-72354"))()
+end})
+
+TrollTab:AddButton({ Name = "Emotes", Callback = function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-7yd7-I-Emote-Script-48024"))()
+end})
+
+----------------------------------------------------------
+-- ABA UTILITIES
+----------------------------------------------------------
+local UtilsTab = Window:MakeTab({
+    Name = "Utilities",
+    Icon = "rbxassetid://1337177622"
+})
+
+UtilsTab:AddButton({ Name = "Rejoin", Callback = function()
+    game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
+end})
+
+UtilsTab:AddButton({ Name = "Server Hop", Callback = function()
+    -- Você pode adicionar sua lógica de server hop
+end})
+
+UtilsTab:AddButton({ Name = "Copy Player Name", Callback = function()
+    setclipboard(plr.Name)
+end})
+
+----------------------------------------------------------
+-- ABA CONFIG
+----------------------------------------------------------
+local ConfigTab = Window:MakeTab({
+    Name = "Config",
+    Icon = "rbxassetid://6023426910"
+})
+
+ConfigTab:AddButton({ Name = "Save Config", Callback = function()
+    print("Config Salva!")
+end})
+
+ConfigTab:AddButton({ Name = "Load Config", Callback = function()
+    print("Config Carregada!")
+end})
