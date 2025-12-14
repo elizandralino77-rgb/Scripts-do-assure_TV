@@ -1,0 +1,1760 @@
+-- Carregar a UI Library
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
+
+-- Criar Janela Principal
+local Window = redzlib:MakeWindow({
+    Title = "Spectra HUB / V2 ",
+    SubTitle = "criador assure_TV",
+    SaveFolder = "PlayerTroll_v8"
+})
+
+-- Ícone de minimizar
+Window:AddMinimizeButton({
+    Button = { Image = "rbxassetid://103350505967355", BackgroundTransparency = 0 },
+    Corner = { CornerRadius = UDim.new(35, 1) },
+})
+
+----------------------------------------------------------
+-- VARIÁVEIS IMPORTANTES
+----------------------------------------------------------
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+local humanoid
+
+local currentSpeed = 16
+local currentJump = 50
+local currentGrav = 196
+
+local function getHumanoid()
+    if plr.Character then
+        return plr.Character:FindFirstChildOfClass("Humanoid")
+    end
+end
+
+plr.CharacterAdded:Connect(function(char)
+    task.wait(0.3)
+    local hum = char:WaitForChild("Humanoid")
+    hum.UseJumpPower = true
+    hum.JumpHeight = 0
+    hum.WalkSpeed = currentSpeed
+    hum.JumpPower = currentJump
+    workspace.Gravity = currentGrav
+end)
+
+----------------------------------------------------------
+-- ABA PLAYER
+----------------------------------------------------------
+local PlayerTab = Window:MakeTab({
+    Name = "Player",
+    Icon = "rbxassetid://123973218785851"
+})
+
+-- Slider Speed
+local SpeedSlider = PlayerTab:AddSlider({
+    Name = "Speed",
+    Min = 16,
+    Max = 1000,
+    Default = 16,
+    Increment = 1,
+    Callback = function(v)
+        currentSpeed = v
+        local hum = getHumanoid()
+        if hum then hum.WalkSpeed = v end
+    end
+})
+
+-- Slider Jump Power
+local JumpSlider = PlayerTab:AddSlider({
+    Name = "Jump Power",
+    Min = 50,
+    Max = 1000,
+    Default = 50,
+    Increment = 1,
+    Callback = function(v)
+        currentJump = v
+        local hum = getHumanoid()
+        if hum then
+            hum.UseJumpPower = true
+            hum.JumpPower = v
+            humanoid.JumpHeight = 0
+        end
+    end
+})
+
+-- Slider Gravidade
+local GravitySlider = PlayerTab:AddSlider({
+    Name = "Gravidade",
+    Min = 0,
+    Max = 1000,
+    Default = 196,
+    Increment = 1,
+    Callback = function(v)
+        currentGrav = v
+        workspace.Gravity = v
+    end
+})
+
+-- Botão Normal
+PlayerTab:AddButton({
+    Name = "Normal",
+    Callback = function()
+        currentSpeed = 16
+        currentJump = 50
+        currentGrav = 196
+
+        local hum = getHumanoid()
+        if hum then
+            hum.WalkSpeed = 16
+            hum.UseJumpPower = true
+            hum.JumpPower = 50
+        end
+
+        workspace.Gravity = 196
+
+        SpeedSlider:Set(16)
+        JumpSlider:Set(50)
+        GravitySlider:Set(196)
+    end
+})
+
+
+-- Outros botões
+PlayerTab:AddButton({
+    Name = "Shift Lock",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Shift-lock-64302"))()
+    end
+})
+
+PlayerTab:AddButton({
+    Name = "Fly",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Gui-Fly-v3-37111"))()
+    end
+})
+
+PlayerTab:AddButton({
+    Name = "Infinite Yield",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Infinite-yield-port-Vxeze-72354"))()
+    end
+})
+
+PlayerTab:AddButton({
+    Name = "Emotes",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-7yd7-I-Emote-Script-48024"))()
+    end
+})
+
+-- Infinity Jump Toggle
+local infinityJumpEnabled = false
+PlayerTab:AddToggle({
+    Name = "Infinity Jump",
+    Default = false,
+    Callback = function(state)
+        infinityJumpEnabled = state
+    end
+})
+
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    if infinityJumpEnabled then
+        local hum = getHumanoid()
+        if hum then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- NoClip Toggle
+local noclipEnabled = false
+PlayerTab:AddToggle({
+    Name = "NoClip",
+    Default = false,
+    Callback = function(state)
+        noclipEnabled = state
+    end
+})
+
+game:GetService("RunService").Stepped:Connect(function()
+    if noclipEnabled and plr.Character then
+        for _, part in ipairs(plr.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+----------------------------------------------------------
+-- ABA TROLL
+----------------------------------------------------------
+local TrollTab = Window:MakeTab({
+    Name = "Troll",
+    Icon = "rbxassetid://12755989530"
+})
+
+local selectedPlayer = nil
+local killing = false
+local noclipKillEnabled = false
+local viewEnabled = false
+
+-- Função para obter lista de jogadores
+local function getPlayerNames()
+    local names = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= plr then
+            table.insert(names, p.Name)
+        end
+    end
+    return names
+end
+
+-- Função para criar dropdown atualizado
+local function createDropdown()
+    if TrollTab.Dropdown then
+        TrollTab.Dropdown:Destroy()
+    end
+
+    TrollTab.Dropdown = TrollTab:AddDropdown({
+        Name = "Escolher Player",
+        Options = getPlayerNames(),
+        Callback = function(value)
+            selectedPlayer = value
+        end
+    })
+
+    selectedPlayer = nil
+end
+
+-- Criar dropdown inicial
+createDropdown()
+
+-- Botão Atualizar Lista
+TrollTab:AddButton({
+    Name = "Atualizar Lista",
+    Callback = function()
+        createDropdown()
+    end
+})
+
+-- Botão Kill – teleport rápido + NoClip + PickingTools
+TrollTab:AddButton({
+    Name = "Kill demorado e chato kkkk",
+    Callback = function()
+        if not selectedPlayer then return end
+        killing = true
+        noclipKillEnabled = true
+
+        -- Executa PickingTools script uma vez
+        local args = {
+            [1] = "PickingTools",
+            [2] = "Couch"
+        }
+        game:GetService("ReplicatedStorage").RE:FindFirstChild("1Too1l"):InvokeServer(unpack(args))
+
+        -- Teleporte rápido em várias posições
+        task.spawn(function()
+            while killing do
+                local target = Players:FindFirstChild(selectedPlayer)
+                local char = plr.Character
+                local hum = char and char:FindFirstChild("HumanoidRootPart")
+
+                if target and target.Character and hum then
+                    local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
+                    if targetHRP then
+                        local offsets = {
+                            Vector3.new(0,5,0), Vector3.new(0,-5,0),
+                            Vector3.new(5,0,0), Vector3.new(-5,0,0),
+                            Vector3.new(0,0,5), Vector3.new(0,0,-5),
+                            Vector3.new(5,0,5), Vector3.new(-5,0,5),
+                            Vector3.new(5,0,-5), Vector3.new(-5,0,-5),
+                            Vector3.new(0,5,5), Vector3.new(0,5,-5),
+                            Vector3.new(0,-5,5), Vector3.new(0,-5,-5),
+                            Vector3.new(5,5,0), Vector3.new(-5,5,0),
+                            Vector3.new(5,-5,0), Vector3.new(-5,-5,0)
+                        }
+
+                        for _, offset in ipairs(offsets) do
+                            if not killing then break end
+                            hum.CFrame = CFrame.new(targetHRP.Position + offset, targetHRP.Position)
+                            task.wait(0.01)
+                        end
+                    end
+                end
+                task.wait(0.01)
+            end
+        end)
+
+        -- NoClip absoluto enquanto Kill estiver ativo
+        task.spawn(function()
+            while noclipKillEnabled do
+                local char = plr.Character
+                if char then
+                    for _, part in ipairs(char:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+                task.wait(0.01)
+            end
+        end)
+    end
+})
+
+-- Botão Stop Kill
+TrollTab:AddButton({
+    Name = "Stop Kill",
+    Callback = function()
+        killing = false
+        noclipKillEnabled = false
+        -- Volta para visão normal se estiver visualizando
+        if viewEnabled and plr.Character then
+            workspace.CurrentCamera.CameraSubject = plr.Character:FindFirstChildOfClass("Humanoid")
+            workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+        end
+    end
+})
+
+-- Toggle Visualizar Player
+TrollTab:AddToggle({
+    Name = "Visualizar Player",
+    Default = false,
+    Callback = function(state)
+        viewEnabled = state
+        local target = Players:FindFirstChild(selectedPlayer)
+
+        if viewEnabled then
+            if target and target.Character then
+                workspace.CurrentCamera.CameraSubject = target.Character:FindFirstChildOfClass("Humanoid")
+                workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+            end
+        else
+            if plr.Character then
+                workspace.CurrentCamera.CameraSubject = plr.Character:FindFirstChildOfClass("Humanoid")
+                workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+            end
+        end
+    end
+})
+
+--====================================================
+-- TELEPORTAR PARA O JOGADOR SELECIONADO
+--====================================================
+TrollTab:AddButton({
+    Name = "Teleportar para o Jogador",
+    Callback = function()
+        if not selectedPlayer then return end
+
+        local target = Players:FindFirstChild(selectedPlayer)
+        if target and target.Character then
+            local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
+            local char = plr.Character
+            local hum = char and char:FindFirstChild("HumanoidRootPart")
+
+            if targetHRP and hum then
+                hum.CFrame = targetHRP.CFrame
+            end
+        end
+    end
+})
+
+----------------------------------------------------------
+-- AJUSTES DO MOVIMENTO (MAIS FRENTE + MAIS RÁPIDO)
+----------------------------------------------------------
+local FRONT_OFFSET = 0.35      -- um pouquinho mais pra frente
+local BACK_OFFSET = -3.5
+local SPEED = 0.75             -- um pouco mais rápido
+
+----------------------------------------------------------
+-- LOOP SUAVE DE GRUDE + OSCILAÇÃO
+----------------------------------------------------------
+task.spawn(function()
+    while task.wait() do
+        if followOscillation and selectedPlayer then
+
+            local target = Players:FindFirstChild(selectedPlayer)
+            if not target then continue end
+
+            local targetChar = target.Character
+            local targetHRP = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
+            if not targetHRP then continue end
+
+            local myChar = plr.Character
+            local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+            if not myHRP then continue end
+
+            ------------------------------------------------------
+            -- MOVER UM POUQUINHO MAIS PRA FRENTE (0.35 studs)
+            ------------------------------------------------------
+            local frontPos = targetHRP.CFrame * CFrame.new(0, 0, -FRONT_OFFSET)
+            myHRP.CFrame = myHRP.CFrame:Lerp(frontPos, SPEED)
+            task.wait(0.35)
+            if not followOscillation then continue end
+
+            ------------------------------------------------------
+            -- MOVER PARA TRÁS
+            ------------------------------------------------------
+            local backPos = targetHRP.CFrame * CFrame.new(0, 0, -BACK_OFFSET)
+            myHRP.CFrame = myHRP.CFrame:Lerp(backPos, SPEED)
+            task.wait(0.35)
+        end
+    end
+end)
+
+
+----------------------------------------------------------
+-- TOGGLE DE ATIVAR O MODO "GRUDAR NO PLAYER"
+----------------------------------------------------------
+TrollTab:AddToggle({
+    Name = "Seguir Frente/Trás no Player (ON/OFF)",
+    Default = false,
+    Callback = function(state)
+        followOscillation = state
+
+        if state then
+            local target = Players:FindFirstChild(selectedPlayer)
+            if target and target.Character then
+                local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                local thrp = target.Character:FindFirstChild("HumanoidRootPart")
+
+                if hrp and thrp then
+                    ----------------------------------------------------------
+                    -- TELEPORTA APENAS UMA VEZ (GRUDAR INICIAL)
+                    ----------------------------------------------------------
+                    hrp.CFrame = thrp.CFrame * CFrame.new(0, 0, -3.5)
+                end
+            end
+        end
+    end
+})
+
+--========================================================--
+-- BOTÃO SKYBOX
+--========================================================--
+TrollTab:AddButton({
+    Name = "Skybox",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Fe-Brookhaven-skybox-script-73292"))()
+    end
+})
+
+-- ====================== ABA SKINS =====================
+
+local SkinsTab = Window:MakeTab({
+Name = "Skins",
+Icon = "rbxassetid://113185405775975",
+Scrolling = true
+})
+
+
+
+local function addSkinButton(name, id)
+SkinsTab:AddButton({
+Name = name,
+Callback = function()
+game:GetService("ReplicatedStorage").Remotes.Wear:InvokeServer(id)
+end
+})
+end
+addSkinButton("sem cabeça", 134082579)
+addSkinButton("Sem Perna 1", 115656762149031)
+addSkinButton("Sem Perna 2", 93177286821086)
+addSkinButton("Fada 1", 226189871)
+addSkinButton("Fada 2", 150381051)
+addSkinButton("Fada 3", 141742418)
+addSkinButton("Fada 4", 128217885)
+addSkinButton("Asa de Anjo", 192557913)
+addSkinButton("Abóbora", 132809431)
+addSkinButton("Chapéu", 305888394)
+addSkinButton("Pombo", 134936622364544)
+addSkinButton("pé gigante 1", 140311311736304)
+addSkinButton("pé gigante 2", 94880807456770)
+addSkinButton("unhas grandes ", 135726095366567)
+addSkinButton("mão grandes ", 12725518393)
+
+
+
+SkinsTab:AddButton({
+    Name = "Black Doctor",
+    Callback = function()
+
+        local Wear = game:GetService("ReplicatedStorage").Remotes.Wear
+
+        Wear:InvokeServer(134917317332597)
+        Wear:InvokeServer(76104684961073)
+        Wear:InvokeServer(113280776217715)
+        Wear:InvokeServer(12134501285)
+        Wear:InvokeServer(88423188570127)
+        Wear:InvokeServer(94604639662776)
+        Wear:InvokeServer(134022922877138)
+        Wear:InvokeServer(100316015179747)
+        Wear:InvokeServer(11743311601)
+        Wear:InvokeServer(80195816516327)
+        Wear:InvokeServer(2510235063)
+
+    end
+})
+
+SkinsTab:AddButton({
+    Name = "Goner",
+    Callback = function()
+
+        local Wear = game:GetService("ReplicatedStorage").Remotes.Wear
+
+        Wear:InvokeServer(11274394350)
+        Wear:InvokeServer(17822749561)
+        Wear:InvokeServer(17812417356)
+        Wear:InvokeServer(17812415139)
+        Wear:InvokeServer(17771175724)
+        Wear:InvokeServer(17822722698)
+        Wear:InvokeServer(17772174303)
+        Wear:InvokeServer(17770317484)
+        Wear:InvokeServer(892268340)
+        Wear:InvokeServer(892267099)
+        Wear:InvokeServer(2510236649)
+
+    end
+})
+
+----------------------------------------------------------
+-- ABA RGB + BIO
+----------------------------------------------------------
+local RGBTab = Window:MakeTab({
+    Name = "RGB + BIO",
+    Icon = "rbxassetid://75218041779982",
+    Scrolling = true
+})
+
+-- Lista de cores
+local rgbColors = {
+    Color3.new(1, 0, 0.004161),
+    Color3.new(1, 0, 0.199614),
+    Color3.new(1, 0, 0.328759),
+    Color3.new(1, 0, 0.429368),
+    Color3.new(1, 0, 0.589731),
+    Color3.new(1, 0, 0.902806),
+    Color3.new(0.966330, 0, 1),
+    Color3.new(0.834912, 0, 1),
+    Color3.new(0.791382, 0, 1),
+    Color3.new(0.664456, 0, 1),
+    Color3.new(0.668570, 0, 1),
+    Color3.new(0.596789, 0, 1),
+    Color3.new(0.445471, 0, 1),
+    Color3.new(0.371015, 0, 1),
+    Color3.new(0.295245, 0, 1),
+    Color3.new(0.108400, 0, 1),
+    Color3.new(0.057096, 0, 1),
+    Color3.new(0, 0.135998, 1),
+    Color3.new(0, 0.258361, 1),
+    Color3.new(0, 0.292691, 1),
+    Color3.new(0, 0.472392, 1),
+    Color3.new(0, 0.562154, 1),
+    Color3.new(0, 0.664428, 1),
+    Color3.new(0, 0.740237, 1),
+    Color3.new(0, 0.787741, 1),
+    Color3.new(0, 0.917008, 1),
+    Color3.new(0, 1, 0.988636),
+    Color3.new(0, 1, 0.894186),
+    Color3.new(0, 1, 0.755222),
+    Color3.new(0, 1, 0.680279),
+    Color3.new(0, 1, 0.496102),
+    Color3.new(0, 1, 0.371891),
+    Color3.new(0, 1, 0.223895),
+    Color3.new(0.464880, 1, 0),
+    Color3.new(0.765280, 1, 0),
+    Color3.new(0.861053, 1, 0),
+    Color3.new(0.991914, 1, 0),
+    Color3.new(1, 0.938450, 0),
+    Color3.new(1, 0.857300, 0),
+    Color3.new(1, 0.737320, 0),
+    Color3.new(1, 0.688919, 0),
+    Color3.new(1, 0.590376, 0),
+    Color3.new(1, 0.463648, 0),
+    Color3.new(1, 0.327963, 0),
+    Color3.new(1, 0.245878, 0),
+    Color3.new(1, 0, 0.170379),
+    Color3.new(1, 0, 0.212681)
+}
+
+local rgbSpeed = 10
+local bioSpeed = 10
+local ativo = false
+
+-- Slider velocidade RGB
+RGBTab:AddSlider({
+    Name = "Velocidade RGB",
+    Min = 1,
+    Max = 50,
+    Default = 10,
+    Increment = 1,
+    Callback = function(v)
+        rgbSpeed = v
+    end
+})
+
+-- Slider velocidade BIO
+RGBTab:AddSlider({
+    Name = "Velocidade BIO",
+    Min = 1,
+    Max = 50,
+    Default = 10,
+    Increment = 1,
+    Callback = function(v)
+        bioSpeed = v
+    end
+})
+
+-- Toggle para ligar/desligar os dois ao mesmo tempo
+RGBTab:AddToggle({
+    Name = "RGB + BIO ON/OFF",
+    Default = false,
+    Callback = function(state)
+        ativo = state
+        local remote = game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eColo1r")
+        if not remote then return end
+
+        if ativo then
+            -- Loop RGB do NOME
+            task.spawn(function()
+                while ativo do
+                    for _, color in ipairs(rgbColors) do
+                        if not ativo then break end
+                        remote:FireServer("PickingRPNameColor", color)
+                        task.wait(1 / rgbSpeed)
+                    end
+                end
+            end)
+
+            -- Loop BIO
+            task.spawn(function()
+                while ativo do
+                    for _, color in ipairs(rgbColors) do
+                        if not ativo then break end
+                        remote:FireServer("PickingRPBioColor", color)
+                        task.wait(1 / bioSpeed)
+                    end
+                end
+            end)
+        end
+    end
+})
+
+
+----------------------------------------------------------
+-- LISTA DE CORES DO SimpleSpy
+----------------------------------------------------------
+local skinColors = {
+    "Pastel brown","Light orange","Dark nougat","Brown","Pine Cone","Dirt brown","Really black","Black",
+    "Smoky grey","Dark stone grey","Medium stone grey","Fossil","Flint","Cloudy grey","Mid gray",
+    "Institutional white","Mulberry","Eggplant","Bright violet","Magenta","Royal purple","Navy blue",
+    "Dark blue","Really blue","Bright blue","Cyan","Pastel light blue","Toothpaste","Slime green",
+    "Earth green","Parsley green","Forest green","Grime","Lime green","Artichoke","Mint",
+    "Br. yellowish green","New Yeller","Olive","Deep orange","Br. yellowish orange","Fawn brown",
+    "Burlap","Brick yellow","Beige","CGA brown","Rust","Cocoa","Maroon","Burgundy","Tawny",
+    "Really red","Hot pink","Pink","Carnation pink","Sunrise","Salmon","Light reddish violet"
+}
+
+local remote = game:GetService("ReplicatedStorage").Remotes:FindFirstChild("ChangeBodyColor")
+
+local skinRGBActive = false
+local skinRGBReverseActive = false
+local skinSpeed = 10
+
+
+
+----------------------------------------------------------
+-- LISTA DE CORES DO SimpleSpy
+----------------------------------------------------------
+local skinColors = {
+    "Pastel brown","Light orange","Dark nougat","Brown","Pine Cone","Dirt brown","Really black","Black",
+    "Smoky grey","Dark stone grey","Medium stone grey","Fossil","Flint","Cloudy grey","Mid gray",
+    "Institutional white","Mulberry","Eggplant","Bright violet","Magenta","Royal purple","Navy blue",
+    "Dark blue","Really blue","Bright blue","Cyan","Pastel light blue","Toothpaste","Slime green",
+    "Earth green","Parsley green","Forest green","Grime","Lime green","Artichoke","Mint",
+    "Br. yellowish green","New Yeller","Olive","Deep orange","Br. yellowish orange","Fawn brown",
+    "Burlap","Brick yellow","Beige","CGA brown","Rust","Cocoa","Maroon","Burgundy","Tawny",
+    "Really red","Hot pink","Pink","Carnation pink","Sunrise","Salmon","Light reddish violet"
+}
+
+local remote = game:GetService("ReplicatedStorage").Remotes:FindFirstChild("ChangeBodyColor")
+
+local skinRGBActive = false
+local skinRGBReverseActive = false
+local skinSpeed = 10
+
+----------------------------------------------------------
+-- SLIDER VELOCIDADE
+----------------------------------------------------------
+RGBTab:AddSlider({
+    Name = "Velocidade RGB da Pele",
+    Min = 1,
+    Max = 50,
+    Default = 10,
+    Increment = 1,
+    Callback = function(v)
+        skinSpeed = v
+    end
+})
+
+----------------------------------------------------------
+-- FUNÇÃO DO RGB NORMAL
+----------------------------------------------------------
+local function startSkinRGB()
+    task.spawn(function()
+        while skinRGBActive do
+            for _, colorName in ipairs(skinColors) do
+                if not skinRGBActive then break end
+                remote:FireServer(colorName)
+                task.wait(1 / skinSpeed)
+            end
+        end
+    end)
+end
+
+----------------------------------------------------------
+-- FUNÇÃO DO RGB INVERTIDO
+----------------------------------------------------------
+local function startSkinRGBReverse()
+    task.spawn(function()
+        while skinRGBReverseActive do
+            for i = #skinColors, 1, -1 do
+                if not skinRGBReverseActive then break end
+                remote:FireServer(skinColors[i])
+                task.wait(1 / skinSpeed)
+            end
+        end
+    end)
+end
+
+----------------------------------------------------------
+-- TOGGLE RGB NORMAL
+----------------------------------------------------------
+RGBTab:AddToggle({
+    Name = "RGB DA PELE (Normal) ON/OFF",
+    Default = false,
+    Callback = function(state)
+        skinRGBActive = state
+        if state then
+            startSkinRGB()
+        end
+    end
+})
+
+----------------------------------------------------------
+-- TOGGLE RGB INVERTIDO
+----------------------------------------------------------
+RGBTab:AddToggle({
+    Name = "RGB DA PELE (Invertido) ON/OFF",
+    Default = false,
+    Callback = function(state)
+        skinRGBReverseActive = state
+        if state then
+            startSkinRGBReverse()
+        end
+    end
+})
+
+----------------------------------------------------------
+-- ABA SPAWN
+----------------------------------------------------------
+local SpawnTab = Window:MakeTab({
+    Name = "Spawn",
+    Icon = "rbxassetid://122111755573310" -- Substitua pelo seu ícone
+})
+
+-- Tabela de carros
+local cars = {
+    ["Car 1"] = "Lambo",
+    ["Car 2"] = "NascarTruck",
+    ["Car 3"] = "Challenger",
+    ["Car 4"] = "JDMCoupe",
+    ["Car 5"] = "CopLambo",
+    ["Car 6"] = "CopSUV",
+    ["Car 7"] = "September2025StreetHotHatchTeal1",
+    ["Car 8"] = "September2025StreetWidebodyCamaroBlue1",
+    ["Car 9"] = "FordGT",
+    ["Car 10"] = "Raptor",
+    ["Car 11"] = "SmartCar",
+    ["Car 12"] = "September2025StreetCompactPink1",
+    ["Car 13"] = "Cadillac",
+    ["Car 14"] = "Jeep",
+    ["Car 15"] = "FireTruck",
+    ["Car 16"] = "SUVFire",
+    ["Car 17"] = "Taxi",
+    ["Car 18"] = "GarbageTruck",
+    ["Car 19"] = "MoonBuggy",
+    ["Car 20"] = "QuadStock"
+}
+
+-- Tabela de itens
+local items = {
+    ["Sofá"] = "Couch",
+    ["Macaco"] = "BabyMonkey",
+    ["Bomba"] = "Bomb",
+    ["Carrinho"] = "ShoppingCart",
+    ["Carrinho 2"] = "Wagon",
+    ["Caixa de som"] = "Boombox",
+    ["Bola"] = "SoccerBall",
+    ["Maca"] = "Stretcher"
+}
+
+-- Variáveis selecionadas
+local selectedCar = "Car 1"
+local selectedItem = "Sofá"
+
+-- Dropdown para carros
+SpawnTab:AddDropdown({
+    Name = "Escolher Carro",
+    Options = (function()
+        local list = {}
+        for name, _ in pairs(cars) do
+            table.insert(list, name)
+        end
+        return list
+    end)(),
+    Default = selectedCar,
+    Callback = function(option)
+        selectedCar = option
+    end
+})
+
+-- Botão Spawn Carro
+SpawnTab:AddButton({
+    Name = "Spawn Carro",
+    Callback = function()
+        if selectedCar and cars[selectedCar] then
+            local args = {
+                [1] = "PickingCar",
+                [2] = cars[selectedCar]
+            }
+            local remote = game:GetService("ReplicatedStorage").RE:FindFirstChild("1Ca1r")
+            if remote then
+                remote:FireServer(unpack(args))
+            end
+        end
+    end
+})
+
+-- Dropdown para itens
+SpawnTab:AddDropdown({
+    Name = "Escolher Item",
+    Options = (function()
+        local list = {}
+        for name, _ in pairs(items) do
+            table.insert(list, name)
+        end
+        return list
+    end)(),
+    Default = selectedItem,
+    Callback = function(option)
+        selectedItem = option
+    end
+})
+
+-- =========================
+-- Aba Teleporte
+-- =========================
+local TeleportTab = Window:MakeTab({
+    Name = "Teleporte",
+    Icon = "rbxassetid://12689978575" -- substitua pelo ícone que quiser
+})
+
+-- Coordenadas de todos os locais
+local locais = {
+    ["Cemitério"] = Vector3.new(-467, 2, 53),
+    ["Tóxico"] = Vector3.new(561, 1, 387),
+    ["Lobby"] = Vector3.new(-27, 2, -9),
+    ["Praia"] = Vector3.new(-212, 1, 686),
+    ["Fazenda"] = Vector3.new(-839, 3, -285),
+    ["Monte Everest"] = Vector3.new(-667, 251, 760),
+    ["Posto de gasosa"] = Vector3.new(82, 3, -298),
+    ["Nada"] = Vector3.new(-1379, 76, -1352),
+    ["Limbo"] = Vector3.new(204, -400, -80)
+}
+
+-- Variável para armazenar a escolha
+local chosenLocation = nil
+
+-- Dropdown para escolher local
+TeleportTab:AddDropdown({
+    Name = "Escolher Local",
+    Default = "Escolher Local",
+    Options = {"Cemitério", "Tóxico", "Lobby", "Praia", "Fazenda", "Monte Everest", "Posto de gasosa", "Nada", "Limbo"},
+    Callback = function(value)
+        chosenLocation = value
+    end
+})
+
+-- Botão de teleportar
+TeleportTab:AddButton({
+    Name = "Teleportar",
+    Callback = function()
+        if chosenLocation and locais[chosenLocation] then
+            local player = game.Players.LocalPlayer
+            local char = player.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                char.HumanoidRootPart.CFrame = CFrame.new(locais[chosenLocation])
+            end
+        else
+            warn("Escolha um local antes de teleportar!")
+        end
+    end
+})
+
+            local function startMeteorEvent()
+                local rootPart = PlayerChar:WaitForChild("HumanoidRootPart")
+                local targetPosition = rootPart.Position
+                local startCFrame = CFrame.new(targetPosition + Vector3.new(0, START_DISTANCE,0))
+                MeteorPart = createMeteor(startCFrame)
+                local tween = TweenService:Create(MeteorPart,TweenInfo.new(TRAVEL_DURATION,Enum.EasingStyle.Linear),{CFrame=CFrame.new(targetPosition)})
+                tween:Play()
+                tween.Completed:Once(function()
+                    createExplosionEffect(targetPosition)
+                    MeteorPart:Destroy()
+                    MeteorPart=nil
+                end)
+            end
+
+            startMeteorEvent()
+        end)
+    end
+})
+
+-- Bolas  KKK
+MapTab:AddButton({
+    Name = "Bolas KKK",
+    Callback = function()
+        spawn(function()
+            local Players = game:GetService("Players")
+            local Workspace = game:GetService("Workspace")
+            local TweenService = game:GetService("TweenService")
+            local RandomGen = Random.new()
+            local PlayerChar = plr.Character or plr.CharacterAdded:Wait()
+
+            local NUMBER_OF_METEORS = 80
+            local DISPERSION_RADIUS = 300
+            local METEOR_SIZE = Vector3.new(25,25,25)
+            local METEOR_COLOR = Color3.fromRGB(80,80,80)
+            local MIN_START_HEIGHT = 400
+            local MAX_START_HEIGHT = 800
+            local START_HORIZONTAL_SPREAD = 150
+            local MIN_TRAVEL_DURATION = 40
+            local MAX_TRAVEL_DURATION = 80
+
+            local function createMeteor(startCFrame)
+                local part = Instance.new("Part")
+                part.Size = METEOR_SIZE
+                part.Color = METEOR_COLOR
+                part.Shape = Enum.PartType.Ball
+                part.Anchored = true
+                part.CanCollide = false
+                part.CFrame = startCFrame
+                part.Parent = Workspace
+                return part
+            end
+
+            local function launchMeteor(startCFrame,targetPos,duration)
+                local meteor = createMeteor(startCFrame)
+                local tween = TweenService:Create(meteor,TweenInfo.new(duration,Enum.EasingStyle.Linear),{CFrame=CFrame.new(targetPos)})
+                tween:Play()
+                tween.Completed:Once(function()
+                    meteor:Destroy()
+                end)
+            end
+
+            local rootPart = PlayerChar:WaitForChild("HumanoidRootPart")
+            local center = rootPart.Position
+            for i=1,NUMBER_OF_METEORS do
+                local angle = RandomGen:NextNumber()*2*math.pi
+                local dist = RandomGen:NextNumber()*DISPERSION_RADIUS
+                local target = center + Vector3.new(math.cos(angle)*dist,0,math.sin(angle)*dist)
+                local height = RandomGen:NextNumber(MIN_START_HEIGHT,MAX_START_HEIGHT)
+                local offsetX = RandomGen:NextNumber(-START_HORIZONTAL_SPREAD,START_HORIZONTAL_SPREAD)
+                local offsetZ = RandomGen:NextNumber(-START_HORIZONTAL_SPREAD,START_HORIZONTAL_SPREAD)
+                local startPos = target + Vector3.new(offsetX,height,offsetZ)
+                launchMeteor(CFrame.new(startPos),target,RandomGen:NextNumber(MIN_TRAVEL_DURATION,MAX_TRAVEL_DURATION))
+            end
+        end)
+    end
+})
+
+
+-- Criar Aba "Tela"
+local TelaTab = Window:MakeTab({
+    Name = "Tela",
+    Icon = "rbxassetid://6031075938" -- ícone genérico
+})
+
+-- Função auxiliar para executar scripts LocalScript de forma segura
+local function executarScript(scriptString)
+    local func, err = loadstring(scriptString)
+    if func then
+        func()
+    else
+        warn("Erro ao carregar o script: "..err)
+    end
+end
+
+local sun = getOrCreateEffect("SunRaysEffect","CinematicSunRays")
+sun.Intensity = 0.12
+sun.Spread = 0.8
+
+Settings().Rendering.TextureQuality = Enum.TextureQuality.High
+Settings().Rendering.GraphicsMode = Enum.GraphicsMode.DirectX11
+
+print("Modo Cinematográfico ativado!")
+        ]])
+    end
+})
+
+-- 6️⃣ Terror
+TelaTab:AddButton({
+    Name = "Terror",
+    Callback = function()
+        executarScript([[
+local Lighting = game:GetService("Lighting")
+
+local function getOrCreateEffect(class,name)
+    local effect = Lighting:FindFirstChild(name)
+    if not effect then
+        effect = Instance.new(class)
+        effect.Name = name
+        effect.Parent = Lighting
+    end
+    return effect
+end
+
+Lighting.Technology = Enum.Technology.ShadowMap
+Lighting.GlobalShadows = true
+Lighting.Ambient = Color3.fromRGB(120,130,120)
+Lighting.OutdoorAmbient = Color3.fromRGB(150,160,150)
+Lighting.Brightness = 1.0
+Lighting.TimeOfDay = "18:00:00"
+
+local cc = getOrCreateEffect("ColorCorrectionEffect","TerrorVisualColor")
+cc.Saturation = -0.5
+cc.Contrast = 0.4
+cc.TintColor = Color3.fromRGB(150,150,180)
+
+Lighting.FogStart = 20
+Lighting.FogEnd = 80
+Lighting.FogColor = Color3.fromRGB(100,100,100)
+
+local bloom = getOrCreateEffect("BloomEffect","TerrorVisualBloom")
+bloom.Intensity = 0.3
+bloom.Size = 10
+bloom.Threshold = 1.0
+
+local blur = getOrCreateEffect("BlurEffect","TerrorVisualBlur")
+blur.Size = 2.0
+
+print("Modo Terror ativado!")
+        ]])
+    end
+})
+
+
+
+
+----------------------------------------------------------------
+-- 🔥 Criar nova aba "R6 e R15"
+----------------------------------------------------------------
+local Aba_R6R15 = Window:MakeTab({
+    Name = "R6 e R15",
+    Icon = "rbxassetid://7734068321"
+})
+
+-- Função auxiliar para criar botões
+local function AddBodyButton(name, argsTable)
+    Aba_R6R15:AddButton({
+        Name = name,
+        Callback = function()
+            pcall(function()
+                game:GetService("ReplicatedStorage").Remotes.ChangeCharacterBody:InvokeServer(unpack(argsTable))
+            end)
+        end
+    })
+end
+
+----------------------------------------------------------------
+-- 🔘 BOTÕES (cada um executa seu script)
+----------------------------------------------------------------
+
+-- Headless Head
+AddBodyButton("Headless Head", {
+    {
+        0, 0, 0, 0, 0, 16580493236
+    }
+})
+
+-- Corblox
+AddBodyButton("Corblox", {
+    {
+        0, 0, 0, 0, 0, 16580493236
+    }
+})
+
+-- Bunda caída
+AddBodyButton("Bunda caída", {
+    {
+        75159926897589,
+        76683091425509,
+        14567282030,
+        14567281990,
+        14874108946,
+        0
+    }
+})
+
+-- Pequena coxuda
+AddBodyButton("Pequena coxuda", {
+    {
+        84519338962111,
+        104625992479605,
+        89231963593670,
+        101500262169377,
+        130044271500910,
+        0
+    }
+})
+
+-- Sei la moça
+AddBodyButton("Sei la moça", {
+    {
+        97119075795691,
+        72699005696177,
+        122027795919157,
+        80393546275035,
+        125637672664513,
+        0
+    }
+})
+
+-- Mini plusie
+AddBodyButton("Mini plusie", {
+    {
+        14579958702,
+        14583777042,
+        14583777007,
+        14579959249,
+        14579963667,
+        0
+    }
+})
+
+-- Criança da moda
+AddBodyButton("Criança da moda", {
+    {
+        115745153758680,
+        75159926897589,
+        76683091425509,
+        90734460351120,
+        80766960128463,
+        77694936482035
+    }
+})
+
+-- Criança torta
+AddBodyButton("Criança torta", {
+    {
+        16214246112,
+        16214251181,
+        16214249513,
+        16214246210,
+        16214246089,
+        16214247769
+    }
+})
+
+-- 2009 R6
+AddBodyButton("2009 R6", {
+    {
+        106411216404626,
+        87202958751790,
+        81500432784353,
+        103452055306587,
+        129699548221468,
+        0
+    }
+})
+
+-- Menino magrelo
+AddBodyButton("Menino magrelo", {
+    {
+        82491774691726,
+        99519402284266,
+        115905570886697,
+        84418052877367,
+        124343282827669,
+        0
+    }
+})
+
+-- Menino musculoso
+AddBodyButton("Menino musculoso", {
+    {
+        121532625082697,
+        119216187383922,
+        121634444400488,
+        100229264383618,
+        126161096503611,
+        0
+    }
+})
+
+-- Mini homi
+AddBodyButton("Mini homi", {
+    {
+        93074839269016,
+        117079685799715,
+        81502860408959,
+        89658787394734,
+        108834379337347,
+        0
+    }
+})
+
+-- Cheinho
+AddBodyButton("Cheinho", {
+    {
+        16305051918,
+        16305051718,
+        16305053205,
+        16305053865,
+        16305051982,
+        16305055011
+    }
+})
+
+-- Grande cinza
+AddBodyButton("Grande cinza", {
+    {
+        15976071359,
+        15976074883,
+        15976074123,
+        15976074125,
+        15976074171,
+        15976074135
+    }
+})
+
+-- Golem
+AddBodyButton("Golem", {
+    {
+        15489582363,
+        15489584734,
+        15489584622,
+        15489582354,
+        15489584682,
+        15489582340
+    }
+})
+
+-- Mini garanhão
+AddBodyButton("Mini garanhão", {
+    {
+        120973199097564,
+        112849465115864,
+        118345433416023,
+        106586789635639,
+        78321005147549,
+        0
+    }
+})
+
+-- Mini menininho
+AddBodyButton("Mini menininho", {
+    {
+        101678129797722,
+        74948603903648,
+        114267907635155,
+        101387518276175,
+        100840538291335,
+        0
+    }
+})
+
+-- Sem blusa
+AddBodyButton("Sem blusa", {
+    {
+        102344834840946,
+        70400527171038,
+        0,
+        0,
+        0,
+        0
+    }
+})
+
+----------------------------------------------------
+-- Aba ESPS
+----------------------------------------------------
+local abaESPS = Window:MakeTab({
+    Name = "ESPS",
+    Icon = "rbxassetid://6523858394"
+})
+
+----------------------------------------------------
+-- Serviços e variáveis
+----------------------------------------------------
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+
+-- Estado global
+local NAME_ESP_ENABLED = false
+local BOX_ESP_ENABLED = false
+local RAINBOW_MODE = false
+local SELECTED_COLOR = Color3.fromRGB(255,255,255)
+local FONT_SIZE = 18
+
+-- Tables para ESPs
+local NameESPs = {} -- player -> {BillboardGui, Label}
+local BoxESPs = {}  -- player -> Highlight
+
+----------------------------------------------------
+-- Lista de cores
+----------------------------------------------------
+local cores = {
+    ["Rainbow"] = "rainbow",
+    ["Vermelho"] = Color3.fromRGB(255,0,0),
+    ["Azul"] = Color3.fromRGB(0,0,255),
+    ["Verde"] = Color3.fromRGB(0,255,0),
+    ["Roxo"] = Color3.fromRGB(170,0,255),
+    ["Amarelo"] = Color3.fromRGB(255,255,0),
+    ["Branco"] = Color3.fromRGB(255,255,255),
+    ["Preto"] = Color3.fromRGB(0,0,0),
+    ["Ciano"] = Color3.fromRGB(0,255,255),
+    ["Laranja"] = Color3.fromRGB(255,140,0),
+    ["Rosa"] = Color3.fromRGB(255,105,180),
+    ["Marrom"] = Color3.fromRGB(150,75,0),
+    ["Cinza"] = Color3.fromRGB(128,128,128),
+    ["Dourado"] = Color3.fromRGB(212,175,55),
+    ["Verde Escuro"] = Color3.fromRGB(0,100,0),
+    ["Azul Claro"] = Color3.fromRGB(135,206,235),
+    ["Magenta"] = Color3.fromRGB(255,0,255)
+}
+local colorSelectedName = "Branco"
+
+----------------------------------------------------
+-- Funções utilitárias
+----------------------------------------------------
+local function GetAccountAgeDays(player)
+    return tostring(player.AccountAge or 0)
+end
+
+local function CreateNameESP(player)
+    if not player.Character or NameESPs[player] then return end
+    local head = player.Character:FindFirstChild("Head")
+    if not head then return end
+
+    local bill = Instance.new("BillboardGui")
+    bill.Name = "Spectra_NameESP"
+    bill.Adornee = head
+    bill.Size = UDim2.new(0,200,0,50)
+    bill.StudsOffset = Vector3.new(0,2.5,0)
+    bill.AlwaysOnTop = true
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1,0,1,0)
+    label.BackgroundTransparency = 1
+    label.TextScaled = false
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = FONT_SIZE
+    label.TextStrokeTransparency = 0.2
+    label.Text = player.Name.." | "..GetAccountAgeDays(player).." dias"
+    if not RAINBOW_MODE then label.TextColor3 = SELECTED_COLOR end
+    label.Parent = bill
+
+    bill.Parent = head
+    NameESPs[player] = {Bill=bill, Label=label}
+
+    player.CharacterAdded:Connect(function()
+        task.wait(0.8)
+        if NAME_ESP_ENABLED then
+            if NameESPs[player] and NameESPs[player].Bill then NameESPs[player].Bill:Destroy() end
+            NameESPs[player] = nil
+            CreateNameESP(player)
+        end
+    end)
+end
+
+local function RemoveNameESP(player)
+    if NameESPs[player] then
+        pcall(function() NameESPs[player].Bill:Destroy() end)
+        NameESPs[player] = nil
+    end
+end
+
+
+
+----------------------------------------------------
+-- ESP Box 3D com Highlight
+----------------------------------------------------
+local function CreateBoxESP(player)
+    if not player.Character or BoxESPs[player] then return end
+    local model = player.Character
+    local highlight = Instance.new("Highlight")
+    highlight.Adornee = model
+    highlight.FillTransparency = 1 -- invisível dentro
+    highlight.OutlineTransparency = 0
+    highlight.OutlineColor = SELECTED_COLOR
+    highlight.Parent = Workspace
+    BoxESPs[player] = highlight
+
+    player.CharacterAdded:Connect(function()
+        task.wait(0.8)
+        if BOX_ESP_ENABLED then
+            RemoveBoxESP(player)
+            CreateBoxESP(player)
+        end
+    end)
+end
+
+local function RemoveBoxESP(player)
+    if BoxESPs[player] then
+        pcall(function() BoxESPs[player]:Destroy() end)
+        BoxESPs[player] = nil
+    end
+end
+
+----------------------------------------------------
+-- Ativar / Desativar ESPs
+----------------------------------------------------
+local function EnableNameESPs()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then CreateNameESP(plr) end
+    end
+end
+
+local function DisableNameESPs()
+    for plr,_ in pairs(NameESPs) do RemoveNameESP(plr) end
+end
+
+local function EnableBoxESPs()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then CreateBoxESP(plr) end
+    end
+end
+
+local function DisableBoxESPs()
+    for plr,_ in pairs(BoxESPs) do RemoveBoxESP(plr) end
+end
+
+----------------------------------------------------
+-- Atualização por frame (Rainbow e cores)
+----------------------------------------------------
+RunService.RenderStepped:Connect(function()
+    local hue = (tick()%5)/5
+    for plr,data in pairs(NameESPs) do
+        if data and data.Label then
+            data.Label.Text = plr.Name.." | "..GetAccountAgeDays(plr).." dias"
+            data.Label.TextSize = FONT_SIZE
+            if RAINBOW_MODE then
+                data.Label.TextColor3 = Color3.fromHSV(hue,1,1)
+            else
+                data.Label.TextColor3 = SELECTED_COLOR
+            end
+        end
+    end
+    for plr,highlight in pairs(BoxESPs) do
+        if highlight then
+            if RAINBOW_MODE then
+                highlight.OutlineColor = Color3.fromHSV(hue,1,1)
+            else
+                highlight.OutlineColor = SELECTED_COLOR
+            end
+        end
+    end
+end)
+
+----------------------------------------------------
+-- Players joining/leaving
+----------------------------------------------------
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        task.wait(0.8)
+        if NAME_ESP_ENABLED then CreateNameESP(player) end
+        if BOX_ESP_ENABLED then CreateBoxESP(player) end
+    end)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    RemoveNameESP(player)
+    RemoveBoxESP(player)
+end)
+
+for _,plr in pairs(Players:GetPlayers()) do
+    if plr ~= LocalPlayer then
+        plr.CharacterAdded:Connect(function()
+            task.wait(0.8)
+            if NAME_ESP_ENABLED then CreateNameESP(plr) end
+            if BOX_ESP_ENABLED then CreateBoxESP(plr) end
+        end)
+    end
+end
+
+----------------------------------------------------
+-- GUI Controls
+----------------------------------------------------
+-- Nome ESP Toggle
+abaESPS:AddToggle({
+    Name = "ESP Nome ON/OFF",
+    Default = false,
+    Callback = function(state)
+        NAME_ESP_ENABLED = state
+        if state then EnableNameESPs() else DisableNameESPs() end
+    end
+})
+
+-- Box ESP Toggle
+abaESPS:AddToggle({
+    Name = "ESP Box ON/OFF",
+    Default = false,
+    Callback = function(state)
+        BOX_ESP_ENABLED = state
+        if state then EnableBoxESPs() else DisableBoxESPs() end
+    end
+})
+
+-- Color Dropdown
+local options = {}
+for k,_ in pairs(cores) do table.insert(options,k) end
+table.sort(options)
+
+abaESPS:AddDropdown({
+    Name = "Escolher Cor",
+    Default = "Branco",
+    Options = options,
+    Callback = function(selected)
+        colorSelectedName = selected
+        -- Atualiza cor imediatamente
+        if colorSelectedName == "Rainbow" then
+            RAINBOW_MODE = true
+        else
+            RAINBOW_MODE = false
+            SELECTED_COLOR = cores[colorSelectedName] or Color3.fromRGB(255,255,255)
+            for _,data in pairs(NameESPs) do
+                if data and data.Label then data.Label.TextColor3 = SELECTED_COLOR end
+            end
+            for _,highlight in pairs(BoxESPs) do
+                if highlight then highlight.OutlineColor = SELECTED_COLOR end
+            end
+        end
+    end
+})
+
+-- Slider tamanho
+abaESPS:AddSlider({
+    Name = "Tamanho do Nome + Dias",
+    Min = 10,
+    Max = 40,
+    Default = FONT_SIZE,
+    Callback = function(size)
+        FONT_SIZE = size
+        for _,data in pairs(NameESPs) do
+            if data and data.Label then data.Label.TextSize = FONT_SIZE end
+        end
+    end
+})
+
+print("Spectra ESP Finalizado: Nome + Dias + Box 3D (Highlight), Rainbow, cores, visível atrás de paredes, R6/R15.")
+
+
+
+
+----------------------------------------------------------
+-- ABA limitados
+----------------------------------------------------------
+local PlayerTab = Window:MakeTab({
+    Name = "Limited",
+    Icon = "rbxassetid://113114601887005"
+})
+
+-- Função para pegar o nome do jogador atual
+local function getPlayerName()
+    return game.Players.LocalPlayer.Name
+end
+
+-- Função para criar botão que dispara evento
+local function createToolButton(name)
+    PlayerTab:AddButton({
+        Name = name,
+        Callback = function()
+            local args = {
+                [1] = "AcceptedToolToServer",
+                [2] = name,
+                [3] = game.Players:WaitForChild(getPlayerName())
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t"):FireServer(unpack(args))
+        end
+    })
+end
+
+-- Adicionar todos os botões
+createToolButton("EggLauncher")
+createToolButton("Cannon")
+createToolButton("Glider")
+createToolButton("UraniumRod")
+createToolButton("Water Balloon")
+createToolButton("Chainsaw") -- Novo botão adicionado
+
+
+
+
+----------------------------------------------------------
+-- ABA PLAYER
+----------------------------------------------------------
+
+local PlayerTab = Window:MakeTab({
+    Name = "som ids",
+    Icon = "rbxassetid://12339192128"
+})
+
+----------------------------------------------------------
+-- LISTA DE MÚSICAS FUNK
+----------------------------------------------------------
+
+local MusicList = {
+    ["Música 1"] = "131847084942844",
+    ["Música 2"] = "139693447546059",
+    ["Música 3"] = "72182615662988",
+    ["Música 4"] = "79120642849019",
+    ["Música 5"] = "119020235792430",
+    ["Música 6"] = "104417510874127",
+    ["Música 7"] = "95046091312570",
+    ["Música 8"] = "93146696739126",
+    ["Música 9"] = "76312991186384",
+    ["Música 10"] = "83064304128519",
+    ["Música 11"] = "139745829218874",
+    ["Música 12"] = "81700399219236",
+    ["Música 13"] = "92492039534399",
+    ["Música 14"] = "138830667342178",
+    ["Música 16"] = "75800874324383",
+    ["Música 17"] = "85342086082111",
+    ["Música 18"] = "113300606282180",
+    ["Música 19"] = "124085422276732",
+    ["Música 20"] = "97011217688307",
+    ["Música 21"] = "139147474886402",
+    ["Música 22"] = "79349174602261",
+    ["Música 23"] = "93928823862203",
+    ["Música 24"] = "121187736532042",
+    ["Música 25"] = "129546408528391",
+    ["Música 26"] = "112143944982807",
+    ["Música 27"] = "131891110268352",
+    ["Música 29"] = "104481380959795",
+    ["Música 30"] = "110860247960302",
+
+    -- NOVAS FUNK
+    ["Música 31"] = "93590122047380",
+    ["Música 32"] = "106958630419629",
+    ["Música 33"] = "111318048787674",
+    ["Música 34"] = "132082397247824",
+    ["Música 35"] = "104621031886653",
+    ["Música 36"] = "99695831392938",
+    ["Música 37"] = "122039107528238",
+    ["Música 38"] = "104828343009296",
+    ["Música 39"] = "85182585406642",
+}
+
+local MusicNames = {}
+for name,_ in pairs(MusicList) do table.insert(MusicNames, name) end
+local SelectedMusicID = MusicList["Música 1"]
+
+----------------------------------------------------------
+-- DROPDOWN FUNK
+----------------------------------------------------------
+
+PlayerTab:AddDropdown({
+    Name = "Músicas de Funk",
+    Default = "Música 1",
+    Options = MusicNames,
+    Callback = function(option)
+        SelectedMusicID = MusicList[option]
+    end
+})
+
+----------------------------------------------------------
+-- BOTÃO PLAY FUNK
+----------------------------------------------------------
+
+PlayerTab:AddButton({
+    Name = "Play Music (Funk)",
+    Callback = function()
+
+        game.ReplicatedStorage.RE.PlayerToolEvent:FireServer("ToolMusicText", SelectedMusicID)
+        game.ReplicatedStorage.RE:FindFirstChild("1Player1sHous1e"):FireServer("PickHouseMusicText", SelectedMusicID)
+        game.ReplicatedStorage.RE:FindFirstChild("1Player1sCa1r"):FireServer("VehicleMusicPlay", SelectedMusicID)
+        game.ReplicatedStorage.RE:FindFirstChild("1NoMoto1rVehicle1s"):FireServer("PickingScooterMusicText", SelectedMusicID)
+
+    end
+})
+
+----------------------------------------------------------
+-- LISTA DE MÚSICAS PHONK
+----------------------------------------------------------
+
+local PhonkList = {
+    ["Phonk 1"] = "117971716538048",
+    ["Phonk 2"] = "111151077918268",
+    ["Phonk 3"] = "100828493764353",
+    ["Phonk 4"] = "72208831321523",
+    ["Phonk 5"] = "121842269070019",
+    ["Phonk 6"] = "112821767085847",
+    ["Phonk 7"] = "87022583947683",
+    ["Phonk 8"] = "106185171358009",
+    ["Phonk 9"] = "88339486019486",
+    ["Phonk 10"] = "129057182599544",
+    ["Phonk 11"] = "82411642961457",
+    ["Phonk 12"] = "98337901681441",
+    ["Phonk 13"] = "110647877930724",
+    ["Phonk 14"] = "113072044238343",
+    ["Phonk 15"] = "140160495884365",
+    ["Phonk 16"] = "107260053679799",
+    ["Phonk 17"] = "120504339752285",
+    ["Phonk 18"] = "70626485375251",
+    ["Phonk 19"] = "74424698514019",
+    ["Phonk 20"] = "113768944849093",
+    ["Phonk 21"] = "81665575945119",
+    ["Phonk 22"] = "103409297553965",
+    ["Phonk 23"] = "117562011395992",
+    ["Phonk 24"] = "107424491541808",
+    ["Phonk 25"] = "79381341943021",
+    ["Phonk 26"] = "111668097052966",
+}
+
+local PhonkNames = {}
+for name,_ in pairs(PhonkList) do table.insert(PhonkNames, name) end
+local SelectedPhonkID = PhonkList["Phonk 1"]
+
+----------------------------------------------------------
+-- DROPDOWN PHONK
+----------------------------------------------------------
+
+PlayerTab:AddDropdown({
+    Name = "Músicas Phonk",
+    Default = "Phonk 1",
+    Options = PhonkNames,
+    Callback = function(option)
+        SelectedPhonkID = PhonkList[option]
+    end
+})
+
+----------------------------------------------------------
+-- BOTÃO PLAY PHONK
+----------------------------------------------------------
+
+PlayerTab:AddButton({
+    Name = "Play Music (Phonk)",
+    Callback = function()
+
+        game.ReplicatedStorage.RE.PlayerToolEvent:FireServer("ToolMusicText", SelectedPhonkID)
+        game.ReplicatedStorage.RE:FindFirstChild("1Player1sHous1e"):FireServer("PickHouseMusicText", SelectedPhonkID)
+        game.ReplicatedStorage.RE:FindFirstChild("1Player1sCa1r"):FireServer("VehicleMusicPlay", SelectedPhonkID)
+        game.ReplicatedStorage.RE:FindFirstChild("1NoMoto1rVehicle1s"):FireServer("PickingScooterMusicText", SelectedPhonkID)
+
+    end
+})
