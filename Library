@@ -1,270 +1,250 @@
--- AssureUI Library - Melhorada e Modular
--- Basta colocar como ModuleScript e importar via require()
+--[[
+    Peli Library v1.0
+    GUI Framework para Roblox
+    Features:
+    - Abas
+    - Toggles
+    - Sliders
+    - Color Pickers
+    - Text Inputs
+    - Notificações
+    - Custom Icon / Letter
+]]
 
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
+local PeliLibrary = {}
+PeliLibrary.__index = PeliLibrary
+
 local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local CoreGui = game:GetService("CoreGui")
-local TextService = game:GetService("TextService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
 
-local LocalPlayer = Players.LocalPlayer
-
--- Tema padrão
-local Theme = {
-    Background = Color3.fromRGB(20,20,20),
-    Sidebar = Color3.fromRGB(25,25,25),
-    Section = Color3.fromRGB(28,28,28),
-    Text = Color3.fromRGB(240,240,240),
-    TextDark = Color3.fromRGB(150,150,150),
-    Accent = Color3.fromRGB(0,122,204),
-    Border = Color3.fromRGB(45,45,45),
-    Hover = Color3.fromRGB(35,35,35)
+-- ===== CORE COLORS =====
+local COLORS = {
+    White = Color3.fromRGB(255, 255, 255),
+    Black = Color3.fromRGB(0, 0, 0),
+    Background = Color3.fromRGB(15, 15, 15),
+    DarkBG = Color3.fromRGB(25, 25, 25),
+    Frame = Color3.fromRGB(35, 35, 35),
+    Gray = Color3.fromRGB(50, 50, 50),
+    LightGray = Color3.fromRGB(160, 160, 160),
+    Green = Color3.fromRGB(80, 220, 100),
+    Red = Color3.fromRGB(220, 70, 70),
+    ActiveGreen = Color3.fromRGB(40, 100, 50),
+    ActiveRed = Color3.fromRGB(120, 35, 35),
 }
 
-local Library = {}
-Library.__index = Library
-Library.Flags = {}
-Library.Notifications = Instance.new("ScreenGui")
-Library.Notifications.Name = "AssureNotifications"
-Library.Notifications.Parent = CoreGui
-Library.Notifications.ZIndexBehavior = Enum.ZIndexBehavior.Global
+local ColorPresets = {
+    {name = "White", r=255,g=255,b=255},
+    {name = "Red", r=255,g=70,b=70},
+    {name = "Green", r=70,g=255,b=100},
+    {name = "Blue", r=70,g=130,b=255},
+    {name = "Yellow", r=255,g=230,b=70},
+    {name = "Purple", r=180,g=70,b=255},
+    {name = "Cyan", r=70,g=230,b=255},
+    {name = "Orange", r=255,g=150,b=70},
+    {name = "Pink", r=255,g=120,b=200},
+    {name = "Gray", r=140,g=140,b=140},
+}
 
--- Funções utilitárias
-local function createUICorner(parent, radius)
-    local uiCorner = Instance.new("UICorner")
-    uiCorner.CornerRadius = UDim.new(0, radius or 8)
-    uiCorner.Parent = parent
-    return uiCorner
+-- ===== HELPERS =====
+local function tween(obj, props, duration)
+    if not obj or not obj.Parent then return end
+    TweenService:Create(obj, TweenInfo.new(duration or 0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), props):Play()
 end
 
-local function createUIStroke(parent, color, thickness)
-    local uiStroke = Instance.new("UIStroke")
-    uiStroke.Color = color or Color3.fromRGB(50,50,50)
-    uiStroke.Thickness = thickness or 1
-    uiStroke.Parent = parent
-    return uiStroke
+local function createCorner(parent, radius)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, radius or 12)
+    corner.Parent = parent
+    return corner
 end
 
-local function makeDraggable(topbar, frame)
-    local dragging, dragInput, dragStart, startPos
-    local function update(input)
-        local delta = input.Position - dragStart
-        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset+delta.X, startPos.Y.Scale, startPos.Y.Offset+delta.Y)
-    end
-
-    topbar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then dragging = false end
-            end)
-        end
-    end)
-
-    topbar.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then update(input) end
-    end)
+local function createStroke(parent, color, thickness, transparency)
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = color or COLORS.White
+    stroke.Thickness = thickness or 1.5
+    stroke.Transparency = transparency or 0.3
+    stroke.Parent = parent
+    return stroke
 end
 
--- Notificação simples
-function Library:Notify(title,text,duration)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0,250,0,70)
-    frame.Position = UDim2.new(1,260,1,-80)
-    frame.BackgroundColor3 = Theme.Section
-    frame.BorderColor3 = Theme.Border
-    frame.BorderSizePixel = 1
-    frame.Parent = self.Notifications
-    frame.ClipsDescendants = true
+local function createGradient(parent, color1, color2, rotation)
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0, color1), ColorSequenceKeypoint.new(1, color2)}
+    gradient.Rotation = rotation or 90
+    gradient.Parent = parent
+    return gradient
+end
 
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1,-20,0,20)
-    titleLabel.Position = UDim2.new(0,10,0,5)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = title
-    titleLabel.TextColor3 = Theme.Accent
-    titleLabel.Font = Enum.Font.Code
-    titleLabel.TextSize = 14
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.Parent = frame
-
-    local descLabel = Instance.new("TextLabel")
-    descLabel.Size = UDim2.new(1,-20,0,40)
-    descLabel.Position = UDim2.new(0,10,0,25)
-    descLabel.BackgroundTransparency = 1
-    descLabel.Text = text
-    descLabel.TextColor3 = Theme.Text
-    descLabel.Font = Enum.Font.Gotham
-    descLabel.TextSize = 12
-    descLabel.TextWrapped = true
-    descLabel.TextXAlignment = Enum.TextXAlignment.Left
-    descLabel.TextYAlignment = Enum.TextYAlignment.Top
-    descLabel.Parent = frame
-
-    local bar = Instance.new("Frame")
-    bar.Size = UDim2.new(1,0,0,2)
-    bar.Position = UDim2.new(0,0,1,-2)
-    bar.BackgroundColor3 = Theme.Accent
-    bar.BorderSizePixel = 0
-    bar.Parent = frame
-
-    TweenService:Create(frame,TweenInfo.new(0.5),{Position = UDim2.new(1,-260,1,-80)}):Play()
-    TweenService:Create(bar,TweenInfo.new(duration or 3,Enum.EasingStyle.Linear),{Size=UDim2.new(0,0,0,2)}):Play()
-
-    task.delay(duration or 3,function()
-        local tween = TweenService:Create(frame,TweenInfo.new(0.5),{Position = UDim2.new(1,260,1,-80)})
-        tween:Play()
-        tween.Completed:Connect(function() frame:Destroy() end)
+local function notify(text)
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "PELI LIBRARY",
+            Text = text,
+            Duration = 2.5,
+            Icon = ""
+        })
     end)
 end
 
--- Criar Janela
-function Library:CreateWindow(title)
-    local Window = {}
-    Window.Tabs = {}
-    Window.TabButtons = {}
+-- ===== GUI CREATION =====
+function PeliLibrary.new(title)
+    local self = setmetatable({}, PeliLibrary)
 
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "AssureUI"
-    screenGui.ResetOnSpawn = false
-    screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    -- ScreenGui
+    self.ScreenGui = Instance.new("ScreenGui")
+    self.ScreenGui.Name = title or "PeliLibrary"
+    self.ScreenGui.ResetOnSpawn = false
+    self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    self.ScreenGui.Parent = game.CoreGui
 
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Name = "MainFrame"
-    mainFrame.Size = UDim2.new(0,550,0,380)
-    mainFrame.Position = UDim2.new(0.5,-275,0.5,-190)
-    mainFrame.BackgroundColor3 = Theme.Background
-    mainFrame.BorderColor3 = Theme.Border
-    mainFrame.BorderSizePixel = 1
-    mainFrame.Parent = screenGui
+    -- Main Frame
+    self.MainFrame = Instance.new("Frame")
+    self.MainFrame.Size = UDim2.new(0, 550, 0, 340)
+    self.MainFrame.Position = UDim2.new(0.5, -275, 0.5, -170)
+    self.MainFrame.BackgroundColor3 = COLORS.Background
+    self.MainFrame.BorderSizePixel = 0
+    self.MainFrame.Active = true
+    self.MainFrame.Draggable = true
+    self.MainFrame.ClipsDescendants = true
+    self.MainFrame.Parent = self.ScreenGui
+    createCorner(self.MainFrame, 18)
+    createStroke(self.MainFrame, COLORS.White, 2, 0)
 
-    local header = Instance.new("Frame")
-    header.Name = "Header"
-    header.Size = UDim2.new(1,0,0,35)
-    header.BackgroundColor3 = Theme.Sidebar
-    header.BorderColor3 = Theme.Border
-    header.BorderSizePixel = 1
-    header.Parent = mainFrame
-    makeDraggable(header,mainFrame)
+    -- Header
+    self.Header = Instance.new("Frame", self.MainFrame)
+    self.Header.Size = UDim2.new(1, 0, 0, 52)
+    self.Header.BackgroundColor3 = COLORS.White
+    self.Header.BorderSizePixel = 0
+    createCorner(self.Header, 18)
+    createGradient(self.Header, Color3.fromRGB(240, 240, 240), Color3.fromRGB(180, 180, 180))
 
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1,-10,1,0)
-    titleLabel.Position = UDim2.new(0,10,0,0)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = title
-    titleLabel.TextColor3 = Theme.Accent
-    titleLabel.TextSize = 17
-    titleLabel.Font = Enum.Font.Code
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.Parent = header
+    self.TitleLabel = Instance.new("TextLabel", self.Header)
+    self.TitleLabel.Size = UDim2.new(1, -120, 1, 0)
+    self.TitleLabel.Position = UDim2.new(0, 10, 0, 0)
+    self.TitleLabel.BackgroundTransparency = 1
+    self.TitleLabel.Text = title or "PELI LIBRARY"
+    self.TitleLabel.TextColor3 = COLORS.Black
+    self.TitleLabel.Font = Enum.Font.GothamBlack
+    self.TitleLabel.TextSize = 17
+    self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-    local closeBtn = Instance.new("TextButton")
-    closeBtn.Size = UDim2.new(0,35,1,0)
-    closeBtn.Position = UDim2.new(1,-35,0,0)
-    closeBtn.BackgroundTransparency = 1
-    closeBtn.Text = "X"
-    closeBtn.TextColor3 = Theme.TextDark
+    -- Close Button
+    local closeBtn = Instance.new("TextButton", self.Header)
+    closeBtn.Size = UDim2.new(0, 28, 0, 28)
+    closeBtn.Position = UDim2.new(1, -38, 0.5, -14)
+    closeBtn.Text = "×"
+    closeBtn.BackgroundColor3 = COLORS.Red
+    closeBtn.TextColor3 = COLORS.White
     closeBtn.Font = Enum.Font.GothamBold
-    closeBtn.TextSize = 14
-    closeBtn.Parent = header
+    closeBtn.TextSize = 18
+    createCorner(closeBtn, 8)
     closeBtn.MouseButton1Click:Connect(function()
-        screenGui:Destroy()
+        self.ScreenGui:Destroy()
     end)
 
-    local sidebar = Instance.new("ScrollingFrame")
-    sidebar.Size = UDim2.new(0,140,1, -36)
-    sidebar.Position = UDim2.new(0,0,0,36)
-    sidebar.BackgroundColor3 = Theme.Sidebar
-    sidebar.BorderColor3 = Theme.Border
-    sidebar.BorderSizePixel = 1
-    sidebar.ScrollBarThickness = 2
-    sidebar.Parent = mainFrame
+    -- Sidebar
+    self.TabSidebar = Instance.new("Frame", self.MainFrame)
+    self.TabSidebar.Size = UDim2.new(0, 110, 0, 280)
+    self.TabSidebar.Position = UDim2.new(0, 5, 0, 56)
+    self.TabSidebar.BackgroundColor3 = COLORS.DarkBG
+    self.TabSidebar.BorderSizePixel = 0
+    createCorner(self.TabSidebar, 14)
+    createStroke(self.TabSidebar, COLORS.Gray, 1, 0.5)
 
-    local sidebarLayout = Instance.new("UIListLayout")
-    sidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    sidebarLayout.Parent = sidebar
+    self.TabButtons = {}
+    self.ContentArea = Instance.new("Frame", self.MainFrame)
+    self.ContentArea.Size = UDim2.new(0, 425, 0, 280)
+    self.ContentArea.Position = UDim2.new(0, 120, 0, 56)
+    self.ContentArea.BackgroundTransparency = 1
+    self.ContentArea.BorderSizePixel = 0
 
-    local contentArea = Instance.new("Frame")
-    contentArea.Size = UDim2.new(1,-142,1,-36)
-    contentArea.Position = UDim2.new(0,142,0,36)
-    contentArea.BackgroundTransparency = 1
-    contentArea.ClipsDescendants = true
-    contentArea.Parent = mainFrame
-
-    function Window:AddTab(tabName)
-        local tabBtn = Instance.new("TextButton")
-        tabBtn.Size = UDim2.new(1,0,0,32)
-        tabBtn.BackgroundColor3 = Theme.Sidebar
-        tabBtn.Text = tabName
-        tabBtn.TextColor3 = Theme.TextDark
-        tabBtn.Font = Enum.Font.Gotham
-        tabBtn.TextSize = 12
-        tabBtn.BorderSizePixel = 0
-        tabBtn.Parent = sidebar
-
-        local tabContent = Instance.new("ScrollingFrame")
-        tabContent.Size = UDim2.new(1,-4,1,0)
-        tabContent.Position = UDim2.new(0,4,0,0)
-        tabContent.BackgroundTransparency = 1
-        tabContent.BorderSizePixel = 0
-        tabContent.Visible = #Window.Tabs == 0
-        tabContent.Parent = contentArea
-
-        local listLayout = Instance.new("UIListLayout")
-        listLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        listLayout.Padding = UDim.new(0,6)
-        listLayout.Parent = tabContent
-
-        local tab = {}
-        tab.Content = tabContent
-
-        function tab:AddSection(name)
-            local section = Instance.new("Frame")
-            section.Size = UDim2.new(1,-4,0,30)
-            section.BackgroundColor3 = Theme.Section
-            section.BorderColor3 = Theme.Border
-            section.BorderSizePixel = 1
-            section.Parent = tabContent
-
-            local sectionLabel = Instance.new("TextLabel")
-            sectionLabel.Size = UDim2.new(1,-10,0,20)
-            sectionLabel.Position = UDim2.new(0,5,0,2)
-            sectionLabel.BackgroundTransparency = 1
-            sectionLabel.Text = name:upper()
-            sectionLabel.TextColor3 = Theme.Accent
-            sectionLabel.Font = Enum.Font.Code
-            sectionLabel.TextSize = 11
-            sectionLabel.TextXAlignment = Enum.TextXAlignment.Left
-            sectionLabel.Parent = section
-
-            local sectionLayout = Instance.new("UIListLayout")
-            sectionLayout.SortOrder = Enum.SortOrder.LayoutOrder
-            sectionLayout.Padding = UDim.new(0,4)
-            sectionLayout.Parent = section
-
-            return section
-        end
-
-        tabBtn.MouseButton1Click:Connect(function()
-            for _, t in pairs(Window.Tabs) do t.Content.Visible = false end
-            tabContent.Visible = true
-        end)
-
-        table.insert(Window.Tabs,tab)
-        table.insert(Window.TabButtons,tabBtn)
-        return tab
-    end
-
-    return Window
+    self.Tabs = {}
+    return self
 end
 
-return Library
+-- ===== TAB CREATION =====
+function PeliLibrary:AddTab(name)
+    local btn = Instance.new("TextButton", self.TabSidebar)
+    btn.Size = UDim2.new(1, -8, 0, 30)
+    btn.Position = UDim2.new(0, 4, 0, (#self.TabButtons)*34 + 4)
+    btn.Text = name
+    btn.BackgroundColor3 = COLORS.Frame
+    btn.TextColor3 = COLORS.LightGray
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 10
+    createCorner(btn, 8)
+    self.TabButtons[#self.TabButtons+1] = btn
+
+    local container = Instance.new("ScrollingFrame", self.ContentArea)
+    container.Size = UDim2.new(1, 0, 1, 0)
+    container.BackgroundTransparency = 1
+    container.BorderSizePixel = 0
+    container.ScrollBarThickness = 3
+    container.Visible = (#self.TabButtons==1)
+    self.Tabs[name] = container
+
+    btn.MouseButton1Click:Connect(function()
+        for _, c in pairs(self.Tabs) do c.Visible = false end
+        container.Visible = true
+        for _, b in pairs(self.TabButtons) do
+            b.BackgroundColor3 = COLORS.Frame
+            b.TextColor3 = COLORS.LightGray
+        end
+        btn.BackgroundColor3 = COLORS.White
+        btn.TextColor3 = COLORS.Black
+    end)
+
+    return container
+end
+
+-- ===== UI ELEMENTS =====
+function PeliLibrary:CreateToggle(parent, label, default, callback)
+    local container = Instance.new("Frame", parent)
+    container.Size = UDim2.new(1, -12, 0, 38)
+    container.BackgroundColor3 = default and COLORS.ActiveRed or COLORS.ActiveGreen
+    container.BorderSizePixel = 0
+    createCorner(container, 10)
+    createStroke(container, default and COLORS.Red or COLORS.Green, 2, 0)
+
+    local toggleBtn = Instance.new("Frame", container)
+    toggleBtn.Size = UDim2.new(0, 34, 0, 26)
+    toggleBtn.Position = UDim2.new(1, -40, 0.5, -13)
+    toggleBtn.BackgroundColor3 = default and COLORS.Red or COLORS.Green
+    createCorner(toggleBtn, 8)
+
+    local toggleIcon = Instance.new("TextLabel", toggleBtn)
+    toggleIcon.Size = UDim2.new(1,0,1,0)
+    toggleIcon.BackgroundTransparency = 1
+    toggleIcon.Text = default and "×" or "✓"
+    toggleIcon.TextColor3 = COLORS.White
+    toggleIcon.Font = Enum.Font.GothamBold
+    toggleIcon.TextSize = 16
+
+    local labelTxt = Instance.new("TextLabel", container)
+    labelTxt.Size = UDim2.new(1, -55, 1, 0)
+    labelTxt.Position = UDim2.new(0, 10, 0, 0)
+    labelTxt.BackgroundTransparency = 1
+    labelTxt.Text = label
+    labelTxt.TextColor3 = COLORS.White
+    labelTxt.Font = Enum.Font.GothamSemibold
+    labelTxt.TextSize = 11
+    labelTxt.TextXAlignment = Enum.TextXAlignment.Left
+
+    local clickBtn = Instance.new("TextButton", container)
+    clickBtn.Size = UDim2.new(1,0,1,0)
+    clickBtn.BackgroundTransparency = 1
+    clickBtn.Text = ""
+    clickBtn.MouseButton1Click:Connect(function()
+        default = not default
+        container.BackgroundColor3 = default and COLORS.ActiveRed or COLORS.ActiveGreen
+        toggleBtn.BackgroundColor3 = default and COLORS.Red or COLORS.Green
+        toggleIcon.Text = default and "×" or "✓"
+        if callback then pcall(callback, default) end
+    end)
+
+    return container
+end
+
+-- ===== RETURN LIBRARY =====
+return PeliLibrary
