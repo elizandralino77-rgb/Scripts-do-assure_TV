@@ -723,6 +723,7 @@ local tools = {
     "Glider",
     "UraniumRod",
     "Water Balloon",
+    "Couch"
     "Chainsaw"
 }
 
