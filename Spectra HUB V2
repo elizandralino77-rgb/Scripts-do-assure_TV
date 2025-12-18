@@ -133,107 +133,162 @@ game:GetService("UserInputService").JumpRequest:Connect(function()
     end
 end)
 
-
+--////////////////////////////////////////////////////
 --// ESP NAME
-PlayerTab:AddSection({ "ESP Name" })
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+PlayerTab:AddSection({ "ESP Nome" })
 
 local ESPEnabled = false
-local ESPSize = 14
-local ESPColor = Color3.fromRGB(255,255,255)
+local ESPSize = 18
+local ESPStrokeSize = 2
 local Rainbow = false
+local ESPColor = Color3.fromRGB(255,255,255)
 local ESPObjects = {}
 
-local function createESP(player)
-    if player.Character and player.Character:FindFirstChild("Head") and not ESPObjects[player] then
-        local billboard = Instance.new("BillboardGui")
-        billboard.Name = "ESP_Name"
-        billboard.Adornee = player.Character.Head
-        billboard.Size = UDim2.new(0,200,0,50)
-        billboard.StudsOffset = Vector3.new(0,2,0)
-        billboard.AlwaysOnTop = true
+-- Cores do ESP Nome (dryptrol) com muitas opções e Rainbow
+local Colors = {
+    ["Branco"] = Color3.fromRGB(255,255,255),
+    ["Vermelho"] = Color3.fromRGB(255,50,50), -- destaque vermelho
+    ["Azul"] = Color3.fromRGB(0,170,255),
+    ["Verde"] = Color3.fromRGB(0,255,0),
+    ["Roxo"] = Color3.fromRGB(170,0,255),
+    ["Amarelo"] = Color3.fromRGB(255,255,0),
+    ["Laranja"] = Color3.fromRGB(255,165,0),
+    ["Rosa"] = Color3.fromRGB(255,105,180),
+    ["Ciano"] = Color3.fromRGB(0,255,255),
+    ["Magenta"] = Color3.fromRGB(255,0,255),
+    ["Turquesa"] = Color3.fromRGB(64,224,208),
+    ["Dourado"] = Color3.fromRGB(255,215,0),
+    ["Prata"] = Color3.fromRGB(192,192,192),
+    ["Lima"] = Color3.fromRGB(50,205,50),
+    ["Rosa Choque"] = Color3.fromRGB(255,20,147),
+    ["Lavanda"] = Color3.fromRGB(230,230,250),
+    ["Rainbow"] = "Rainbow" -- cor especial que muda continuamente
+}
 
-        local text = Instance.new("TextLabel", billboard)
-        text.Size = UDim2.new(1,0,1,0)
-        text.BackgroundTransparency = 1
-        text.TextScaled = true
-        text.Font = Enum.Font.GothamBold
-        text.TextStrokeTransparency = 0
-
-        local days = player.AccountAge
-        text.Text = player.Name .. " | " .. days .. " dias"
-
-        billboard.Parent = player.Character.Head
-        ESPObjects[player] = text
-    end
-end
-
-local function removeESP()
-    for _, v in pairs(ESPObjects) do
-        if v and v.Parent then
-            v.Parent:Destroy()
-        end
+local function ClearESP()
+    for _, gui in pairs(ESPObjects) do
+        if gui and gui.Text then gui.Text.Parent:Destroy() end
     end
     ESPObjects = {}
 end
 
--- Toggle ESP
+local function CreateESP(player)
+    if player.Character and player.Character:FindFirstChild("Head") and not ESPObjects[player] then
+        local bb = Instance.new("BillboardGui")
+        bb.Adornee = player.Character.Head
+        bb.Size = UDim2.new(0, 220, 0, 45)
+        bb.StudsOffset = Vector3.new(0, 2.8, 0)
+        bb.AlwaysOnTop = true
+
+        local txt = Instance.new("TextLabel")
+        txt.Parent = bb
+        txt.Size = UDim2.new(1,0,1,0)
+        txt.BackgroundTransparency = 1
+        txt.Font = Enum.Font.GothamBold
+        txt.TextScaled = false
+        txt.TextWrapped = true
+        txt.Text = player.Name .. " | " .. player.AccountAge .. " dias"
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Thickness = ESPStrokeSize
+        stroke.Color = Color3.new(0,0,0)
+        stroke.Parent = txt
+
+        bb.Parent = player.Character.Head
+
+        ESPObjects[player] = {Text = txt, Stroke = stroke}
+    end
+end
+
+--////////////////////////////////////////////////////
+--// UI CONTROLS
 PlayerTab:AddToggle({
-    Name = "ESP Nome (ON / OFF)",
+    Name = "ESP Nome ON / OFF",
     Default = false,
     Callback = function(v)
         ESPEnabled = v
-        if not v then
-            removeESP()
+        if not v then ClearESP() end
+    end
+})
+
+PlayerTab:AddSlider({
+    Name = "Tamanho do Texto",
+    Min = 10,
+    Max = 40,
+    Default = ESPSize,
+    Callback = function(v) ESPSize = v end
+})
+
+PlayerTab:AddSlider({
+    Name = "Espessura do Nome",
+    Min = 1,
+    Max = 6,
+    Default = ESPStrokeSize,
+    Callback = function(v) ESPStrokeSize = v end
+})
+
+-- Dropdown de cores com Rainbow
+PlayerTab:AddDropdown({
+    Name = "Cor do ESP",
+    Options = {"Branco","Vermelho","Azul","Verde","Roxo","Amarelo","Laranja","Rosa","Ciano","Magenta","Turquesa","Dourado","Prata","Lima","Rosa Choque","Lavanda","Rainbow"},
+    Default = "Branco",
+    Callback = function(opt)
+        if opt == "Rainbow" then
+            Rainbow = true
+        else
+            Rainbow = false
+            ESPColor = Colors[opt]
         end
     end
 })
 
--- Slider Tamanho
-PlayerTab:AddSlider({
-    Name = "Tamanho do Nome",
-    Min = 10,
-    Max = 40,
-    Default = ESPSize,
-    Callback = function(v)
-        ESPSize = v
-    end
-})
-
--- Toggle Rainbow RGB
+-- Rainbow toggle (opcional, mantém ativado se quiser)
 PlayerTab:AddToggle({
     Name = "Rainbow RGB",
     Default = false,
-    Callback = function(v)
-        Rainbow = v
+    Callback = function(v) Rainbow = v end
+})
+
+--////////////////////////////////////////////////////
+--// SCRIPTS
+PlayerTab:AddSection({ "Scripts" })
+
+PlayerTab:AddButton({
+    Name = "Emotes",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-7yd7-I-Emote-Script-48024"))()
     end
 })
 
--- Color Picker (se sua UI suportar)
-PlayerTab:AddColorPicker({
-    Name = "Cor do ESP",
-    Default = ESPColor,
-    Callback = function(c)
-        ESPColor = c
+PlayerTab:AddButton({
+    Name = "Fly",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Gui-Fly-v3-37111"))()
     end
 })
 
--- Atualização constante
+PlayerTab:AddButton({
+    Name = "Sigma Spy",
+    Callback = function()
+        loadstring(game:HttpGet("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"))()
+    end
+})
+
+--////////////////////////////////////////////////////
+--// RUN LOOP
 RunService.RenderStepped:Connect(function()
     if ESPEnabled then
-        for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= Players.LocalPlayer then
-                createESP(player)
-                local text = ESPObjects[player]
-                if text then
-                    text.TextSize = ESPSize
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= plr then
+                CreateESP(p)
+                local data = ESPObjects[p]
+                if data then
+                    data.Text.TextSize = ESPSize
+                    data.Stroke.Thickness = ESPStrokeSize
                     if Rainbow then
-                        local hue = (tick() % 5) / 5
-                        text.TextColor3 = Color3.fromHSV(hue,1,1)
+                        data.Text.TextColor3 = Color3.fromHSV((tick()%5)/5,1,1)
                     else
-                        text.TextColor3 = ESPColor
+                        data.Text.TextColor3 = ESPColor
                     end
                 end
             end
