@@ -693,42 +693,64 @@ local LimitedTab = Window:MakeTab({
     Icon = "rbxassetid://16181381646"
 })
 
--- Função para pegar o nome do jogador local
-local function getPlayerName()
-    return Players.LocalPlayer.Name
-end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
 
--- Função para criar botão que dispara evento
-local function createToolButton(name)
-    LimitedTab:AddButton({
-        Name = name,
-        Callback = function()
-            local args = {
-                [1] = "AcceptedToolToServer",
-                [2] = name,
-                [3] = Players:WaitForChild(getPlayerName())
-            }
-            ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t"):FireServer(unpack(args))
-        end
-    })
-end
-
--- Adicionar seção visual (opcional)
+-- Adicionar seção visual
 LimitedTab:AddSection({ "Ferramentas Limitadas" })
 
--- Criar todos os botões
+-- Lista de ferramentas
 local tools = {
     "EggLauncher",
     "Cannon",
     "Glider",
     "UraniumRod",
     "Water Balloon",
-    "Chainsaw"
+    "Chainsaw",
+    "Couch" -- novo botão adicionado
 }
 
+-- Função para criar botão que dispara evento
+local function createToolButton(toolName)
+    LimitedTab:AddButton({
+        Name = toolName,
+        Callback = function()
+            local args = {
+                [1] = "AcceptedToolToServer",
+                [2] = toolName,
+                [3] = plr
+            }
+            local event = ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t")
+            if event then
+                event:FireServer(unpack(args))
+            end
+        end
+    })
+end
+
+-- Criar botões individuais
 for _, toolName in ipairs(tools) do
     createToolButton(toolName)
 end
+
+-- Botão "Itens ALL" que dispara todos de uma vez
+LimitedTab:AddButton({
+    Name = "Itens ALL",
+    Callback = function()
+        local event = ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t")
+        if event then
+            for _, toolName in ipairs(tools) do
+                local args = {
+                    [1] = "AcceptedToolToServer",
+                    [2] = toolName,
+                    [3] = plr
+                }
+                event:FireServer(unpack(args))
+            end
+        end
+    end
+})
 
 
 
