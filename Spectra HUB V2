@@ -1225,3 +1225,262 @@ ChatTab:AddButton({
         end
     end
 })
+
+
+
+
+--// CRIAR ABA PROTECTION
+local ProtectionTab = Window:MakeTab({
+    Title = "Protection",
+    Icon = "rbxassetid://5197571732"
+})
+
+--// REFERÊNCIAS
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+--===============================
+-- FUNÇÃO ANTI-FLING GENÉRICA
+--===============================
+function AntiFlingLoop(name, finder)
+    return function(state)
+        task.spawn(function()
+            while state do
+                local target = finder()
+                if target then
+                    for _, part in ipairs(target:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = true
+                            part.Anchored = true
+                        end
+                    end
+                end
+                task.wait(0.5)
+            end
+        end)
+    end
+end
+
+--===============================
+-- TOGGLES INDIVIDUAIS
+--===============================
+ProtectionTab:AddToggle({Name = "Anti Fling Carros", Default = false, Callback = AntiFlingLoop("Vehicles", function() return Workspace:FindFirstChild("Vehicles") end)})
+ProtectionTab:AddToggle({Name = "Anti Canoe Fling", Default = false, Callback = AntiFlingLoop("Canoes", function() local wc = Workspace:FindFirstChild("WorkspaceCom") return wc and wc:FindFirstChild("001_CanoeStorage") end)})
+ProtectionTab:AddToggle({Name = "Anti Fling Jets", Default = false, Callback = AntiFlingLoop("Jets", function() local f = Workspace:FindFirstChild("WorkspaceCom") if f and f:FindFirstChild("001_Airport") then local s = f["001_Airport"]:FindFirstChild("AirportHanger") if s then return s:FindFirstChild("001_JetStorage") and s["001_JetStorage"]:FindFirstChild("JetAirport") end end end)})
+ProtectionTab:AddToggle({Name = "Anti Fling Helicópteros", Default = false, Callback = AntiFlingLoop("Helis", function() local f = Workspace:FindFirstChild("WorkspaceCom") return f and f:FindFirstChild("001_HeliStorage") and f["001_HeliStorage"]:FindFirstChild("PoliceStationHeli") end)})
+ProtectionTab:AddToggle({Name = "Anti Fling Ball", Default = false, Callback = AntiFlingLoop("Balls", function() local f = Workspace:FindFirstChild("WorkspaceCom") return f and f:FindFirstChild("001_SoccerBalls") end)})
+
+--===============================
+-- Anti Sit / Sofá / Grab
+--===============================
+local antiSitActive = false
+ProtectionTab:AddToggle({
+    Name = "Anti Sit / Grab / Sofá",
+    Default = false,
+    Callback = function(state)
+        antiSitActive = state
+        task.spawn(function()
+            while antiSitActive and LocalPlayer.Character do
+                local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+                    if humanoid:GetState() == Enum.HumanoidStateType.Seated then
+                        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                    end
+                end
+                task.wait(0.05)
+            end
+        end)
+    end
+})
+
+--===============================
+-- Anti Lag / Anti Tool
+--===============================
+ProtectionTab:AddToggle({
+    Name = "Anti-Lag / Anti Tool",
+    Default = false,
+    Callback = function(state)
+        if not state then return end
+        task.spawn(function()
+            local dedupLock = {}
+            local function isTool(inst) return inst:IsA("Tool") end
+            local function gather(player)
+                local items = {}
+                local containers = {}
+                if player.Character then table.insert(containers, player.Character) end
+                local backpack = player:FindFirstChildOfClass("Backpack")
+                if backpack then table.insert(containers, backpack) end
+                local sg = player:FindFirstChild("StarterGear")
+                if sg then table.insert(containers, sg) end
+                for _, container in ipairs(containers) do
+                    for _, child in ipairs(container:GetChildren()) do
+                        if isTool(child) then table.insert(items, child) end
+                    end
+                end
+                return items
+            end
+            local function dedupe(player)
+                if dedupLock[player] then return end
+                dedupLock[player] = true
+                local tools = gather(player)
+                if #tools > 1 then
+                    for i = 2, #tools do pcall(function() tools[i]:Destroy() end) end
+                end
+                dedupLock[player] = false
+            end
+            Players.PlayerAdded:Connect(function(plr) dedupe(plr) end)
+            for _,plr in ipairs(Players:GetPlayers()) do dedupe(plr) end
+            while state do
+                for _,plr in ipairs(Players:GetPlayers()) do dedupe(plr) end
+                task.wait(2)
+            end
+        end)
+    end
+})
+
+--===============================
+-- Anti Fling Portas
+--===============================
+ProtectionTab:AddToggle({
+    Name = "Anti Fling Portas",
+    Default = false,
+    Callback = function(state)
+        if not _G.hiddenDoors then _G.hiddenDoors = {} end
+        if state then
+            _G.hiddenDoors = {}
+            for _, obj in ipairs(workspace:GetDescendants()) do
+                if obj:IsA("BasePart") and obj.Name:lower():find("door") then
+                    local doorData = {door=obj, originalTransparency=obj.Transparency, originalCanCollide=obj.CanCollide, originalCastShadow=obj.CastShadow}
+                    obj.Transparency = 1
+                    obj.CanCollide = false
+                    obj.CastShadow = false
+                    for _, child in ipairs(obj:GetChildren()) do
+                        if child:IsA("BasePart") then child.Transparency = 1; child.CanCollide=false
+                        elseif child:IsA("SurfaceGui") or child:IsA("BillboardGui") then child.Enabled = false end
+                    end
+                    table.insert(_G.hiddenDoors, doorData)
+                end
+            end
+            print("⚡ " .. #_G.hiddenDoors .. " portas escondidas!")
+        else
+            for _, doorData in ipairs(_G.hiddenDoors or {}) do
+                if doorData.door and doorData.door.Parent then
+                    doorData.door.Transparency = doorData.originalTransparency
+                    doorData.door.CanCollide = doorData.originalCanCollide
+                    doorData.door.CastShadow = doorData.originalCastShadow
+                    for _, child in ipairs(doorData.door:GetChildren()) do
+                        if child:IsA("BasePart") then child.Transparency=0; child.CanCollide=true
+                        elseif child:IsA("SurfaceGui") or child:IsA("BillboardGui") then child.Enabled = true end
+                    end
+                end
+            end
+            print("✔ " .. #(_G.hiddenDoors or {}) .. " portas restauradas!")
+            _G.hiddenDoors = {}
+        end
+    end
+})
+
+--===============================
+-- TOGGLE MASTER – PROTEÇÃO ALL
+--===============================
+ProtectionTab:AddToggle({
+    Name = "🛡️ Proteção All",
+    Default = false,
+    Callback = function(state)
+        for _,toggle in ipairs(ProtectionTab.Toggles) do
+            if toggle.Name ~= "🛡️ Proteção All" then
+                toggle:SetState(state)
+            end
+        end
+    end
+})
+
+--===============================
+-- TOGGLE ULTRA MAX / ANTI-KILL / ANTI-FALL
+--===============================
+local UltraEnabled = false
+local Connections = {}
+local lastSafeCFrame = nil
+local lastCheck = tick()
+local MAX_SPEED = 85
+local MAX_FALL_SPEED = -120
+local MAP_Y_LIMIT = -80
+
+local function disconnectAll()
+    for _,c in ipairs(Connections) do pcall(function() c:Disconnect() end) end
+    table.clear(Connections)
+end
+
+local function getChar() return LocalPlayer.Character end
+local function getHRP() local c=getChar() return c and c:FindFirstChild("HumanoidRootPart") end
+local function getHum() local c=getChar() return c and c:FindFirstChildOfClass("Humanoid") end
+local function restorePosition()
+    local hrp = getHRP()
+    if hrp and lastSafeCFrame then
+        hrp.AssemblyLinearVelocity=Vector3.zero
+        hrp.AssemblyAngularVelocity=Vector3.zero
+        hrp.CFrame=lastSafeCFrame+Vector3.new(0,5,0)
+    end
+end
+
+ProtectionTab:AddToggle({
+    Name = "🛡️ Proteção Máxima ULTRA++",
+    Default = false,
+    Callback = function(state)
+        UltraEnabled = state
+        disconnectAll()
+        if state then task.wait(0.4) end
+        if not state then return end
+
+        table.insert(Connections, RunService.Heartbeat:Connect(function()
+            local hrp = getHRP()
+            if hrp then lastSafeCFrame = hrp.CFrame end
+        end))
+
+        table.insert(Connections, RunService.Heartbeat:Connect(function()
+            if not UltraEnabled then return end
+            local char = getChar()
+            local hrp = getHRP()
+            local hum = getHum()
+            if not (char and hrp and hum) then return end
+            hum:SetStateEnabled(Enum.HumanoidStateType.Seated,false)
+            if hum:GetState()==Enum.HumanoidStateType.Seated then hum:ChangeState(Enum.HumanoidStateType.GettingUp) end
+            for _,p in ipairs(char:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide=true; p.Anchored=false end end
+            hrp.AssemblyAngularVelocity=Vector3.zero
+            if hrp.AssemblyLinearVelocity.Magnitude>MAX_SPEED then restorePosition() end
+            hrp.CustomPhysicalProperties=PhysicalProperties.new(0.01,0,0,0,0)
+        end))
+
+        table.insert(Connections, RunService.Heartbeat:Connect(function()
+            if not UltraEnabled then return end
+            local hrp=getHRP()
+            if not hrp then return end
+            local now=tick()
+            if now-lastCheck<0.15 then return end
+            lastCheck=now
+            local vy=hrp.AssemblyLinearVelocity.Y
+            if vy<MAX_FALL_SPEED or hrp.Position.Y<MAP_Y_LIMIT then restorePosition() end
+        end))
+
+        task.spawn(function()
+            while UltraEnabled do
+                for _,obj in ipairs(Workspace:GetDescendants()) do
+                    if obj:IsA("BodyMover") or obj:IsA("VectorForce") or obj:IsA("AngularVelocity") or obj:IsA("LinearVelocity") then
+                        pcall(function() obj:Destroy() end)
+                    end
+                end
+                task.wait(2)
+            end
+        end)
+
+        table.insert(Connections, LocalPlayer.CharacterAdded:Connect(function(char)
+            task.wait(0.6)
+            for _,v in ipairs(char:GetChildren()) do
+                if v:IsA("Tool") then pcall(function() v:Destroy() end) end
+            end
+        end))
+    end
+})
