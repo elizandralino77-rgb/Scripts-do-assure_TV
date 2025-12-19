@@ -1129,3 +1129,99 @@ RGBTab:AddToggle({
         end)
     end
 })
+
+
+--// ABA CHAT
+local ChatTab = Window:MakeTab({ Title = "Chat", Icon = "rbxassetid://92345592692449" })
+
+--// SEÇÃO SPAM CHAT
+ChatTab:AddSection({ Name = "Spam Chat" })
+
+local TextSave = ""
+local tcs = game:GetService("TextChatService")
+local chat = tcs.ChatInputBarConfiguration and tcs.ChatInputBarConfiguration.TargetTextChannel
+
+local function sendchat(msg)
+    if not msg or msg == "" then return end
+    if tcs.ChatVersion == Enum.ChatVersion.LegacyChatService then
+        local success, err = pcall(function()
+            game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(msg, "All")
+        end)
+        if not success then warn(err) end
+    elseif chat then
+        local success, err = pcall(function()
+            chat:SendAsync(msg)
+        end)
+        if not success then warn(err) end
+    end
+end
+
+--// TEXTBOX PARA DIGITAR MENSAGEM
+ChatTab:AddTextBox({
+    Name = "Enter text",
+    PlaceholderText = "Digite a mensagem",
+    Callback = function(text)
+        TextSave = text
+    end
+})
+
+--// BOTÃO SEND CHAT
+ChatTab:AddButton({
+    Name = "Send Chat",
+    Callback = function()
+        sendchat(TextSave)
+    end
+})
+
+--// SLIDER DE DELAY PARA SPAM
+getgenv().ChaosHubSendDelay = 1
+ChatTab:AddSlider({
+    Name = "Spam Delay",
+    Min = 0.4,
+    Max = 10,
+    Default = 1,
+    Increment = 0.1,
+    Callback = function(Value)
+        getgenv().ChaosHubSendDelay = Value
+    end
+})
+
+--// TOGGLE DE SPAM AUTOMÁTICO
+getgenv().ChaosHubSpawnText = false
+ChatTab:AddToggle({
+    Name = "Spam Chat",
+    Default = false,
+    Callback = function(Value)
+        getgenv().ChaosHubSpawnText = Value
+        task.spawn(function()
+            while getgenv().ChaosHubSpawnText do
+                sendchat(TextSave)
+                task.wait(getgenv().ChaosHubSendDelay)
+            end
+        end)
+    end
+})
+
+--// BOTÃO SPAM HACKED
+ChatTab:AddButton({
+    Name = "Spam chat Hacked By Spectra",
+    Callback = function()
+        if tcs.ChatVersion == Enum.ChatVersion.TextChatService then 
+            tcs.TextChannels.RBXGeneral:SendAsync("Server: Hacked by Spectra HUB")
+        else 
+            print("Nothing")
+        end
+    end
+})
+
+--// BOTÃO LIMPAR CHAT
+ChatTab:AddButton({
+    Name = "Clear Chat",
+    Callback = function()
+        if tcs.ChatVersion == Enum.ChatVersion.TextChatService then 
+            tcs.TextChannels.RBXGeneral:SendAsync("Server: Chat Cleared")
+        else 
+            print("Nothing")
+        end
+    end
+})
