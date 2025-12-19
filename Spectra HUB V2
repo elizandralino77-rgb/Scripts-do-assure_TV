@@ -296,6 +296,100 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
+--// ABA PLAYER - SPAM CHAT
+local SpamSection = PlayerTab:AddSection({
+    Name = "Spam Chat"
+})
+
+local SpamText = ""
+local TextChatService = game:GetService("TextChatService")
+local chatChannel = TextChatService.ChatInputBarConfiguration and TextChatService.ChatInputBarConfiguration.TargetTextChannel
+
+local function sendChat(msg)
+    if not msg or msg == "" then return end
+    if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
+        local success, err = pcall(function()
+            game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents").SayMessageRequest:FireServer(msg, "All")
+        end)
+        if not success then warn("Error sending chat: " .. err) end
+    elseif chatChannel then
+        local success, err = pcall(function()
+            chatChannel:SendAsync(msg)
+        end)
+        if not success then warn("Error sending chat: " .. err) end
+    end
+end
+
+-- Caixa de texto
+SpamSection:AddTextBox({
+    Name = "Mensagem",
+    PlaceholderText = "Digite sua mensagem",
+    Callback = function(txt)
+        SpamText = txt
+    end
+})
+
+-- Botão para enviar mensagem única
+SpamSection:AddButton({
+    Name = "Enviar Chat",
+    Callback = function()
+        sendChat(SpamText)
+    end
+})
+
+-- Slider de delay
+getgenv().ChaosHubSendDelay = 1
+SpamSection:AddSlider({
+    Name = "Delay do Spam",
+    Min = 0.4,
+    Max = 10,
+    Valor padrão = 1,
+    Increment = 0.1,
+    Callback = function(val)
+        getgenv().ChaosHubSendDelay = val
+    end
+})
+
+-- Toggle de spam contínuo
+getgenv().ChaosHubSpawnText = false
+SpamSection:AddToggle({
+    Name = "Spam Chat",
+    Default = false,
+    Callback = function(state)
+        getgenv().ChaosHubSpawnText = state
+        task.spawn(function()
+            while getgenv().ChaosHubSpawnText do
+                sendChat(SpamText)
+                task.wait(getgenv().ChaosHubSendDelay)
+            end
+        end)
+    end
+})
+
+-- Botão de spam com mensagem padrão
+SpamSection:AddButton({
+    Name = "Spam chat Hacked By Mafia",
+    Callback = function()
+        if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then 
+            TextChatService.TextChannels.RBXGeneral:SendAsync("Server: Hacked by Mafia Hub")
+        else 
+            print("Nada aconteceu")
+        end
+    end
+})
+
+-- Botão para limpar chat
+SpamSection:AddButton({
+    Name = "Limpar Chat",
+    Callback = function()
+        if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then 
+            TextChatService.TextChannels.RBXGeneral:SendAsync("Server: Chat Cleared")
+        else 
+            print("Nada aconteceu")
+        end
+    end
+})
+
 --// TROLL TAB
 local TrollTab = Window:MakeTab({ Title = "Troll", Icon = "rbxassetid://84468243121641" })
 TrollTab:AddSection({ "Troll Features" })
