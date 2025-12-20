@@ -985,6 +985,7 @@ local tools = {
     "Water Balloon",
     "Chainsaw",
     "Present",
+    "CookieWindowTray",
     "SnowflakeGlider",
     "Couch" -- novo botão adicionado
 }
