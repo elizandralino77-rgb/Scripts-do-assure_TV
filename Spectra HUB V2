@@ -1448,6 +1448,29 @@ EventosTab:AddToggle({
     end
 })
 
+--==============================
+-- BOTÕES DE TELEPORTE DIRETO
+--==============================
+local locaisTeleport = {
+    ["Loja de Natal"] = Vector3.new(163.30, 4.31, -148.14),
+    ["Monte Everest"] = Vector3.new(614.71, 138.72, -393.17),
+    ["Em cima da Árvore de Natal"] = Vector3.new(356.16, 101.81, -172.04),
+    ["Na frente do evento de Natal"] = Vector3.new(115.82, 4.93, -113.38),
+    ["Festa de Natal"] = Vector3.new(306.78, -20.02, -337.43),
+    ["Túnel de Natal"] = Vector3.new(124.52, -5.64, -163.93)
+}
+
+for nome, pos in pairs(locaisTeleport) do
+    EventosTab:AddButton({
+        Name = nome,
+        Callback = function()
+            local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = CFrame.new(pos)
+            end
+        end
+    })
+end
 
 --// CRIAR ABA PROTECTION
 local ProtectionTab = Window:MakeTab({
