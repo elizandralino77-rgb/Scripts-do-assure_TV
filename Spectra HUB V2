@@ -296,87 +296,153 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
---// TROLL TAB
-local TrollTab = Window:MakeTab({ Title = "Troll", Icon = "rbxassetid://84468243121641" })
-TrollTab:AddSection({ "Troll Features" })
 
+
+local TrollTab = Window:MakeTab({
+    Title = "Troll",
+    Icon = "rbxassetid://84468243121641"
+})
+
+TrollTab:AddSection({ Name = "Kill Troll" })
+
+--==============================
+-- VARIÁVEIS
+--==============================
 local selectedPlayer
-local killing = false
-local noclipKillEnabled = false
+local killEnabled = false
 
+local teleportThread
+local noclipThread
+local monitorThread
+local jumpThread
+local respawnConn
+
+--==============================
+-- SOFÁ
+--==============================
+local function hasCouch()
+    local char = plr.Character
+    local bp = plr:FindFirstChildOfClass("Backpack")
+    if char and char:FindFirstChild("Couch") then return true end
+    if bp and bp:FindFirstChild("Couch") then return true end
+    return false
+end
+
+local function pickCouch()
+    pcall(function()
+        ReplicatedStorage.RE:FindFirstChild("1Too1l")
+            :InvokeServer("PickingTools", "Couch")
+    end)
+end
+
+local function equipCouch()
+    local char = plr.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+
+    local tool =
+        (char and char:FindFirstChild("Couch")) or
+        (plr.Backpack and plr.Backpack:FindFirstChild("Couch"))
+
+    if tool then
+        hum:EquipTool(tool)
+    end
+end
+
+--==============================
+-- PLAYER LIST
+--==============================
 local function getPlayers()
     local t = {}
     for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= plr then table.insert(t, p.Name) end
+        if p ~= plr then
+            table.insert(t, p.Name)
+        end
     end
     return t
 end
 
-local playerDropdown = TrollTab:AddDropdown({
+local dropdown = TrollTab:AddDropdown({
     Name = "Escolher Player",
-    Options = {},
-    Callback = function(v) selectedPlayer = v end
+    Options = getPlayers(),
+    Callback = function(v)
+        selectedPlayer = v
+    end
 })
 
-local function refreshDropdown()
-    playerDropdown:Set(getPlayers())
-end
-refreshDropdown()
-
-TrollTab:AddButton({ Name = "Atualizar Lista", Callback = refreshDropdown })
-
---// KILL EXTREMO (TELEPORTANDO EM TODAS AS POSIÇÕES + NOCLIP FORTE + TOOL SOFÁ)
 TrollTab:AddButton({
-    Name = "Kill demorado e chato kkkk",
+    Name = "Atualizar Lista",
     Callback = function()
+        dropdown:Set(getPlayers())
+    end
+})
+
+--==============================
+-- TOGGLE KILL DEMORADO E CHATO
+--==============================
+TrollTab:AddToggle({
+    Name = "Kill demorado e chato 😈",
+    Default = false,
+    Callback = function(state)
+        killEnabled = state
+
+        -- DESLIGAR TUDO
+        if not state then
+            if teleportThread then task.cancel(teleportThread) teleportThread = nil end
+            if noclipThread then task.cancel(noclipThread) noclipThread = nil end
+            if monitorThread then task.cancel(monitorThread) monitorThread = nil end
+            if jumpThread then task.cancel(jumpThread) jumpThread = nil end
+            if respawnConn then respawnConn:Disconnect() respawnConn = nil end
+            return
+        end
+
         if not selectedPlayer then return end
-        killing = true
-        noclipKillEnabled = true
 
-        -- Pegar Tool (Sofá)
-        pcall(function()
-            ReplicatedStorage.RE:FindFirstChild("1Too1l"):InvokeServer("PickingTools", "Couch")
-        end)
-
-        task.wait(0.05)
-
-        -- Equipar o Tool Couch
-        task.spawn(function()
-            while killing do
-                local bp = plr:FindFirstChildOfClass("Backpack")
-                local tool = bp and bp:FindFirstChild("Couch")
-                if tool and humanoid then
-                    humanoid:EquipTool(tool)
-                    break
+        -- MONITORAR SOFÁ (pegar automaticamente)
+        monitorThread = task.spawn(function()
+            while killEnabled do
+                if not hasCouch() then
+                    pickCouch()
+                    task.wait(0.15)
                 end
-                task.wait(0.01)
+                equipCouch()
+                task.wait(0.2)
             end
         end)
 
-        -- Teleport brutal em TODAS as direções, sempre olhando para o alvo
-        task.spawn(function()
-            while killing do
+        -- AO MORRER
+        respawnConn = plr.CharacterAdded:Connect(function()
+            if killEnabled then
+                task.wait(0.3)
+                pickCouch()
+            end
+        end)
+
+        -- TELEPORT CAÓTICO (NÁRNIA MODE 🌌)
+        teleportThread = task.spawn(function()
+            while killEnabled do
                 local target = Players:FindFirstChild(selectedPlayer)
                 local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
                 local thrp = target and target.Character and target.Character:FindFirstChild("HumanoidRootPart")
+
                 if hrp and thrp then
-                    for _ = 1, 60 do
-                        if not killing then break end
+                    for i = 1, 60 do
+                        if not killEnabled then break end
                         local dir = Vector3.new(
-                            math.random(-10,10),
-                            math.random(-10,10),
-                            math.random(-10,10)
+                            math.random(-100,100)/100*0.001, -- distância mínima de 1mm
+                            math.random(-100,100)/100*0.001,
+                            math.random(-100,100)/100*0.001
                         )
-                        hrp.CFrame = CFrame.new(thrp.Position + dir, thrp.Position)
+                        hrp.CFrame = CFrame.lookAt(thrp.Position + dir, thrp.Position)
                     end
                 end
                 task.wait(0.001)
             end
         end)
 
-        -- NoClip MUITO forte (atravessa tudo)
-        task.spawn(function()
-            while noclipKillEnabled do
+        -- NOCLIP FORTE
+        noclipThread = task.spawn(function()
+            while killEnabled do
                 local char = plr.Character
                 if char then
                     for _, p in ipairs(char:GetDescendants()) do
@@ -388,63 +454,273 @@ TrollTab:AddButton({
                 task.wait()
             end
         end)
-    end
-})
 
---// STOP KILL (DESATIVA TUDO)
-TrollTab:AddButton({
-    Name = "Stop Kill",
-    Callback = function()
-        killing = false
-        noclipKillEnabled = false
-        if plr.Character then
-            for _, p in ipairs(plr.Character:GetDescendants()) do
-                if p:IsA("BasePart") then
-                    p.CanCollide = true
+        -- 🔥 PULO INFINITO (PC, Mobile, Tablet)
+        jumpThread = task.spawn(function()
+            while killEnabled do
+                local char = plr.Character
+                local hum = char and char:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    hum.Jump = true
+                    -- Dispara Input para todos os dispositivos
+                    pcall(function()
+                        UserInputService:InputBegan({UserInputType = Enum.UserInputType.Keyboard, KeyCode = Enum.KeyCode.Space}, false)
+                        UserInputService:InputBegan({UserInputType = Enum.UserInputType.Touch}, false)
+                    end)
                 end
+                task.wait(0.15)
             end
-            workspace.CurrentCamera.CameraSubject = plr.Character:FindFirstChildOfClass("Humanoid")
-        end
+        end)
     end
 })
 
+
+--==============================
+-- SLIDER TELEPORTE INFINITO
+--==============================
+TrollTab:AddSlider({
+    Name = "Velocidade Teleporte Infinito",
+    Min = 1,
+    Max = 100,
+    Default = 5,
+    Increment = 1,
+    Callback = function(v)
+        tpSpeed = v
+    end
+})
+
+--==============================
+-- TOGGLE TELEPORTE INFINITO
+--==============================
+TrollTab:AddToggle({
+    Name = "Teleportar Infinito (On / Off)",
+    Default = false,
+    Callback = function(state)
+        tpEnabled = state
+
+        if tpConnection then
+            tpConnection:Disconnect()
+            tpConnection = nil
+        end
+
+        if not state then return end
+
+        tpConnection = RunService.Heartbeat:Connect(function(dt)
+            if not tpEnabled or not selectedPlayer then return end
+
+            local target = Players:FindFirstChild(selectedPlayer)
+            if not target or not target.Character then return end
+
+            local thrp = target.Character:FindFirstChild("HumanoidRootPart")
+            local char = plr.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+            if not (thrp and hrp) then return end
+
+            -- teleporta literalmente DENTRO do jogador
+            hrp.CFrame = thrp.CFrame
+
+            task.wait(1 / math.clamp(tpSpeed, 1, 100))
+        end)
+    end
+})
+
+--==============================
+-- BOTÃO TELEPORTE ÚNICO
+--==============================
 TrollTab:AddButton({
-    Name = "Teleportar para o Jogador",
+    Name = "Teleportar Uma Vez",
     Callback = function()
         if not selectedPlayer then return end
+
         local target = Players:FindFirstChild(selectedPlayer)
-        if target and target.Character and plr.Character then
-            local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
-            local thrp = target.Character:FindFirstChild("HumanoidRootPart")
-            if hrp and thrp then hrp.CFrame = thrp.CFrame end
+        if not target or not target.Character then return end
+
+        local thrp = target.Character:FindFirstChild("HumanoidRootPart")
+        local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+
+        if thrp and hrp then
+            hrp.CFrame = thrp.CFrame
         end
     end
 })
 
-TrollTab:AddButton({
-    Name = "Skybox",
-    Callback = function()
-        loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Fe-Brookhaven-skybox-script-73292"))()
-    end
-})
-
-
---// VISUALIZAR JOGADOR SELECIONADO
-local viewing = false
-
+--==============================
+-- VISUALIZAR JOGADOR
+--==============================
 TrollTab:AddToggle({
     Name = "Visualizar Jogador",
     Default = false,
     Callback = function(state)
         viewing = state
-        local target = Players:FindFirstChild(selectedPlayer)
+
+        local cam = workspace.CurrentCamera
+        local target = selectedPlayer and Players:FindFirstChild(selectedPlayer)
+
         if state and target and target.Character then
-            workspace.CurrentCamera.CameraSubject = target.Character:FindFirstChildOfClass("Humanoid")
-            workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
-        elseif plr.Character then
-            workspace.CurrentCamera.CameraSubject = plr.Character:FindFirstChildOfClass("Humanoid")
-            workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+            local hum = target.Character:FindFirstChildOfClass("Humanoid")
+            if hum then
+                cam.CameraSubject = hum
+                cam.CameraType = Enum.CameraType.Custom
+            end
+        else
+            local myHum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
+            if myHum then
+                cam.CameraSubject = myHum
+                cam.CameraType = Enum.CameraType.Custom
+            end
         end
+    end
+})
+
+
+
+
+
+
+--// SLIDER VELOCIDADE (só velocidade)
+TrollTab:AddSlider({
+    Name = "velocidade de frente e trás +18",
+    Min = 1,
+    Max = 100,
+    Default = 5,
+    Increment = 1,
+    Callback = function(v)
+        moveSpeed = v
+    end
+})
+
+--// TOGGLE PRINCIPAL
+TrollTab:AddToggle({
+    Name = "Teleport Troll (On / Off)",
+    Default = false,
+    Callback = function(state)
+        enabled = state
+
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+
+        if not state or not selectedPlayer then return end
+
+        timeOffset = 0
+
+        connection = RunService.Heartbeat:Connect(function(dt)
+            if not enabled then return end
+
+            local target = Players:FindFirstChild(selectedPlayer)
+            if not target or not target.Character then return end
+
+            local thrp = target.Character:FindFirstChild("HumanoidRootPart")
+            local char = plr.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+            if not (thrp and hrp) then return end
+
+            -- TEMPO (slider atua aqui)
+            timeOffset += dt * (moveSpeed * 0.3)
+
+            -- FRENTE ↔ TRÁS
+            local baseDistance = 4.5      -- mais perto do jogador
+            local oscillation = math.sin(timeOffset) * 3
+
+            -- CIMA ↕ BAIXO (bem leve)
+            local verticalOffset = math.sin(timeOffset * 2) * 0.6
+
+            -- POSIÇÃO FINAL
+            local targetPos =
+                thrp.Position
+                - thrp.CFrame.LookVector * (baseDistance + oscillation)
+                + Vector3.new(0, verticalOffset, 0)
+
+            -- TREMIDA VISUAL
+            local shake = Vector3.new(
+                math.random(-10,10) / 70,
+                math.random(-10,10) / 70,
+                0
+            )
+
+            -- APLICAR TELEPORTE
+            hrp.CFrame = CFrame.lookAt(
+                targetPos + shake,
+                thrp.Position
+            )
+        end)
+    end
+})
+
+
+
+
+
+
+--==============================
+-- SLIDER VELOCIDADE
+--==============================
+TrollTab:AddSlider({
+    Name = "Velocidade do gogogogo",
+    Min = 1,
+    Max = 100,
+    Default = 10,
+    Increment = 1,
+    Callback = function(v)
+        speed = v
+    end
+})
+
+--==============================
+-- TOGGLE
+--==============================
+TrollTab:AddToggle({
+    Name = "gogogogo no player +18",
+    Default = false,
+    Callback = function(state)
+        enabled = state
+
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+
+        if not state or not selectedPlayer then return end
+
+        timeValue = 0
+
+        connection = RunService.Heartbeat:Connect(function(dt)
+            if not enabled then return end
+
+            local target = Players:FindFirstChild(selectedPlayer)
+            if not target or not target.Character then return end
+
+            local tChar = target.Character
+            local tRoot = tChar:FindFirstChild("HumanoidRootPart")
+            local tHead = tChar:FindFirstChild("Head")
+
+            local char = plr.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+            if not (tRoot and tHead and hrp) then return end
+
+            -- ALTURA BASEADA NA SUA CINTURA
+            local myHipHeight = hrp.Size.Y * 0.5
+
+            -- ALTURA FINAL (BOCA + UM POUCO PRA CIMA)
+            local heightOffset = Vector3.new(0, tHead.Size.Y * 0.4 + myHipHeight * 0.15, 0)
+
+            -- CONTROLE REAL DE VAI ↔ VOLTA
+            timeValue += dt * speed
+            local backAndForth = math.sin(timeValue) * 2.5
+
+            -- POSIÇÃO NA FRENTE DO JOGADOR
+            local finalPosition =
+                tRoot.Position
+                + tRoot.CFrame.LookVector * (3 + backAndForth)
+                + heightOffset
+
+            -- APLICAR
+            hrp.CFrame = CFrame.lookAt(finalPosition, tHead.Position)
+        end)
     end
 })
 
@@ -1097,7 +1373,71 @@ ChatTab:AddButton({
 })
 
 
+--==============================
+-- ABA EVENTOS
+--==============================
+local EventosTab = Window:MakeTab({
+    Title = "Eventos",
+    Icon = "rbxassetid://84468243121641"
+})
 
+EventosTab:AddSection({ Name = "coletar estrelas de Natal" })
+
+local eventoEnabled = false
+local teleportThreadEvento
+
+-- Lista de localizações do evento
+local localizacoes = {
+    Vector3.new(174.7, 4.4, -172.7),
+    Vector3.new(179.5, 9.5, -231.0),
+    Vector3.new(350.9, 4.7, -409.6),
+    Vector3.new(320.3, 4.7, -436.0),
+    Vector3.new(263.5, 4.7, -435.8),
+    Vector3.new(425.4, 4.8, -268.3),
+    Vector3.new(367.4, 12.7, -251.0),
+    Vector3.new(338.1, 11.3, -214.3),
+    Vector3.new(333.5, 4.8, -150.9),
+    Vector3.new(293.5, 4.3, -144.0),
+    Vector3.new(244.3, 4.3, -172.9),
+    Vector3.new(171.3, 53.3, -263.4),
+    Vector3.new(442.7, 51.0, -368.5),
+    Vector3.new(487.3, 69.4, -333.4),
+    Vector3.new(351.4, 101.9, -168.1),
+    Vector3.new(259.0, 11.3, -204.4),
+    Vector3.new(171.1, 30.4, -278.7),
+    Vector3.new(189.2, -11.1, -256.9),
+    Vector3.new(349.8, 101.9, -168.9)
+}
+
+EventosTab:AddToggle({
+    Name = "Evento de Natal",
+    Default = false,
+    Callback = function(state)
+        eventoEnabled = state
+
+        -- DESLIGAR
+        if not state then
+            if teleportThreadEvento then task.cancel(teleportThreadEvento) end
+            return
+        end
+
+        -- Ligar loop de teleporte
+        teleportThreadEvento = task.spawn(function()
+            local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+            while eventoEnabled do
+                hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    for _, pos in ipairs(localizacoes) do
+                        if not eventoEnabled then break end
+                        hrp.CFrame = CFrame.new(pos)
+                        task.wait(2) -- espera 2 segundos em cada posição
+                    end
+                end
+                task.wait()
+            end
+        end)
+    end
+})
 
 --// CRIAR ABA PROTECTION
 local ProtectionTab = Window:MakeTab({
