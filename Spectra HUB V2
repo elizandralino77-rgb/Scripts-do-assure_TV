@@ -1381,12 +1381,12 @@ local EventosTab = Window:MakeTab({
     Icon = "rbxassetid://4519515245"
 })
 
-EventosTab:AddSection({ Name = "coletar estrelas de Natal" })
+EventosTab:AddSection({ Name = "Coletar Estrelas de Natal" })
 
 local eventoEnabled = false
 local teleportThreadEvento
 
--- Lista de localizações do evento
+-- Lista de localizações do evento (corrigida)
 local localizacoes = {
     Vector3.new(174.7, 4.4, -172.7),
     Vector3.new(179.5, 9.5, -231.0),
@@ -1402,6 +1402,16 @@ local localizacoes = {
     Vector3.new(171.3, 53.3, -263.4),
     Vector3.new(442.7, 51.0, -368.5),
     Vector3.new(487.3, 69.4, -333.4),
+    Vector3.new(121.17, 3.74, -117.83),
+    Vector3.new(122.07, 3.02, -179.70),
+    Vector3.new(125.72, 7.27, -241.51),
+    Vector3.new(126.70, 6.33, -291.01),
+    Vector3.new(135.30, 6.01, -336.68),
+    Vector3.new(191.58, 5.90, -344.29),
+    Vector3.new(258.76, 5.04, -336.52),
+    Vector3.new(312.00, 7.85, -321.72),
+    Vector3.new(362.28, 6.83, -334.05),
+    Vector3.new(615.31, 142.10, -419.94),
     Vector3.new(351.4, 101.9, -168.1),
     Vector3.new(259.0, 11.3, -204.4),
     Vector3.new(171.1, 30.4, -278.7),
@@ -1423,9 +1433,8 @@ EventosTab:AddToggle({
 
         -- Ligar loop de teleporte
         teleportThreadEvento = task.spawn(function()
-            local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
             while eventoEnabled do
-                hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
                 if hrp then
                     for _, pos in ipairs(localizacoes) do
                         if not eventoEnabled then break end
@@ -1438,6 +1447,7 @@ EventosTab:AddToggle({
         end)
     end
 })
+
 
 --// CRIAR ABA PROTECTION
 local ProtectionTab = Window:MakeTab({
