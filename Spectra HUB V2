@@ -133,121 +133,200 @@ game:GetService("UserInputService").JumpRequest:Connect(function()
     end
 end)
 
---////////////////////////////////////////////////////
---// ESP NAME
-PlayerTab:AddSection({ "ESP Nome" })
 
-local ESPEnabled = false
-local ESPSize = 18
-local ESPStrokeSize = 2
-local Rainbow = false
-local ESPColor = Color3.fromRGB(255,255,255)
-local ESPObjects = {}
 
--- Cores do ESP Nome (dryptrol) com muitas opções e Rainbow
-local Colors = {
-    ["Branco"] = Color3.fromRGB(255,255,255),
-    ["Vermelho"] = Color3.fromRGB(255,50,50), -- destaque vermelho
-    ["Azul"] = Color3.fromRGB(0,170,255),
-    ["Verde"] = Color3.fromRGB(0,255,0),
-    ["Roxo"] = Color3.fromRGB(170,0,255),
-    ["Amarelo"] = Color3.fromRGB(255,255,0),
-    ["Laranja"] = Color3.fromRGB(255,165,0),
-    ["Rosa"] = Color3.fromRGB(255,105,180),
-    ["Ciano"] = Color3.fromRGB(0,255,255),
-    ["Magenta"] = Color3.fromRGB(255,0,255),
-    ["Turquesa"] = Color3.fromRGB(64,224,208),
-    ["Dourado"] = Color3.fromRGB(255,215,0),
-    ["Prata"] = Color3.fromRGB(192,192,192),
-    ["Lima"] = Color3.fromRGB(50,205,50),
-    ["Rosa Choque"] = Color3.fromRGB(255,20,147),
-    ["Lavanda"] = Color3.fromRGB(230,230,250),
-    ["Rainbow"] = "Rainbow" -- cor especial que muda continuamente
-}
+--====================================================
+-- ANTI-SIT
+--====================================================
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
 
-local function ClearESP()
-    for _, gui in pairs(ESPObjects) do
-        if gui and gui.Text then gui.Text.Parent:Destroy() end
-    end
-    ESPObjects = {}
-end
+local antiSitEnabled = false
+local antiSitConnection
 
-local function CreateESP(player)
-    if player.Character and player.Character:FindFirstChild("Head") and not ESPObjects[player] then
-        local bb = Instance.new("BillboardGui")
-        bb.Adornee = player.Character.Head
-        bb.Size = UDim2.new(0, 220, 0, 45)
-        bb.StudsOffset = Vector3.new(0, 2.8, 0)
-        bb.AlwaysOnTop = true
-
-        local txt = Instance.new("TextLabel")
-        txt.Parent = bb
-        txt.Size = UDim2.new(1,0,1,0)
-        txt.BackgroundTransparency = 1
-        txt.Font = Enum.Font.GothamBold
-        txt.TextScaled = false
-        txt.TextWrapped = true
-        txt.Text = player.Name .. " | " .. player.AccountAge .. " dias"
-
-        local stroke = Instance.new("UIStroke")
-        stroke.Thickness = ESPStrokeSize
-        stroke.Color = Color3.new(0,0,0)
-        stroke.Parent = txt
-
-        bb.Parent = player.Character.Head
-
-        ESPObjects[player] = {Text = txt, Stroke = stroke}
-    end
-end
-
---////////////////////////////////////////////////////
---// UI CONTROLS
-PlayerTab:AddToggle({
-    Name = "ESP Nome ON / OFF",
+Tab2:AddToggle({
+    Name = "Anti-Sit",
+    Description = "Impede o jogador de sentar",
     Default = false,
-    Callback = function(v)
-        ESPEnabled = v
-        if not v then ClearESP() end
-    end
-})
+    Callback = function(state)
+        antiSitEnabled = state
 
-PlayerTab:AddSlider({
-    Name = "Tamanho do Texto",
-    Min = 10,
-    Max = 40,
-    Default = ESPSize,
-    Callback = function(v) ESPSize = v end
-})
+        local function apply(character)
+            local hum = character:FindFirstChildOfClass("Humanoid")
+            if not hum then return end
 
-PlayerTab:AddSlider({
-    Name = "Espessura do Nome",
-    Min = 1,
-    Max = 6,
-    Default = ESPStrokeSize,
-    Callback = function(v) ESPStrokeSize = v end
-})
+            hum.Sit = false
+            hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
 
--- Dropdown de cores com Rainbow
-PlayerTab:AddDropdown({
-    Name = "Cor do ESP",
-    Options = {"Branco","Vermelho","Azul","Verde","Roxo","Amarelo","Laranja","Rosa","Ciano","Magenta","Turquesa","Dourado","Prata","Lima","Rosa Choque","Lavanda","Rainbow"},
-    Default = "Branco",
-    Callback = function(opt)
-        if opt == "Rainbow" then
-            Rainbow = true
+            if antiSitConnection then
+                antiSitConnection:Disconnect()
+            end
+
+            antiSitConnection = hum.Seated:Connect(function(sit)
+                if sit then
+                    hum.Sit = false
+                    hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                end
+            end)
+        end
+
+        if state then
+            if LocalPlayer.Character then
+                apply(LocalPlayer.Character)
+            end
+
+            LocalPlayer.CharacterAdded:Connect(function(char)
+                if antiSitEnabled then
+                    apply(char)
+                end
+            end)
         else
-            Rainbow = false
-            ESPColor = Colors[opt]
+            if antiSitConnection then
+                antiSitConnection:Disconnect()
+                antiSitConnection = nil
+            end
+
+            if LocalPlayer.Character then
+                local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    hum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+                end
+            end
         end
     end
 })
 
--- Rainbow toggle (opcional, mantém ativado se quiser)
-PlayerTab:AddToggle({
-    Name = "Rainbow RGB",
-    Default = false,
-    Callback = function(v) Rainbow = v end
+--====================================================
+-- ESP COMPLETO
+--====================================================
+local espEnabled = false
+local selectedColor = "RGB"
+local billboardGuis = {}
+local connections = {}
+
+Tab2:AddSection({ Name = "ESP" })
+
+Tab2:AddDropdown({
+    Name = "Cor do ESP",
+    Default = "RGB",
+    Options = {
+        "RGB","Branco","Preto","Vermelho",
+        "Verde","Azul","Amarelo","Rosa","Roxo"
+    },
+    Callback = function(v)
+        selectedColor = v
+    end
 })
+
+local function getColor()
+    if selectedColor == "RGB" then
+        return Color3.fromHSV((tick() % 5) / 5, 1, 1)
+    elseif selectedColor == "Branco" then
+        return Color3.fromRGB(255,255,255)
+    elseif selectedColor == "Preto" then
+        return Color3.fromRGB(0,0,0)
+    elseif selectedColor == "Vermelho" then
+        return Color3.fromRGB(255,0,0)
+    elseif selectedColor == "Verde" then
+        return Color3.fromRGB(0,255,0)
+    elseif selectedColor == "Azul" then
+        return Color3.fromRGB(0,170,255)
+    elseif selectedColor == "Amarelo" then
+        return Color3.fromRGB(255,255,0)
+    elseif selectedColor == "Rosa" then
+        return Color3.fromRGB(255,105,180)
+    elseif selectedColor == "Roxo" then
+        return Color3.fromRGB(128,0,128)
+    end
+    return Color3.new(1,1,1)
+end
+
+local function removeESP(player)
+    if billboardGuis[player] then
+        billboardGuis[player]:Destroy()
+        billboardGuis[player] = nil
+    end
+end
+
+local function createESP(player)
+    if player == LocalPlayer then return end
+    if not espEnabled then return end
+    if not player.Character then return end
+
+    local head = player.Character:FindFirstChild("Head")
+    if not head then return end
+
+    removeESP(player)
+
+    local gui = Instance.new("BillboardGui")
+    gui.Name = "ESP_GUI"
+    gui.Size = UDim2.new(0, 220, 0, 45)
+    gui.StudsOffset = Vector3.new(0, 3, 0)
+    gui.AlwaysOnTop = true
+    gui.Adornee = head
+    gui.Parent = head
+
+    local txt = Instance.new("TextLabel")
+    txt.BackgroundTransparency = 1
+    txt.Size = UDim2.new(1, 0, 1, 0)
+    txt.Font = Enum.Font.SourceSansBold
+    txt.TextScaled = false
+    txt.TextSize = 14
+    txt.TextStrokeTransparency = 0.4
+    txt.Text = player.Name .. " | " .. player.AccountAge .. " dias"
+    txt.TextColor3 = getColor()
+    txt.Parent = gui
+
+    billboardGuis[player] = gui
+end
+
+Tab2:AddToggle({
+    Name = "ESP Ativado",
+    Description = "Nome + idade da conta (ESP completo)",
+    Default = false,
+    Callback = function(state)
+        espEnabled = state
+
+        if state then
+            for _, p in pairs(Players:GetPlayers()) do
+                createESP(p)
+            end
+
+            table.insert(connections, Players.PlayerAdded:Connect(function(p)
+                p.CharacterAdded:Connect(function()
+                    task.wait(0.5)
+                    createESP(p)
+                end)
+            end))
+
+            table.insert(connections, Players.PlayerRemoving:Connect(function(p)
+                removeESP(p)
+            end))
+
+            table.insert(connections, RunService.Heartbeat:Connect(function()
+                if selectedColor == "RGB" then
+                    for _, gui in pairs(billboardGuis) do
+                        if gui:FindFirstChildOfClass("TextLabel") then
+                            gui.TextLabel.TextColor3 = getColor()
+                        end
+                    end
+                end
+            end))
+        else
+            for _, gui in pairs(billboardGuis) do
+                gui:Destroy()
+            end
+            billboardGuis = {}
+
+            for _, c in pairs(connections) do
+                c:Disconnect()
+            end
+            connections = {}
+        end
+    end
+})
+
 
 --////////////////////////////////////////////////////
 --// SCRIPTS
