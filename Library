@@ -232,7 +232,8 @@ local redzlib = {
 			["clock6"] = "rbxassetid://10709804435",
 			["clock7"] = "rbxassetid://10709804599",
 			["clock8"] = "rbxassetid://10709804784",
-			["clock9"] = "rbxassetid://10709804996",		["cloud"] = "rbxassetid://10709806740",
+			["clock9"] = "rbxassetid://10709804996",
+			["cloud"] = "rbxassetid://10709806740",
 			["cloudcog"] = "rbxassetid://10709805262",
 			["clouddrizzle"] = "rbxassetid://10709805371",
 			["cloudfog"] = "rbxassetid://10709805477",
@@ -397,7 +398,8 @@ local redzlib = {
 			["fliphorizontal2"] = "rbxassetid://10723376745",
 			["flipvertical"] = "rbxassetid://10723377138",
 			["flipvertical2"] = "rbxassetid://10723377026",
-			["flower"] = "rbxassetid://10747830374",		["flower2"] = "rbxassetid://10723377305",
+			["flower"] = "rbxassetid://10747830374",
+			["flower2"] = "rbxassetid://10723377305",
 			["focus"] = "rbxassetid://10723377537",
 			["folder"] = "rbxassetid://10723387563",
 			["folderarchive"] = "rbxassetid://10723384478",
@@ -546,7 +548,8 @@ local redzlib = {
 			["mail"] = "rbxassetid://10734885430",
 			["mailcheck"] = "rbxassetid://10723435182",
 			["mailminus"] = "rbxassetid://10723435261",
-			["mailopen"] = "rbxassetid://10723435342",			["mailplus"] = "rbxassetid://10723435443",
+			["mailopen"] = "rbxassetid://10723435342",
+			["mailplus"] = "rbxassetid://10723435443",
 			["mailquestion"] = "rbxassetid://10723435515",
 			["mailsearch"] = "rbxassetid://10734884739",
 			["mailwarning"] = "rbxassetid://10734885015",
@@ -592,7 +595,7 @@ local redzlib = {
 			["movediagonal"] = "rbxassetid://10734899164",
 			["movediagonal2"] = "rbxassetid://10734898934",
 			["movehorizontal"] = "rbxassetid://10734899414",
-			["movevertical"] = "rbxassetid://10734899821",
+			["movevertical"] = "rbxassetid://10734899821
 			["music"] = "rbxassetid://10734905958",
 			["music2"] = "rbxassetid://10734900215",
 			["music3"] = "rbxassetid://10734905665",
@@ -704,7 +707,8 @@ local redzlib = {
 			["share"] = "rbxassetid://10734950813",
 			["share2"] = "rbxassetid://10734950553",
 			["sheet"] = "rbxassetid://10734951038",
-			["shield"] = "rbxassetid://10734951847",			["shieldalert"] = "rbxassetid://10734951173",
+			["shield"] = "rbxassetid://10734951847",
+			["shieldalert"] = "rbxassetid://10734951173",
 			["shieldcheck"] = "rbxassetid://10734951367",
 			["shieldclose"] = "rbxassetid://10734951535",
 			["shieldoff"] = "rbxassetid://10734951684",
@@ -836,7 +840,8 @@ local redzlib = {
 			["voicemail"] = "rbxassetid://10747375281",
 			["volume"] = "rbxassetid://10747376008",
 			["volume1"] = "rbxassetid://10747375450",
-			["volume2"] = "rbxassetid://10747375679",			["volumex"] = "rbxassetid://10747375880",
+			["volume2"] = "rbxassetid://10747375679",
+			["volumex"] = "rbxassetid://10747375880",
 			["wallet"] = "rbxassetid://10747376205",
 			["wand"] = "rbxassetid://10747376565",
 			["wand2"] = "rbxassetid://10747376349",
@@ -872,6 +877,7 @@ local SetProps, SetChildren, InsertTheme, Create do
 		})
 		return Instance
 	end
+
 	SetChildren = function(Instance, Children)
 		if Children then
 			table.foreach(Children, function(_,Child)
@@ -1203,8 +1209,6 @@ AddEle("Button", function(parent, props, ...)
 	end)
 	New.MouseLeave:Connect(function()
 		New.BackgroundTransparency = 0
-	end)New.MouseLeave:Connect(function()
-		New.BackgroundTransparency = 0
 	end)
 	if args[1] then
 		New.Activated:Connect(args[1])
@@ -1448,8 +1452,8 @@ function redzlib:MakeWindow(Configs)
 			Name = "SubTitle"
 		}), "DarkText")
 	}), "Text")
-
-local MainScroll = InsertTheme(Create("ScrollingFrame", Components, {
+	
+	local MainScroll = InsertTheme(Create("ScrollingFrame", Components, {
 		Size = UDim2.new(0, redzlib.Save.TabSize, 1, -TopBar.Size.Y.Offset),
 		ScrollBarImageColor3 = Theme["Color Theme"],
 		Position = UDim2.new(0, 0, 1, 0),
@@ -1507,7 +1511,7 @@ local MainScroll = InsertTheme(Create("ScrollingFrame", Components, {
 		Containers.Size = UDim2.new(1, -MainScroll.Size.X.Offset, 1, -TopBar.Size.Y.Offset)
 		MainFrame.Size = ControlSize1.Position
 	end
-	
+
 	ControlSize1:GetPropertyChangedSignal("Position"):Connect(ControlSize)
 	ControlSize2:GetPropertyChangedSignal("Position"):Connect(ControlSize)
 	
@@ -1562,7 +1566,7 @@ local MainScroll = InsertTheme(Create("ScrollingFrame", Components, {
 			}
 		})
 	end
-function Window:MinimizeBtn()
+	function Window:MinimizeBtn()
 		if WaitClick then return end
 		WaitClick = true
 		
@@ -1676,7 +1680,7 @@ function Window:MinimizeBtn()
 				HorizontalAlignment = "Center"
 			})
 		})
-		
+
 		local Screen = InsertTheme(Create("Frame", MainFrame, {
 			BackgroundTransparency = 0.6,
 			Active = true,
@@ -1737,8 +1741,8 @@ function Window:MinimizeBtn()
 			end
 		end
 	end
-
-local ContainerList = {}
+	
+	local ContainerList = {}
 	function Window:MakeTab(paste, Configs)
 		if type(paste) == "table" then Configs = paste end
 		local TName = Configs[1] or Configs.Title or "Tab!"
@@ -1862,7 +1866,7 @@ local ContainerList = {}
 				BackgroundTransparency = 1,
 				Name = "Option"
 			})
-			
+
 			local SectionLabel = InsertTheme(Create("TextLabel", SectionFrame, {
 				Font = Enum.Font.GothamBold,
 				Text = SectionName,
@@ -1916,8 +1920,7 @@ local ContainerList = {}
 			end
 			return Paragraph
 		end
-
-function Tab:AddButton(Configs)
+		function Tab:AddButton(Configs)
 			local BName = Configs[1] or Configs.Name or Configs.Title or "Button!"
 			local BDescription = Configs.Desc or Configs.Description or ""
 			local Callback = Funcs:GetCallback(Configs, 2)
@@ -2055,7 +2058,7 @@ function Tab:AddButton(Configs)
 				TextColor3 = Theme["Color Text"],
 				Text = "..."
 			}), "Text")
-			
+
 			local Arrow = Create("ImageLabel", SelectedFrame, {
 				Size = UDim2.new(0, 15, 0, 15),
 				Position = UDim2.new(0, -5, 0.5),
@@ -2131,8 +2134,8 @@ function Tab:AddButton(Configs)
 					CreateTween({DropFrame, "Size", GetFrameSize(), 0.2, true})
 				end
 			end
-
-local function Minimize()
+			
+			local function Minimize()
 				if WaitClick then return end
 				WaitClick = true
 				if NoClickFrame.Visible then
@@ -2195,7 +2198,7 @@ local function Minimize()
 						ActiveLabel.Text = tostring(Selected or "...")
 					end
 				end
-				
+
 				local function UpdateSelected()
 					if MultiSelect then
 						for _,v in pairs(Options) do
@@ -2340,8 +2343,38 @@ local function Minimize()
 					end)
 				end
 			end
-
-function Tab:AddSlider(Configs)
+			function Dropdown:Remove(Option)
+				for index, Value in pairs(GetOptions()) do
+					if type(Option) == "number" and index == Option or Value.Name == "Option" then
+						RemoveOption(index, Value.Value)
+					end
+				end
+			end
+			function Dropdown:Select(Option)
+				if type(Option) == "string" then
+					for _,Val in pairs(Options) do
+						if Val.Name == Option then
+							Val.Active()
+						end
+					end
+				elseif type(Option) == "number" then
+					for ind,Val in pairs(Options) do
+						if ind == Option then
+							Val.Active()
+						end
+					end
+				end
+			end
+			function Dropdown:Set(Val1, Clear)
+				if type(Val1) == "table" then
+					AddNewOptions(Val1, not Clear)
+				elseif type(Val1) == "function" then
+					Callback = Val1
+				end
+			end
+			return Dropdown
+		end
+		function Tab:AddSlider(Configs)
 			local SName = Configs[1] or Configs.Name or Configs.Title or "Slider!"
 			local SDesc = Configs.Desc or Configs.Description or ""
 			local Min = Configs[2] or Configs.MinValue or Configs.Min or 10
@@ -2475,7 +2508,7 @@ function Tab:AddSlider(Configs)
 			function Slider:Destroy() Button:Destroy() end
 			return Slider
 		end
-function Tab:AddTextBox(Configs)
+		function Tab:AddTextBox(Configs)
 			local TName = Configs[1] or Configs.Name or Configs.Title or "Text Box"
 			local TDesc = Configs.Desc or Configs.Description or ""
 			local TDefault = Configs[2] or Configs.Default or ""
@@ -2526,7 +2559,7 @@ function Tab:AddTextBox(Configs)
 					TextBoxInput.Text = Text
 				end
 			end
-			
+
 			TextBoxInput.FocusLost:Connect(Input)Input()
 			
 			TextBoxInput.FocusLost:Connect(function()
