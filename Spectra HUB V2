@@ -1054,6 +1054,7 @@ local tools = {
     "Glider",
     "UraniumRod",
     "Water Balloon",
+    "FireHose",
     "Chainsaw",
     "Present",
     "CookieWindowTray",
