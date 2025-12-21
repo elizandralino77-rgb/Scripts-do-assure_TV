@@ -167,26 +167,194 @@ PlayerTab:AddButton({
 })
 
 --////////////////////////////////////////////////////
---// RUN LOOP
-RunService.RenderStepped:Connect(function()
-    if ESPEnabled then
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= plr then
-                CreateESP(p)
-                local data = ESPObjects[p]
-                if data then
-                    data.Text.TextSize = ESPSize
-                    data.Stroke.Thickness = ESPStrokeSize
-                    if Rainbow then
-                        data.Text.TextColor3 = Color3.fromHSV((tick()%5)/5,1,1)
-                    else
-                        data.Text.TextColor3 = ESPColor
-                    end
+--// ANTI-SIT
+PlayerTab:AddSection({ "Anti-Sit" })
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local antiSitEnabled = false
+local antiSitConn
+
+PlayerTab:AddToggle({
+    Name = "Anti-Sit",
+    Default = false,
+    Callback = function(state)
+        antiSitEnabled = state
+
+        local function apply(character)
+            local hum = character:FindFirstChildOfClass("Humanoid")
+            if not hum then return end
+
+            hum.Sit = false
+            hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+
+            if antiSitConn then
+                antiSitConn:Disconnect()
+            end
+
+            antiSitConn = hum.Seated:Connect(function(sit)
+                if sit then
+                    hum.Sit = false
+                    hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                end
+            end)
+        end
+
+        if state then
+            if LocalPlayer.Character then
+                apply(LocalPlayer.Character)
+            end
+
+            LocalPlayer.CharacterAdded:Connect(function(char)
+                if antiSitEnabled then
+                    apply(char)
+                end
+            end)
+        else
+            if antiSitConn then
+                antiSitConn:Disconnect()
+                antiSitConn = nil
+            end
+
+            if LocalPlayer.Character then
+                local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    hum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
                 end
             end
         end
     end
-end)
+})
+
+--////////////////////////////////////////////////////
+--// ESP COMPLETO
+PlayerTab:AddSection({ "ESP" })
+
+local ESPEnabled = false
+local ESPColorMode = "RGB"
+local ESPObjects = {}
+local ESPConnections = {}
+
+PlayerTab:AddDropdown({
+    Name = "ESP Color",
+    Default = "RGB",
+    Options = {
+        "RGB","Branco","Preto","Vermelho",
+        "Verde","Azul","Amarelo","Rosa","Roxo"
+    },
+    Callback = function(v)
+        ESPColorMode = v
+    end
+})
+
+local function getESPColor()
+    if ESPColorMode == "RGB" then
+        return Color3.fromHSV((tick()%5)/5,1,1)
+    elseif ESPColorMode == "Branco" then
+        return Color3.fromRGB(255,255,255)
+    elseif ESPColorMode == "Preto" then
+        return Color3.fromRGB(0,0,0)
+    elseif ESPColorMode == "Vermelho" then
+        return Color3.fromRGB(255,0,0)
+    elseif ESPColorMode == "Verde" then
+        return Color3.fromRGB(0,255,0)
+    elseif ESPColorMode == "Azul" then
+        return Color3.fromRGB(0,170,255)
+    elseif ESPColorMode == "Amarelo" then
+        return Color3.fromRGB(255,255,0)
+    elseif ESPColorMode == "Rosa" then
+        return Color3.fromRGB(255,105,180)
+    elseif ESPColorMode == "Roxo" then
+        return Color3.fromRGB(128,0,128)
+    end
+    return Color3.new(1,1,1)
+end
+
+local function RemoveESP(player)
+    if ESPObjects[player] then
+        ESPObjects[player]:Destroy()
+        ESPObjects[player] = nil
+    end
+end
+
+local function CreateESP(player)
+    if player == LocalPlayer then return end
+    if not ESPEnabled then return end
+    if not player.Character then return end
+
+    local head = player.Character:FindFirstChild("Head")
+    if not head then return end
+
+    RemoveESP(player)
+
+    local gui = Instance.new("BillboardGui")
+    gui.Name = "ESP"
+    gui.Size = UDim2.new(0,220,0,45)
+    gui.StudsOffset = Vector3.new(0,3,0)
+    gui.AlwaysOnTop = true
+    gui.Adornee = head
+    gui.Parent = head
+
+    local txt = Instance.new("TextLabel")
+    txt.Size = UDim2.new(1,0,1,0)
+    txt.BackgroundTransparency = 1
+    txt.TextStrokeTransparency = 0.4
+    txt.Font = Enum.Font.SourceSansBold
+    txt.TextSize = 14
+    txt.Text = player.Name.." | "..player.AccountAge.." dias"
+    txt.TextColor3 = getESPColor()
+    txt.Parent = gui
+
+    ESPObjects[player] = gui
+end
+
+PlayerTab:AddToggle({
+    Name = "ESP On/Off",
+    Default = false,
+    Callback = function(state)
+        ESPEnabled = state
+
+        if state then
+            for _,p in ipairs(Players:GetPlayers()) do
+                CreateESP(p)
+            end
+
+            table.insert(ESPConnections, Players.PlayerAdded:Connect(function(p)
+                p.CharacterAdded:Connect(function()
+                    task.wait(0.4)
+                    CreateESP(p)
+                end)
+            end))
+
+            table.insert(ESPConnections, Players.PlayerRemoving:Connect(function(p)
+                RemoveESP(p)
+            end))
+
+            table.insert(ESPConnections, RunService.RenderStepped:Connect(function()
+                if ESPColorMode == "RGB" then
+                    for _,gui in pairs(ESPObjects) do
+                        local txt = gui:FindFirstChildOfClass("TextLabel")
+                        if txt then
+                            txt.TextColor3 = getESPColor()
+                        end
+                    end
+                end
+            end))
+        else
+            for _,gui in pairs(ESPObjects) do
+                gui:Destroy()
+            end
+            ESPObjects = {}
+
+            for _,c in pairs(ESPConnections) do
+                c:Disconnect()
+            end
+            ESPConnections = {}
+        end
+    end
+})
 
 
 
