@@ -166,6 +166,17 @@ PlayerTab:AddButton({
     end
 })
 
+
+PlayerTab:AddButton({
+    Name = "click teleport",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/err0r129/KptHadesBlair/main/Bao.lua"))()
+    end
+})
+
+
+
+
 --////////////////////////////////////////////////////
 --// ANTI-SIT
 PlayerTab:AddSection({ "Anti-Sit" })
