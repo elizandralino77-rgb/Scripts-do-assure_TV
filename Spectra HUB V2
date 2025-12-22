@@ -371,7 +371,7 @@ PlayerTab:AddToggle({
 
 local TrollTab = Window:MakeTab({
     Title = "Troll",
-    Icon = "rbxassetid://84468243121641"
+    Icon = "rbxassetid://6862780932"
 })
 
 TrollTab:AddSection({ Name = "Kill Troll" })
