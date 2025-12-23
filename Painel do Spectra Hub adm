@@ -18,8 +18,8 @@ local LocalPlayer = Players.LocalPlayer
 --// JANELA
 --==================================================
 local Window = WindUI:CreateWindow({
-    Title = "Painel ADM",
-    Author = "Chat FE System",
+    Title = "Painel ADM do Spectra Hub",
+    Author = "by: assure_TV + Lcc",
     Size = UDim2.fromOffset(500, 420),
     Transparent = true,
     HideSearchBar = true
@@ -147,7 +147,7 @@ local AdmTab = Window:Tab({
 })
 
 local Section = AdmTab:Section({
-    Title = "Admin FE (Chat Sync)",
+    Title = "comandos adm",
     Opened = true
 })
 
@@ -352,4 +352,4 @@ TextChatService.TextChannels.ChildAdded:Connect(connectChannel)
 --==================================================
 --// STATUS
 --==================================================
-print("[SCRIPT INVISÍVEL] Chat FE conectado com sucesso")
+print("script é executado com sucesso")
