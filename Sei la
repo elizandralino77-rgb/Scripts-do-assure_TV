@@ -10,7 +10,7 @@ local Workspace = workspace
 --// WHITELIST
 local whitelist = {
     ["doxPkwsXLBt"] = true,
-    [""] = true,
+    ["ssponggbob"] = true,
     [""] = true
 }
 
@@ -21,6 +21,13 @@ if not whitelist[player.Name] then
     return
 end
 
+--// Jogadores autorizados por envio de Lcc_####
+local Autorizados = {} -- chave: nome exato do player -> true
+
+--// Estado local
+local playerOriginalSpeed = {}
+local jaulas = {}
+local jailConnections = {}
 
 --// FunÃƒÂ§ÃƒÂ£o util: atualiza tag visual de um jogador (cria/recria)
 local function createSpecialTag(player)
