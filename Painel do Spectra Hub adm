@@ -352,4 +352,4 @@ TextChatService.TextChannels.ChildAdded:Connect(connectChannel)
 --==================================================
 --// STATUS
 --==================================================
-print("script é executado com sucesso")
+print("script) é executado com sucesso")
