@@ -11,22 +11,10 @@ local WindUI = loadstring(game:HttpGet(
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
 local TeleportService = game:GetService("TeleportService")
-
 local LocalPlayer = Players.LocalPlayer
 
 --==================================================
---// JANELA
---==================================================
-local Window = WindUI:CreateWindow({
-    Title = "Painel ADM do Spectra Hub",
-    Author = "by: assure_TV + Lcc",
-    Size = UDim2.fromOffset(500, 420),
-    Transparent = true,
-    HideSearchBar = true
-})
-
---==================================================
---// FUNÇÕES DE CHAT
+--// CHAT FE
 --==================================================
 local function getChannel()
     return TextChatService.TextChannels:FindFirstChild("RBXGeneral")
@@ -41,29 +29,21 @@ local function sendChat(msg)
 end
 
 --==================================================
---// AÇÕES LOCAIS
+--// AÇÕES SELF (SCRIPT INVISÍVEL)
 --==================================================
-local Actions = {}
-
-function Actions.kill()
+local function killSelf()
     local char = LocalPlayer.Character
-    if char then
-        char:BreakJoints()
-    end
+    if char then char:BreakJoints() end
 end
 
-function Actions.fling()
+local function flingSelf()
     local char = LocalPlayer.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
 
     local bv = Instance.new("BodyVelocity")
-    bv.Velocity = Vector3.new(
-        math.random(-500, 500),
-        400,
-        math.random(-500, 500)
-    )
-    bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+    bv.Velocity = Vector3.new(math.random(-500,500),400,math.random(-500,500))
+    bv.MaxForce = Vector3.new(1e9,1e9,1e9)
     bv.Parent = hrp
 
     task.delay(1.5, function()
@@ -71,58 +51,44 @@ function Actions.fling()
     end)
 end
 
-function Actions.ice()
+local function iceSelf()
     local char = LocalPlayer.Character
     if not char then return end
-
-    for _, v in ipairs(char:GetDescendants()) do
-        if v:IsA("BasePart") then
-            v.Anchored = true
-        end
+    for _,v in ipairs(char:GetDescendants()) do
+        if v:IsA("BasePart") then v.Anchored = true end
     end
 end
 
-function Actions.unice()
+local function unIceSelf()
     local char = LocalPlayer.Character
     if not char then return end
-
-    for _, v in ipairs(char:GetDescendants()) do
-        if v:IsA("BasePart") then
-            v.Anchored = false
-        end
+    for _,v in ipairs(char:GetDescendants()) do
+        if v:IsA("BasePart") then v.Anchored = false end
     end
 end
 
-function Actions.kick()
-    task.wait(0.3)
+local function kickSelf()
     TeleportService:Teleport(0, LocalPlayer)
 end
 
 --==================================================
---// COMANDOS (FÁCIL DE ADICIONAR NOVOS)
---==================================================
-local Commands = {
-    kill  = Actions.kill,
-    fling = Actions.fling,
-    ice   = Actions.ice,
-    unice = Actions.unice,
-    kick  = Actions.kick
-}
-
---==================================================
---// LEITOR DE CHAT (AUTOMÁTICO)
+--// LEITOR DE CHAT (ESSENCIAL)
 --==================================================
 local function onMessage(text)
     if not text then return end
     text = text:lower()
-
     local myName = LocalPlayer.Name:lower()
 
-    for cmd, action in pairs(Commands) do
-        if text == ";" .. cmd .. " " .. myName then
-            action()
-            break
-        end
+    if text == ";kill "..myName then
+        killSelf()
+    elseif text == ";fling "..myName then
+        flingSelf()
+    elseif text == ";ice "..myName then
+        iceSelf()
+    elseif text == ";unice "..myName then
+        unIceSelf()
+    elseif text == ";kick "..myName then
+        kickSelf()
     end
 end
 
@@ -132,14 +98,37 @@ local function connectChannel(channel)
     end)
 end
 
-for _, ch in ipairs(TextChatService.TextChannels:GetChildren()) do
+for _,ch in ipairs(TextChatService.TextChannels:GetChildren()) do
     connectChannel(ch)
 end
-
 TextChatService.TextChannels.ChildAdded:Connect(connectChannel)
 
 --==================================================
---// ABA ADM
+--// JANELA
+--==================================================
+local Window = WindUI:CreateWindow({
+    Title = "Painel ADM",
+    Author = "Chat FE System",
+    Size = UDim2.fromOffset(520, 440),
+    Transparent = true,
+    HideSearchBar = true
+})
+
+--==================================================
+--// PLAYER LIST
+--==================================================
+local function getPlayers()
+    local t = {}
+    for _,p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer then
+            table.insert(t, p.Name)
+        end
+    end
+    return t
+end
+
+--==================================================
+--// ABA ADM (ÚNICA)
 --==================================================
 local AdmTab = Window:Tab({
     Title = "ADM",
@@ -147,106 +136,89 @@ local AdmTab = Window:Tab({
 })
 
 local Section = AdmTab:Section({
-    Title = "comandos adm",
+    Title = "Admin FE via Chat",
     Opened = true
 })
 
---==================================================
---// PLAYER LIST (ORGANIZADO)
---==================================================
 local selectedPlayer = ""
 
-local function getPlayers()
-    local list = {}
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= LocalPlayer then
-            table.insert(list, p.Name)
-        end
-    end
-    return list
-end
-
-local Dropdown
-Dropdown = Section:Dropdown({
-    Title = "Escolher Player",
+local Dropdown = Section:Dropdown({
+    Title = "Selecionar Player",
     Values = getPlayers(),
     Callback = function(v)
         selectedPlayer = v
     end
 })
 
-local function refreshDropdown()
+local function refreshPlayers()
     Dropdown:SetValues(getPlayers())
 end
 
 Section:Button({
     Title = "Atualizar Lista",
-    Callback = refreshDropdown
+    Callback = refreshPlayers
 })
 
-Players.PlayerAdded:Connect(refreshDropdown)
-Players.PlayerRemoving:Connect(refreshDropdown)
+Players.PlayerAdded:Connect(refreshPlayers)
+Players.PlayerRemoving:Connect(refreshPlayers)
 
 --==================================================
---// FUNÇÃO PRA CRIAR BOTÕES (SUPER FÁCIL)
+--// FUNÇÃO PADRÃO DE BOTÃO ADM
 --==================================================
-local function createCommandButton(title, command)
+local function admButton(title, command)
     Section:Button({
         Title = title,
         Callback = function()
             if selectedPlayer ~= "" then
-                sendChat(";" .. command .. " " .. selectedPlayer)
+                sendChat(command.." "..selectedPlayer)
             end
         end
     })
 end
 
 --==================================================
---// BOTÕES ADM
+--// BOTÕES ADM (TODOS VIA CHAT)
 --==================================================
-createCommandButton("Kill",   "kill")
-createCommandButton("Fling",  "fling")
-createCommandButton("Ice",    "ice")
-createCommandButton("UnIce",  "unice")
-createCommandButton("Kick",   "kick")
+admButton("Kill", ";kill")
+admButton("Fling", ";fling")
+admButton("Ice", ";ice")
+admButton("UnIce", ";unice")
+admButton("Kick", ";kick")
 
---==================================================
---// INFO
---==================================================
+-- Exemplos extras (só funcionam se o outro script tiver suporte)
+admButton("Freeze", ";freeze")
+admButton("UnFreeze", ";unfreeze")
+admButton("Bring", ";bring")
+admButton("Sit", ";sit")
+admButton("Jump", ";jump")
+admButton("Reset", ";reset")
+
 Section:Paragraph({
     Title = "IMPORTANTE",
-    Desc = "Os comandos só funcionam se o alvo estiver usando ESTE SCRIPT."
+    Desc = "Os comandos só funcionam se o alvo estiver com o SCRIPT INVISÍVEL executado."
 })
 
+print("[PAINEL ADM] Carregado sem jumpscare, apenas ADM.")
 
 
----- painel adm do Spectra Hub------
 
 
 --==================================================
---// SCRIPT INVISÍVEL - CHAT FE UNIVERSAL
+--// SCRIPT INVISÍVEL - CHAT FE
 --// TODOS OS PLAYERS DEVEM USAR
 --==================================================
 
+--==================================================
 --// SERVIÇOS
+--==================================================
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
-local StarterGui = game:GetService("StarterGui")
+local TeleportService = game:GetService("TeleportService")
+
 local LocalPlayer = Players.LocalPlayer
 
 --==================================================
---// NOTIFICAÇÃO DE EXECUÇÃO
---==================================================
-pcall(function()
-    StarterGui:SetCore("SendNotification", {
-        Title = "Script Invisível",
-        Text = "Script executado com sucesso",
-        Duration = 4
-    })
-end)
-
---==================================================
---// FUNÇÕES AUXILIARES
+--// UTIL
 --==================================================
 local function getChannel()
     return TextChatService.TextChannels:FindFirstChild("RBXGeneral")
@@ -254,7 +226,7 @@ local function getChannel()
 end
 
 --==================================================
---// AÇÕES LOCAIS (FE)
+--// AÇÕES FE (SELF)
 --==================================================
 local function killSelf()
     local char = LocalPlayer.Character
@@ -285,7 +257,6 @@ end
 local function iceSelf()
     local char = LocalPlayer.Character
     if not char then return end
-
     for _,v in ipairs(char:GetDescendants()) do
         if v:IsA("BasePart") then
             v.Anchored = true
@@ -296,7 +267,6 @@ end
 local function unIceSelf()
     local char = LocalPlayer.Character
     if not char then return end
-
     for _,v in ipairs(char:GetDescendants()) do
         if v:IsA("BasePart") then
             v.Anchored = false
@@ -304,17 +274,57 @@ local function unIceSelf()
     end
 end
 
+local function freezeSelf()
+    local char = LocalPlayer.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.WalkSpeed = 0
+        hum.JumpPower = 0
+    end
+end
+
+local function unFreezeSelf()
+    local char = LocalPlayer.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.WalkSpeed = 16
+        hum.JumpPower = 50
+    end
+end
+
+local function bringSelf()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local me = Players:GetPlayerFromCharacter(char)
+    local myChar = me and me.Character
+    local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+
+    if hrp and myHRP then
+        hrp.CFrame = myHRP.CFrame * CFrame.new(0,0,-3)
+    end
+end
+
+local function jumpSelf()
+    local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end
+
+local function resetSelf()
+    killSelf()
+end
+
 local function kickSelf()
     LocalPlayer:Kick("Você foi removido por um ADM")
 end
 
 --==================================================
---// LEITOR DE CHAT (ESSENCIAL)
+--// PROCESSADOR DE CHAT
 --==================================================
-local function onMessage(text)
+local function processMessage(text)
     if not text then return end
     text = text:lower()
-
     local myName = LocalPlayer.Name:lower()
 
     if text == ";kill "..myName then
@@ -329,17 +339,32 @@ local function onMessage(text)
     elseif text == ";unice "..myName then
         unIceSelf()
 
+    elseif text == ";freeze "..myName then
+        freezeSelf()
+
+    elseif text == ";unfreeze "..myName then
+        unFreezeSelf()
+
+    elseif text == ";bring "..myName then
+        bringSelf()
+
+    elseif text == ";jump "..myName then
+        jumpSelf()
+
+    elseif text == ";reset "..myName then
+        resetSelf()
+
     elseif text == ";kick "..myName then
         kickSelf()
     end
 end
 
 --==================================================
---// CONECTAR TODOS OS CANAIS
+--// CONECTAR CHAT (NOVO CHAT DO ROBLOX)
 --==================================================
 local function connectChannel(channel)
     channel.MessageReceived:Connect(function(msg)
-        onMessage(msg.Text)
+        processMessage(msg.Text)
     end)
 end
 
@@ -350,6 +375,9 @@ end
 TextChatService.TextChannels.ChildAdded:Connect(connectChannel)
 
 --==================================================
---// STATUS
+--// NOTIFICAÇÃO SIMPLES (CHAT STYLE)
 --==================================================
-print("script) é executado com sucesso")
+task.spawn(function()
+    task.wait(1)
+    warn("[SCRIPT INVISÍVEL] Executado com sucesso")
+end)
