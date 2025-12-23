@@ -95,30 +95,10 @@ local Section = AdmTab:Section({
 })
 
 --==================================================
---// PLAYER SELECTION VIA CAMPO DE TEXTO
+--// CAMPO DE TEXTO PARA SELECIONAR PLAYER
 --==================================================
 local selectedPlayer = nil
-local Dropdown
 
-local function getPlayers()
-    local t = {}
-    for _,p in ipairs(Players:GetPlayers()) do
-        if p ~= LocalPlayer then
-            table.insert(t, p.Name)
-        end
-    end
-    return t
-end
-
-Dropdown = Section:Dropdown({
-    Title = "Escolher Player",
-    Values = getPlayers(),
-    Callback = function(v)
-        selectedPlayer = v
-    end
-})
-
--- Campo de texto para digitar o nome do jogador
 local PlayerInput = Section:TextBox({
     Title = "Digite o nome do jogador",
     Placeholder = "Ex: Pedro123",
@@ -128,7 +108,6 @@ local PlayerInput = Section:TextBox({
         for _, p in ipairs(Players:GetPlayers()) do
             if p.Name:lower() == value:lower() then
                 selectedPlayer = p.Name
-                Dropdown:SetValue(p.Name)
                 found = true
                 break
             end
@@ -148,7 +127,6 @@ Section:Button({
         for _, p in ipairs(Players:GetPlayers()) do
             if p.Name:lower() == value:lower() then
                 selectedPlayer = p.Name
-                Dropdown:SetValue(p.Name)
                 found = true
                 break
             end
@@ -159,14 +137,6 @@ Section:Button({
     end
 })
 
--- Atualizar dropdown automaticamente
-local function refreshPlayers()
-    Dropdown:SetValues(getPlayers())
-    selectedPlayer = nil
-end
-Players.PlayerAdded:Connect(refreshPlayers)
-Players.PlayerRemoving:Connect(refreshPlayers)
-
 --==================================================
 --// FUNÇÃO PADRÃO PRA BOTÕES
 --==================================================
@@ -176,13 +146,15 @@ local function AddButton(nome, comando)
         Callback = function()
             if selectedPlayer then
                 sendChat(comando.." "..selectedPlayer)
+            else
+                warn("[PAINEL ADM] Nenhum jogador selecionado!")
             end
         end
     })
 end
 
 --==================================================
---// BOTÕES ADM (UM MONTE)
+--// BOTÕES ADM (TODOS)
 --==================================================
 AddButton("Kill", ";kill")
 AddButton("Kick", ";kick")
