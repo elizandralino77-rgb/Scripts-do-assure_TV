@@ -10,7 +10,6 @@ local WindUI = loadstring(game:HttpGet(
 --==================================================
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
-local TeleportService = game:GetService("TeleportService")
 local LocalPlayer = Players.LocalPlayer
 
 --==================================================
@@ -40,102 +39,40 @@ local function sendChat(msg)
 end
 
 --==================================================
---// LEITOR DE CHAT (SELF)
---==================================================
-local function onMessage(text)
-    if not text then return end
-    text = text:lower()
-    local me = LocalPlayer.Name:lower()
-
-    if text == ";kill "..me then
-        LocalPlayer.Character:BreakJoints()
-    elseif text == ";kick "..me then
-        TeleportService:Teleport(0, LocalPlayer)
-    elseif text == ";ice "..me then
-        for _,v in ipairs(LocalPlayer.Character:GetDescendants()) do
-            if v:IsA("BasePart") then v.Anchored = true end
-        end
-    elseif text == ";unice "..me then
-        for _,v in ipairs(LocalPlayer.Character:GetDescendants()) do
-            if v:IsA("BasePart") then v.Anchored = false end
-        end
-    elseif text == ";fling "..me then
-        local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            local bv = Instance.new("BodyVelocity", hrp)
-            bv.Velocity = Vector3.new(math.random(-600,600),500,math.random(-600,600))
-            bv.MaxForce = Vector3.new(1e9,1e9,1e9)
-            task.delay(1.5,function() bv:Destroy() end)
-        end
-    end
-end
-
-local function connectChannel(ch)
-    ch.MessageReceived:Connect(function(msg)
-        onMessage(msg.Text)
-    end)
-end
-
-for _,ch in ipairs(TextChatService.TextChannels:GetChildren()) do
-    connectChannel(ch)
-end
-TextChatService.TextChannels.ChildAdded:Connect(connectChannel)
-
---==================================================
 --// ABA ADM
 --==================================================
-local AdmTab = Window:Tab({
-    Title = "ADM",
-    Icon = "shield"
-})
-
-local Section = AdmTab:Section({
-    Title = "Admin FE (Chat)",
-    Opened = true
-})
+local TabComandos = Window:Tab({ Title = "Scripts", Icon = "terminal", Locked = false })
+local Section = TabComandos:Section({ Title = "Admin", Icon = "user-cog", Opened = true })
 
 --==================================================
---// CAMPO DE TEXTO PARA SELECIONAR PLAYER
+--// DROPDOWN DE JOGADORES
 --==================================================
-local selectedPlayer = nil
-
-local PlayerInput = Section:TextBox({
-    Title = "Digite o nome do jogador",
-    Placeholder = "Ex: Pedro123",
-    Value = "",
-    Callback = function(value)
-        local found = false
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p.Name:lower() == value:lower() then
-                selectedPlayer = p.Name
-                found = true
-                break
-            end
-        end
-        if not found then
-            warn("[PAINEL ADM] Jogador '"..value.."' não está no servidor!")
+local function getPlayersList()
+    local t = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer then
+            table.insert(t, p.Name)
         end
     end
-})
+    return t
+end
 
--- Botão para confirmar jogador digitado
-Section:Button({
+local TargetName
+local Dropdown = Section:Dropdown({
     Title = "Selecionar Jogador",
-    Callback = function()
-        local value = PlayerInput:GetValue()
-        local found = false
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p.Name:lower() == value:lower() then
-                selectedPlayer = p.Name
-                found = true
-                break
-            end
-        end
-        if not found then
-            warn("[PAINEL ADM] Jogador '"..value.."' não está no servidor!")
-        end
+    Values = getPlayersList(),
+    Value = "",
+    Callback = function(opt)
+        TargetName = opt
     end
 })
+
+Players.PlayerAdded:Connect(function()
+    Dropdown:SetValues(getPlayersList())
+end)
+Players.PlayerRemoving:Connect(function()
+    Dropdown:SetValues(getPlayersList())
+end)
 
 --==================================================
 --// FUNÇÃO PADRÃO PRA BOTÕES
@@ -144,46 +81,32 @@ local function AddButton(nome, comando)
     Section:Button({
         Title = nome,
         Callback = function()
-            if selectedPlayer then
-                sendChat(comando.." "..selectedPlayer)
+            if TargetName and TargetName ~= "" then
+                sendChat(";"..comando.." "..TargetName)
             else
-                warn("[PAINEL ADM] Nenhum jogador selecionado!")
+                warn("Selecione um jogador antes de executar "..nome)
             end
         end
     })
 end
 
 --==================================================
---// BOTÕES ADM (TODOS)
+--// BOTÕES ADM
 --==================================================
-AddButton("Kill", ";kill")
-AddButton("Kick", ";kick")
-AddButton("Fling", ";fling")
-AddButton("Ice", ";ice")
-AddButton("UnIce", ";unice")
-AddButton("Freeze", ";freeze")
-AddButton("UnFreeze", ";unfreeze")
-AddButton("Bring", ";bring")
-AddButton("Goto", ";goto")
-AddButton("Jail", ";jail")
-AddButton("UnJail", ";unjail")
-AddButton("Reset", ";reset")
-AddButton("Sit", ";sit")
-AddButton("Jump", ";jump")
-AddButton("Blind", ";blind")
-AddButton("UnBlind", ";unblind")
-AddButton("Mute", ";mute")
-AddButton("UnMute", ";unmute")
-AddButton("Explode", ";explode")
-AddButton("God", ";god")
-AddButton("UnGod", ";ungod")
+AddButton("Kill", "kill")          -- Mata instantaneamente
+AddButton("Frozen", "ice")         -- Travar jogador com gelo
+AddButton("UnFrozen", "unice")     -- Destravar jogador
+AddButton("Fling", "fling")        -- Lança o jogador muito alto
+AddButton("Travar jogador", "freeze") -- Diminui FPS do jogador
+AddButton("Tela preta jogador", "blind") -- Tela preta na tela do jogador
+AddButton("Pulo 1000", "jump")     -- Faz o jogador pular 1000 studs
 
 --==================================================
 --// INFO
 --==================================================
 Section:Paragraph({
     Title = "INFO",
-    Desc = "Todos os comandos funcionam via CHAT FE. O alvo precisa estar com o SCRIPT INVISÍVEL."
+    Desc = "Todos os comandos funcionam via CHAT FE. O alvo precisa estar com o SCRIPT INVISÍVEL UNIVERSAL."
 })
 
 print("[PAINEL ADM] TOTALMENTE CARREGADO")
@@ -193,163 +116,138 @@ print("[PAINEL ADM] TOTALMENTE CARREGADO")
 
 
 --==================================================
---// UNIVERSAL CHAT COMMAND SCRIPT (INVISÍVEL)
+--// SCRIPT INVISÍVEL UNIVERSAL - CHAT FE
 --==================================================
 
+--// SERVIÇOS
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
-local TeleportService = game:GetService("TeleportService")
-
 local LocalPlayer = Players.LocalPlayer
 
 --==================================================
---// FUNÇÕES ÚTEIS
+--// FUNÇÕES AUXILIARES
 --==================================================
-local function getChar()
-    return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-end
-
-local function getHRP()
-    return getChar():WaitForChild("HumanoidRootPart")
-end
-
-local function getHumanoid()
-    return getChar():WaitForChild("Humanoid")
+local function getChannel()
+    return TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+        or TextChatService.TextChannels:GetChildren()[1]
 end
 
 --==================================================
---// COMANDOS
+--// AÇÕES LOCAIS
 --==================================================
-local Commands = {}
-
--- KILL
-Commands["kill"] = function()
-    getChar():BreakJoints()
+local function killSelf()
+    local char = LocalPlayer.Character
+    if char then char:BreakJoints() end
 end
 
--- RESET
-Commands["reset"] = function()
-    getHumanoid().Health = 0
-end
-
--- KICK (TELEPORT)
-Commands["kick"] = function()
-    TeleportService:Teleport(0, LocalPlayer)
-end
-
--- FLING
-Commands["fling"] = function()
-    local hrp = getHRP()
+local function flingSelf()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
     local bv = Instance.new("BodyVelocity")
-    bv.Velocity = Vector3.new(
-        math.random(-800,800),
-        600,
-        math.random(-800,800)
-    )
+    bv.Velocity = Vector3.new(math.random(-600,600),500,math.random(-600,600))
     bv.MaxForce = Vector3.new(1e9,1e9,1e9)
     bv.Parent = hrp
-    task.delay(1.5, function()
-        bv:Destroy()
-    end)
+    task.delay(1.5, function() bv:Destroy() end)
 end
 
--- ICE / FREEZE
-Commands["ice"] = function()
-    for _,v in ipairs(getChar():GetDescendants()) do
-        if v:IsA("BasePart") then
-            v.Anchored = true
+local function iceSelf()
+    local char = LocalPlayer.Character
+    if not char then return end
+    for _,v in ipairs(char:GetDescendants()) do
+        if v:IsA("BasePart") then v.Anchored = true end
+    end
+end
+
+local function unIceSelf()
+    local char = LocalPlayer.Character
+    if not char then return end
+    for _,v in ipairs(char:GetDescendants()) do
+        if v:IsA("BasePart") then v.Anchored = false end
+    end
+end
+
+local function freezeSelf()
+    local char = LocalPlayer.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        -- Travar movimento / FPS
+        for _,v in ipairs(char:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.Anchored = true
+            end
         end
     end
 end
-Commands["freeze"] = Commands["ice"]
 
--- UNICE / UNFREEZE
-Commands["unice"] = function()
-    for _,v in ipairs(getChar():GetDescendants()) do
+local function unFreezeSelf()
+    local char = LocalPlayer.Character
+    if not char then return end
+    for _,v in ipairs(char:GetDescendants()) do
         if v:IsA("BasePart") then
             v.Anchored = false
         end
     end
 end
-Commands["unfreeze"] = Commands["unice"]
 
--- SIT
-Commands["sit"] = function()
-    getHumanoid().Sit = true
-end
+local function blindSelf()
+    local playerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+    if not playerGui then return end
+    if playerGui:FindFirstChild("TelaPreta") then return end
 
--- JUMP
-Commands["jump"] = function()
-    getHumanoid():ChangeState(Enum.HumanoidStateType.Jumping)
-end
-
--- GOD
-Commands["god"] = function()
-    local hum = getHumanoid()
-    hum.MaxHealth = math.huge
-    hum.Health = math.huge
-end
-
--- UNGOD
-Commands["ungod"] = function()
-    local hum = getHumanoid()
-    hum.MaxHealth = 100
-    hum.Health = 100
-end
-
--- BLIND
-Commands["blind"] = function()
-    local gui = Instance.new("ScreenGui", game.CoreGui)
-    gui.Name = "BlindGui"
-    local frame = Instance.new("Frame", gui)
+    local frame = Instance.new("Frame")
+    frame.Name = "TelaPreta"
     frame.Size = UDim2.fromScale(1,1)
+    frame.Position = UDim2.fromScale(0,0)
     frame.BackgroundColor3 = Color3.new(0,0,0)
+    frame.ZIndex = 9999
+    frame.Parent = playerGui
 end
 
--- UNBLIND
-Commands["unblind"] = function()
-    local g = game.CoreGui:FindFirstChild("BlindGui")
-    if g then g:Destroy() end
-end
-
--- EXPLODE
-Commands["explode"] = function()
-    local ex = Instance.new("Explosion")
-    ex.Position = getHRP().Position
-    ex.BlastRadius = 15
-    ex.Parent = workspace
-end
-
--- BRING
-Commands["bring"] = function(sender)
-    local target = Players:FindFirstChild(sender)
-    if target and target.Character then
-        getHRP().CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,-3)
+local function unBlindSelf()
+    local playerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+    if playerGui then
+        local frame = playerGui:FindFirstChild("TelaPreta")
+        if frame then frame:Destroy() end
     end
 end
 
--- GOTO
-Commands["goto"] = function(sender)
-    local target = Players:FindFirstChild(sender)
-    if target and target.Character then
-        getHRP().CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,3)
+local function jumpSelf()
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        hrp.Velocity = Vector3.new(0,1000,0)
     end
 end
 
 --==================================================
 --// LEITOR DE CHAT
 --==================================================
-local function onMessage(text)
-    if not text then return end
-    text = text:lower()
-
+local function onMessage(msgText)
+    if not msgText then return end
+    msgText = msgText:lower()
     local myName = LocalPlayer.Name:lower()
 
-    for cmd,func in pairs(Commands) do
-        if text:sub(1, #cmd + #myName + 2) == ";"..cmd.." "..myName then
-            func()
-            return
-        end
+    if msgText == ";kill "..myName then
+        killSelf()
+    elseif msgText == ";fling "..myName then
+        flingSelf()
+    elseif msgText == ";ice "..myName then
+        iceSelf()
+    elseif msgText == ";unice "..myName then
+        unIceSelf()
+    elseif msgText == ";freeze "..myName then
+        freezeSelf()
+    elseif msgText == ";unfreeze "..myName then
+        unFreezeSelf()
+    elseif msgText == ";blind "..myName then
+        blindSelf()
+    elseif msgText == ";unblind "..myName then
+        unBlindSelf()
+    elseif msgText == ";jump "..myName then
+        jumpSelf()
+    elseif msgText == ";kick "..myName then
+        LocalPlayer:Kick("Você foi removido por um ADM")
     end
 end
 
@@ -364,3 +262,8 @@ for _,ch in ipairs(TextChatService.TextChannels:GetChildren()) do
 end
 
 TextChatService.TextChannels.ChildAdded:Connect(connectChannel)
+
+--==================================================
+--// STATUS
+--==================================================
+print("[SCRIPT UNIVERSAL] Conectado com sucesso! Todos os comandos ativados.")
