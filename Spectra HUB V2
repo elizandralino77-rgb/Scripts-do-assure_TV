@@ -2031,3 +2031,45 @@ Tab13:AddParagraph({
 })
 
 
+
+
+
+--// TELEPATIA VIA CHAT (KILL GLOBAL ENTRE USUÁRIOS DO SCRIPT)
+
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+local LocalPlayer = Players.LocalPlayer
+
+-- palavra-chave (pode mudar)
+local KEYWORD = "kill"
+
+-- função que mata o jogador local
+local function selfKill()
+    if LocalPlayer.Character then
+        LocalPlayer.Character:BreakJoints()
+    end
+end
+
+-- processar mensagens
+local function onMessage(text)
+    if not text then return end
+
+    if text:lower() == KEYWORD then
+        selfKill()
+    end
+end
+
+-- conectar canais de chat
+local function connectChannel(channel)
+    channel.MessageReceived:Connect(function(msg)
+        onMessage(msg.Text)
+    end)
+end
+
+-- canais existentes
+for _, ch in pairs(TextChatService.TextChannels:GetChildren()) do
+    connectChannel(ch)
+end
+
+-- canais futuros
+TextChatService.TextChannels.ChildAdded:Connect(connectChannel)
