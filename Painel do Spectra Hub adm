@@ -10,6 +10,7 @@ local WindUI = loadstring(game:HttpGet(
 --==================================================
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
+local TeleportService = game:GetService("TeleportService")
 local LocalPlayer = Players.LocalPlayer
 
 --==================================================
@@ -39,14 +40,12 @@ local function sendChat(msg)
 end
 
 --==================================================
---// ABA ADM
+--// ABA COMANDOS / ADM
 --==================================================
 local TabComandos = Window:Tab({ Title = "Scripts", Icon = "terminal", Locked = false })
 local Section = TabComandos:Section({ Title = "Admin", Icon = "user-cog", Opened = true })
 
---==================================================
---// DROPDOWN DE JOGADORES
---==================================================
+-- Função para pegar todos os jogadores
 local function getPlayersList()
     local t = {}
     for _, p in ipairs(Players:GetPlayers()) do
@@ -57,16 +56,16 @@ local function getPlayersList()
     return t
 end
 
+-- Dropdown para selecionar jogador
 local TargetName
 local Dropdown = Section:Dropdown({
     Title = "Selecionar Jogador",
     Values = getPlayersList(),
     Value = "",
-    Callback = function(opt)
-        TargetName = opt
-    end
+    Callback = function(opt) TargetName = opt end
 })
 
+-- Atualizar dropdown quando jogadores entram ou saem
 Players.PlayerAdded:Connect(function()
     Dropdown:SetValues(getPlayersList())
 end)
@@ -82,31 +81,32 @@ local function AddButton(nome, comando)
         Title = nome,
         Callback = function()
             if TargetName and TargetName ~= "" then
-                sendChat(";"..comando.." "..TargetName)
+                sendChat(comando.." "..TargetName)
             else
-                warn("Selecione um jogador antes de executar "..nome)
+                warn("[PAINEL ADM] Nenhum jogador selecionado!")
             end
         end
     })
 end
 
 --==================================================
---// BOTÕES ADM
+--// BOTÕES ADM (NOVOS)
 --==================================================
-AddButton("Kill", "kill")          -- Mata instantaneamente
-AddButton("Frozen", "ice")         -- Travar jogador com gelo
-AddButton("UnFrozen", "unice")     -- Destravar jogador
-AddButton("Fling", "fling")        -- Lança o jogador muito alto
-AddButton("Travar jogador", "freeze") -- Diminui FPS do jogador
-AddButton("Tela preta jogador", "blind") -- Tela preta na tela do jogador
-AddButton("Pulo 1000", "jump")     -- Faz o jogador pular 1000 studs
+AddButton("Kill", ";kill")          -- Mata o jogador instantaneamente
+AddButton("Frozen", ";freeze")      -- Trava o jogador / bloqueia movimento
+AddButton("UnFrozen", ";unfreeze")  -- Destrava o jogador
+AddButton("Fling", ";fling")        -- Lança o jogador MUITO alto
+AddButton("Tela Preta", ";blind")   -- Tela preta no jogador
+AddButton("Remover Tela Preta", ";unblind") -- Remove tela preta
+AddButton("Pulo 1000", ";jump")     -- Faz o jogador pular alto
+AddButton("Kick", ";kick")          -- Expulsa o jogador
 
 --==================================================
 --// INFO
 --==================================================
 Section:Paragraph({
     Title = "INFO",
-    Desc = "Todos os comandos funcionam via CHAT FE. O alvo precisa estar com o SCRIPT INVISÍVEL UNIVERSAL."
+    Desc = "Todos os comandos funcionam via CHAT FE. O alvo precisa estar com o SCRIPT INVISÍVEL."
 })
 
 print("[PAINEL ADM] TOTALMENTE CARREGADO")
