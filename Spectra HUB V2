@@ -1214,7 +1214,7 @@ LimitedTab:AddButton({
 
 local RGBTab = Window:MakeTab({
     Name = "RGB",
-    Icon = "rbxassetid://122803943043720"
+    Icon = "rbxassetid://12111879608"
 })
 
 -- Remote
@@ -1556,7 +1556,7 @@ ChatTab:AddButton({
 --==============================
 local EventosTab = Window:MakeTab({
     Title = "Eventos",
-    Icon = "rbxassetid://4519515245"
+    Icon = "rbxassetid://96262151461460"
 })
 
 EventosTab:AddSection({ Name = "Coletar Estrelas de Natal" })
