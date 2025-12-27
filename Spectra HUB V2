@@ -1160,6 +1160,8 @@ local tools = {
     "UraniumRod",
     "Water Balloon",
     "FireHose",
+    "SnowballCannon",
+    "Thermos",
     "Chainsaw",
     "Present",
     "CookieWindowTray",
