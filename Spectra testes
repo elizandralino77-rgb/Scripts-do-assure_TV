@@ -1,0 +1,2313 @@
+--// SERVIÇOS
+Jogadores locais = jogo:ObterServiço("Jogadores")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local RunService = jogo:GetService("RunService")
+
+local plr = Players.LocalPlayer
+caractere local = plr.Character ou plr.CharacterAdded:Wait()
+local humanoide = personagem:EsperePorCriança("Humanoide")
+
+plr.CharacterAdded:Connect(function(char)
+    caractere = char
+    humanoide = char:WaitForChild("Humanoide")
+fim)
+
+--// UI LIB
+Biblioteca local = carregarstring(jogo:HttpGet("https://pastefy.app/qoLIvWvg/raw"))()
+
+local Window = Library:MakeWindow({
+    Título = "Spectra hub | Brookhaven RP 🏡",
+    Subtítulo = "por: assure_TV",
+    LoadText = "Carregando Spectra",
+    Bandeiras = "Spectrahub_Brookhaven"
+})
+
+Janela:AdicionarBotãoMinimizar({
+    Botão = { Imagem = "rbxassetid://83254865257410", BackgroundTransparency = 0 },
+    Canto = { RaioDoCanto = UDim.new(35, 1) }
+})
+
+--////////////////////////////////////////////////////
+--// TAB CRÉDITOS
+local Tab1 = Janela:CriarAba({
+    Título = "Créditos",
+    Ícone = "rbxassetid://76311199408449"
+})
+
+--==============================
+-- CRÉDITOS DO HUB
+--==============================
+Tab1:AddSection({"Créditos do Hub"})
+
+Tab1:AdicionarConviteDiscord({
+    Nome = "Spectra Hub",
+    Description = "Comunidade oficial do Hub",
+    Logotipo = "rbxassetid://102760953257719",
+    Convite = "https://discord.gg/kKJJQrtus",
+})
+
+--==============================
+-- DETECTOR DE EXECUTOR
+--==============================
+função local detectarExecutor()
+    se o executor for identificado, então
+        retornar identifyexecutor()
+    senão se syn então
+        retornar "Synapse X"
+    senão se KRNL_CARREGADO então
+        retornar "KRNL"
+    senão se is_sirhurt_closure então
+        retornar "SirHurt"
+    senão se pebc_execute então
+        retornar "ProtoSmasher"
+    senão se getexecutorname então
+        retornar getexecutorname()
+    outro
+        retornar "Executor Desconhecido"
+    fim
+fim
+
+local executorName = detectExecutor()
+
+-- Executor
+Tab1:AdicionarParágrafo({
+    "Executor",
+    nome do executor
+})
+
+-- 👇 NOME REAL DO JOGADOR (LOGADO)
+Tab1:AdicionarParágrafo({
+    "Jogador",
+    jogo:ObterServiço("Jogadores").LocalPlayer.Nome
+})
+
+--==============================
+-- VERSÃO DO HUB
+--==============================
+Tab1:AddSection({"Versão do Hub"})
+
+Tab1:AdicionarParágrafo({
+    "Inversão do Hub",
+    "V2"
+})
+
+--==============================
+-- CRIADORES
+--==============================
+Tab1:AddSection({"Criadores"})
+
+Tab1:AdicionarParágrafo({
+    "Desenvolvedor Principal",
+    "assure_TV"
+})
+
+Tab1:AdicionarParágrafo({
+    "Projeto",
+    "Centro Spectra"
+})
+
+--==============================
+-- REDES SOCIAIS
+--==============================
+Tab1:AddSection({"Redes Sociais"})
+
+Tab1:AdicionarBotão({
+    Name = "📋 Copiar TikTok do Assegura_TV",
+    Callback = função()
+        se setclipboard então
+            setclipboard("@assure_tv_157")
+            setclipboard("https://www.tiktok.com/@assure_tv_157")
+        fim
+    fim
+})
+
+Tab1:AdicionarBotão({
+    Name = "📋 Copiar Canal do YouTube do Assegura_TV",
+    Callback = função()
+        se setclipboard então
+            setclipboard("assure_TV")
+            setclipboard("https://www.youtube.com/@assure_TV")
+        fim
+    fim
+})
+
+
+--// ABA DO JOGADOR
+local PlayerTab = Window:MakeTab({ Title = "Jogador", Icon = "rbxassetid://17132521951" })
+PlayerTab:AddSection({ "Movimento" })
+
+
+
+
+PlayerTab:AdicionarSlider({
+    Nome = "Velocidade de Caminhada",
+    Mínimo = 16,
+    Máximo = 500,
+    Padrão = humanoid.WalkSpeed,
+    Callback = function(v) humanoid.WalkSpeed ​​= v end
+})
+
+PlayerTab:AdicionarSlider({
+    Nome = "JumpPower",
+    Mínimo = 50,
+    Máximo = 500,
+    Padrão = humanoide.JumpPower,
+    Callback = function(v) humanoid.JumpPower = v end
+})
+
+PlayerTab:AdicionarSlider({
+    Nome = "Gravidade",
+    Mínimo = 10,
+    Máximo = 500,
+    Padrão = Workspace.Gravity,
+    Callback = function(v) Workspace.Gravity = v end
+})
+
+PlayerTab:AddButton({
+    Nome = "Redefinir estatísticas do jogador"
+    Callback = função()
+        humanoide.VelocidadeDeCaminhada = 16
+        humanoide.JumpPower = 50
+        Workspace.Gravity = 196.2
+    fim
+})
+
+
+
+--// RODAR
+PlayerTab:AddSection({ "Girar" })
+rotação local, velocidade de rotação = falso, 50
+
+PlayerTab:AdicionarAlternância({
+    Nome = "Ligar/Desligar",
+    Padrão = falso,
+    Callback = função(v) girando = v fim
+})
+
+PlayerTab:AdicionarSlider({
+    Nome = "Velocidade de Rotação",
+    Mínimo = 1,
+    Máximo = 1000,
+    Padrão = velocidade de rotação,
+    Callback = função(v) velocidadeDeRotação = v fim
+})
+
+RunService.RenderStepped:Connect(função(dt)
+    se girando e humanoide e humanoide.RootPart então
+        humanoid.RootPart.CFrame *= CFrame.Angles(0, math.rad(spinSpeed ​​* dt), 0)
+    fim
+fim)
+
+--// NOCLIP
+local NoclipEnabled = false
+
+PlayerTab:AdicionarAlternância({
+    Nome = "Noclip",
+    Padrão = falso,
+    Callback = função(estado)
+        NoclipEnabled = estado
+    fim
+})
+
+RunService.Stepped:Connect(function()
+    se NoclipEnabled e plr.Character então
+        para _, parte em ipairs(plr.Character:GetDescendants()) faça
+            se parte:IsA("BasePart") então
+                parte.PodeColidir = falso
+            fim
+        fim
+    fim
+fim)
+
+
+--// SALTO INFINITO
+local InfiniteJumpEnabled = false
+
+PlayerTab:AdicionarAlternância({
+    Nome = "Salto Infinito",
+    Padrão = falso,
+    Callback = função(estado)
+        InfiniteJumpEnabled = estado
+    fim
+})
+
+jogo:ObterServiço("ServiçoDeEntradaDoUsuário").SolicitaçãoDePular:Conectar(função()
+    se InfiniteJumpEnabled e humanoide então
+        humanoide:MudarEstado(Enum.HumanoidStateType.Jumping)
+    fim
+fim)
+
+jogo:ObterServiço("ServiçoDeEntradaDoUsuário").SolicitaçãoDePular:Conectar(função()
+    se InfiniteJumpEnabled e humanoide então
+        humanoide:MudarEstado(Enum.HumanoidStateType.Jumping)
+    fim
+fim)
+
+
+
+--////////////////////////////////////////////////////
+--// ROTEIROS
+PlayerTab:AdicionarSeção({ "Scripts" })
+
+PlayerTab:AddButton({
+    Nome = "Emotes",
+    Callback = função()
+        carregarstring(jogo:HttpGet("https://rawscripts.net/raw/Universal-Script-7yd7-I-Emote-Script-48024"))()
+    fim
+})
+
+PlayerTab:AddButton({
+    Nome = "Mosca",
+    Callback = função()
+        carregarstring(jogo:HttpGet("https://rawscripts.net/raw/Universal-Script-Gui-Fly-v3-37111"))()
+    fim
+})
+
+PlayerTab:AddButton({
+    Nome = "Espião Sigma",
+    Callback = função()
+        carregarstring(jogo:HttpGet("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"))()
+    fim
+})
+
+
+PlayerTab:AddButton({
+    Nome = "clique para teletransportar",
+    Callback = função()
+        carregarstring(jogo:HttpGet("https://raw.githubusercontent.com/err0r129/KptHadesBlair/main/Bao.lua"))()
+    fim
+})
+
+
+
+
+--////////////////////////////////////////////////////
+--// ANTI-SENTAR
+PlayerTab:AddSection({ "Anti-Sit" })
+
+Jogadores locais = jogo:ObterServiço("Jogadores")
+local RunService = jogo:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local antiSitEnabled = false
+anti-SitConn local
+
+PlayerTab:AdicionarAlternância({
+    Nome = "Anti-Sentado",
+    Padrão = falso,
+    Callback = função(estado)
+        antiSitEnabled = estado
+
+        função local aplicar(caractere)
+            local hum = character:FindFirstChildOfClass("Humanoid")
+            Se não houver zumbido, retorne ao fim.
+
+            hum.Sit = falso
+            hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+
+            se antiSitConn então
+                antiSitConn:Desconectar()
+            fim
+
+            antiSitConn = hum.Seated:Connect(function(sentar)
+                se sentar então
+                    hum.Sit = falso
+                    hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                fim
+            fim)
+        fim
+
+        se estado então
+            se LocalPlayer.Character então
+                aplicar(LocalPlayer.Character)
+            fim
+
+            JogadorLocal.PersonagemAdicionado:Conectar(função(char)
+                se antiSitEnabled então
+                    aplicar(caractere)
+                fim
+            fim)
+        outro
+            se antiSitConn então
+                antiSitConn:Desconectar()
+                antiSitConn = nulo
+            fim
+
+            se LocalPlayer.Character então
+                local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                se zumbir então
+                    hum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+                fim
+            fim
+        fim
+    fim
+})
+
+--////////////////////////////////////////////////////
+--// ESP COMPLETO
+PlayerTab:AdicionarSeção({ "ESP" })
+
+local ESPEnabled = false
+local ESPColorMode = "RGB"
+local ESPObjects = {}
+local ESPConnections = {}
+
+PlayerTab:AdicionarMenuSuspenso({
+    Nome = "ESP Color",
+    Padrão = "RGB",
+    Opções = {
+        "RGB","Branco","Preto","Vermelho",
+        "Verde","Azul","Amarelo","Rosa","Roxo"
+    },
+    Callback = função(v)
+        ESPColorMode = v
+    fim
+})
+
+função local getESPColor()
+    se ESPColorMode == "RGB" então
+        retornar Color3.fromHSV((tick()%5)/5,1,1)
+    senão se ESPColorMode == "Branco" então
+        retornar Color3.fromRGB(255,255,255)
+    elseif ESPColorMode == "Preto" então
+        retornar Color3.fromRGB(0,0,0)
+    elseif ESPColorMode == "Vermelho" então
+        retornar Color3.fromRGB(255,0,0)
+    senão se ESPColorMode == "Verde" então
+        retornar Color3.fromRGB(0,255,0)
+    senão se ESPColorMode == "Azul" então
+        retornar Color3.fromRGB(0,170,255)
+    elseif ESPColorMode == "Amarelo" então
+        retornar Color3.fromRGB(255,255,0)
+    senão se ESPColorMode == "Rosa" então
+        retornar Color3.fromRGB(255,105,180)
+    senão se ESPColorMode == "Roxo" então
+        retornar Color3.fromRGB(128,0,128)
+    fim
+    retornar Color3.new(1,1,1)
+fim
+
+função local RemoveESP(jogador)
+    se ESPObjects[player] então
+        ESPObjects[player]:Destruir()
+        ESPObjects[player] = nulo
+    fim
+fim
+
+função local CreateESP(jogador)
+    Se jogador == JogadorLocal, então retorne fim.
+    Se ESPEnabled não estiver habilitado, retorne o fim.
+    Se não player.Character, retorne end
+
+    local head = player.Character:FindFirstChild("Head")
+    Se não for o cabeçalho, retorne ao fim.
+
+    RemoverESP(player)
+
+    gui local = Instance.new("BillboardGui")
+    gui.Name = "ESP"
+    gui.Size = UDim2.new(0,220,0,45)
+    gui.StudsOffset = Vector3.new(0,3,0)
+    gui.AlwaysOnTop = true
+    gui.Adornee = cabeça
+    gui.Parent = head
+
+    local txt = Instance.new("TextLabel")
+    txt.Size = UDim2.new(1,0,1,0)
+    txt.BackgroundTransparency = 1
+    txt.TextStrokeTransparency = 0,4
+    txt.Font = Enum.Font.SourceSansBold
+    txt.TextSize = 14
+    txt.Text = player.Name.." | "..player.AccountAge.." dias"
+    txt.TextColor3 = getESPColor()
+    txt.Parent = gui
+
+    ESPObjects[player] = gui
+fim
+
+PlayerTab:AdicionarAlternância({
+    Nome = "ESP Ligado/Desligado",
+    Padrão = falso,
+    Callback = função(estado)
+        ESPEnabled = estado
+
+        se estado então
+            para _,p em ipairs(Players:GetPlayers()) faça
+                CriarESP(p)
+            fim
+
+            tabela.inserir(ESPConnections, Players.PlayerAdded:Connect(function(p)
+                p.CharacterAdded:Connect(function()
+                    tarefa.esperar(0.4)
+                    CriarESP(p)
+                fim)
+            fim))
+
+            tabela.inserir(ESPConnections, Players.PlayerRemoving:Connect(function(p)
+                RemoverESP(p)
+            fim))
+
+            tabela.inserir(ESPConnections, RunService.RenderStepped:Connect(function()
+                se ESPColorMode == "RGB" então
+                    para _,gui em pares(ESPObjects) faça
+                        local txt = gui:FindFirstChildOfClass("TextLabel")
+                        se txt então
+                            txt.TextColor3 = getESPColor()
+                        fim
+                    fim
+                fim
+            fim))
+        outro
+            para _,gui em pares(ESPObjects) faça
+                gui:Destruir()
+            fim
+            ESPObjects = {}
+
+            para _,c em pares(ESPConnections) faça
+                c:Desconectar()
+            fim
+            ESPConnections = {}
+        fim
+    fim
+})
+
+
+
+local TrollTab = Window:MakeTab({
+    Título = "Troll",
+    Ícone = "rbxassetid://6862780932"
+})
+
+TrollTab:AdicionarSeção({ Nome = "Matar Troll" })
+
+--==============================
+-- VARIÁVEIS
+--==============================
+jogador selecionado local
+local killEnabled = false
+
+local teleportThread
+thread local noclip
+thread de monitoramento local
+thread de salto local
+respawn localConn
+
+--==============================
+-- SOFÁ
+--==============================
+função local temCouch()
+    caractere local = plr.Character
+    local bp = plr:FindFirstChildOfClass("Mochila")
+    Se char e char:FindFirstChild("Couch") então retorne verdadeiro fim
+    se bp e bp:FindFirstChild("Couch") então retorne verdadeiro fim
+    retornar falso
+fim
+
+função local pickCouch()
+    pcall(função()
+        ReplicatedStorage.RE:FindFirstChild("1Too1l")
+            :InvokeServer("PickingTools", "Couch")
+    fim)
+fim
+
+função local equipCouch()
+    caractere local = plr.Character
+    local hum = char e char:FindFirstChildOfClass("Humanoid")
+    Se não houver zumbido, retorne ao fim.
+
+    ferramenta local =
+        (char e char:FindFirstChild("Couch")) ou
+        (plr.Backpack e plr.Backpack:FindFirstChild("Couch"))
+
+    se ferramenta então
+        hum:EquipTool(ferramenta)
+    fim
+fim
+
+--==============================
+-- LISTA DE JOGADORES
+--==============================
+função local obterJogadores()
+    local t = {}
+    para _, p em ipairs(Players:GetPlayers()) faça
+        se p ~= plr então
+            tabela.inserir(t, p.Nome)
+        fim
+    fim
+    retornar t
+fim
+
+menu suspenso local = TrollTab:AdicionarDropdown({
+    Nome = "Escolher Player",
+    Opções = obterJogadores(),
+    Callback = função(v)
+        jogadorSelecionado = v
+    fim
+})
+
+TrollTab:AdicionarBotão({
+    Nome = "Atualizar Lista",
+    Callback = função()
+        menu suspenso:Definir(obterJogadores())
+    fim
+})
+
+--==============================
+--TOGGLE KILL DEMORADO E CHATO
+--==============================
+TrollTab:AdicionarAlternância({
+    Name = "Kill demorado e chato 😈",
+    Padrão = falso,
+    Callback = função(estado)
+        killEnabled = estado
+
+        -- DESLIGAR TUDO
+        se não especificar então
+            Se teleportThread então task.cancel(teleportThread) teleportThread = nil fim
+            Se noclipThread então task.cancel(noclipThread) noclipThread = nil fim
+            Se monitorThread então task.cancel(monitorThread) monitorThread = nil fim
+            Se jumpThread então task.cancel(jumpThread) jumpThread = nil fim
+            se respawnConn então respawnConn:Desconectar() respawnConn = nil fim
+            retornar
+        fim
+
+        Se não houver jogador selecionado, retorne ao final.
+
+        -- MONITORAR SOFÁ (pegar automaticamente)
+        monitorThread = task.spawn(function()
+            enquanto killEnabled faça
+                se não hasCouch() então
+                    escolherSofá()
+                    tarefa.esperar(0.15)
+                fim
+                equiparCouch()
+                tarefa.esperar(0.2)
+            fim
+        fim)
+
+        -- AO MORRER
+        respawnConn = plr.CharacterAdded:Connect(function()
+            se killEnabled então
+                tarefa.esperar(0.3)
+                escolherSofá()
+            fim
+        fim)
+
+        -- TELEPORT CAÓTICO (MODO NÁRNIA 🌌)
+        teleportThread = task.spawn(function()
+            enquanto killEnabled faça
+                alvo local = Jogadores:EncontrarPrimeiroFilho(jogadorSelecionado)
+                local hrp = plr.Character e plr.Character:FindFirstChild("HumanoidRootPart")
+                local thrp = target and target.Character and target.Character:FindFirstChild("HumanoidRootPart")
+
+                se hrp e thrp então
+                    para i = 1, 60 faça
+                        se não killEnabled então interrompa o processo
+                        diretório local = Vector3.novo(
+                            math.random(-100.100)/100*0.001, -- distância mínima de 1mm
+                            math.random(-100,100)/100*0.001,
+                            math.random(-100,100)/100*0.001
+                        )
+                        hrp.CFrame = CFrame.lookAt(thrp.Position + dir, thrp.Position)
+                    fim
+                fim
+                tarefa.esperar(0.001)
+            fim
+        fim)
+
+        -- NOCLIP FORTE
+        noclipThread = task.spawn(function()
+            enquanto killEnabled faça
+                caractere local = plr.Character
+                se char então
+                    para _, p em ipairs(char:GetDescendants()) faça
+                        se p:IsA("BasePart") então
+                            p.CanCollide = falso
+                        fim
+                    fim
+                fim
+                tarefa.esperar()
+            fim
+        fim)
+
+        -- 🔥 PULO INFINITO (PC, celular, tablet)
+        jumpThread = task.spawn(function()
+            enquanto killEnabled faça
+                caractere local = plr.Character
+                local hum = char e char:FindFirstChildOfClass("Humanoid")
+                se zumbir então
+                    hum.Jump = verdadeiro
+                    --Dispara entrada para todos os dispositivos
+                    pcall(função()
+                        UserInputService:InputBegan({UserInputType = Enum.UserInputType.Keyboard, KeyCode = Enum.KeyCode.Space}, falso)
+                        UserInputService:InputBegan({UserInputType = Enum.UserInputType.Touch}, falso)
+                    fim)
+                fim
+                tarefa.esperar(0.15)
+            fim
+        fim)
+    fim
+})
+
+
+--==============================
+-- SLIDER TELEPORTE INFINITO
+--==============================
+TrollTab:AdicionarSlider({
+    Nome = "Velocidade Teleporte Infinito",
+    Mínimo = 1,
+    Máximo = 100,
+    Valor padrão = 5,
+    Incremento = 1,
+    Callback = função(v)
+        tpSpeed ​​= v
+    fim
+})
+
+--==============================
+-- ALTERNAR TELEPORTE INFINITO
+--==============================
+TrollTab:AdicionarAlternância({
+    Name = "Teletransportar Infinito (ligado/desligado)",
+    Padrão = falso,
+    Callback = função(estado)
+        tpEnabled = estado
+
+        se tpConnection então
+            tpConnection:Desconectar()
+            tpConnection = nulo
+        fim
+
+        Se não houver estado, retorne ao fim.
+
+        tpConnection = RunService.Heartbeat:Connect(function(dt)
+            Se tpEnabled não estiver ativado ou se o jogador selecionado não estiver ativado, retorne o fim.
+
+            alvo local = Jogadores:EncontrarPrimeiroFilho(jogadorSelecionado)
+            Se não for um alvo ou não for um personagem, retorne.
+
+            local thrp = target.Character:FindFirstChild("HumanoidRootPart")
+            caractere local = plr.Character
+            local hrp = char e char:FindFirstChild("HumanoidRootPart")
+
+            se não (thrp e hrp) então retorne fim
+
+            -- teleporta literalmente DENTRO do jogador
+            hrp.CFrame = thrp.CFrame
+
+            tarefa.esperar(1 / math.clamp(tpSpeed, 1, 100))
+        fim)
+    fim
+})
+
+--==============================
+-- BOTÃO TELEPORTE ÚNICO
+--==============================
+TrollTab:AdicionarBotão({
+    Nome = "Teleportar Uma Vez",
+    Callback = função()
+        Se não houver jogador selecionado, retorne ao final.
+
+        alvo local = Jogadores:EncontrarPrimeiroFilho(jogadorSelecionado)
+        Se não for um alvo ou não for um personagem, retorne.
+
+        local thrp = target.Character:FindFirstChild("HumanoidRootPart")
+        local hrp = plr.Character e plr.Character:FindFirstChild("HumanoidRootPart")
+
+        se thrp e hrp então
+            hrp.CFrame = thrp.CFrame
+        fim
+    fim
+})
+
+--==============================
+-- VISUALIZAR JOGADOR
+--==============================
+TrollTab:AdicionarAlternância({
+    Nome = "Visualizar Jogador",
+    Padrão = falso,
+    Callback = função(estado)
+        visualização = estado
+
+        câmera local = espaço de trabalho.CâmeraAtual
+        alvo local = jogadorSelecionado e Jogadores:EncontrarPrimeiroFilho(jogadorSelecionado)
+
+        se estado e alvo e alvo.Character então
+            local hum = target.Character:FindFirstChildOfClass("Humanoid")
+            se zumbir então
+                cam.CameraSubject = hum
+                cam.CameraType = Enum.CameraType.Custom
+            fim
+        outro
+            local myHum = plr.Character e plr.Character:FindFirstChildOfClass("Humanoid")
+            se meuHum então
+                cam.CameraSubject = myHum
+                cam.CameraType = Enum.CameraType.Custom
+            fim
+        fim
+    fim
+})
+
+
+
+
+
+
+--// SLIDER VELOCIDADE (só velocidade)
+TrollTab:AdicionarSlider({
+    Name = "velocidade de frente e de trás +18",
+    Mínimo = 1,
+    Máximo = 100,
+    Valor padrão = 5,
+    Incremento = 1,
+    Callback = função(v)
+        velocidade de movimento = v
+    fim
+})
+
+--// ALTERNAR PRINCIPAL
+TrollTab:AdicionarAlternância({
+    Nome = "Teleporte Troll (Ligado/Desligado)",
+    Padrão = falso,
+    Callback = função(estado)
+        ativado = estado
+
+        se houver conexão então
+            conexão:Desconectar()
+            conexão = nula
+        fim
+
+        Se não houver estado ou jogador não selecionado, retorne ao fim.
+
+        timeOffset = 0
+
+        conexão = RunService.Heartbeat:Connect(function(dt)
+            Se não estiver habilitado, retorne ao fim.
+
+            alvo local = Jogadores:EncontrarPrimeiroFilho(jogadorSelecionado)
+            Se não for um alvo ou não for um personagem, retorne.
+
+            local thrp = target.Character:FindFirstChild("HumanoidRootPart")
+            caractere local = plr.Character
+            local hrp = char e char:FindFirstChild("HumanoidRootPart")
+
+            se não (thrp e hrp) então retorne fim
+
+            -- TEMPO (slider atua aqui)
+            timeOffset += dt * (movementSpeed ​​* 0.3)
+
+            -- FRENTE ↔ TRÁS
+            local baseDistance = 4.5 -- mais perto do jogador
+            oscilação local = math.sin(deslocamento de tempo) * 3
+
+            -- CIMA ↕ BAIXO (bem leve)
+            local verticalOffset = math.sin(timeOffset * 2) * 0.6
+
+            -- POSIÇÃO FINAL
+            local targetPos =
+                thrp.Posição
+                - thrp.CFrame.LookVector * (baseDistance + oscilação)
+                + Vector3.new(0, verticalOffset, 0)
+
+            -- TREMIDA VISUAL
+            agitação local = Vector3.new(
+                math.random(-10,10) / 70,
+                math.random(-10,10) / 70,
+                0
+            )
+
+            -- APLICAR TELEPORTE
+            hrp.CFrame = CFrame.lookAt(
+                targetPos + agitar,
+                thrp.Posição
+            )
+        fim)
+    fim
+})
+
+
+
+
+
+
+--==============================
+-- VELOCIDADE DO DESLIZADOR
+--==============================
+TrollTab:AdicionarSlider({
+    Nome = "Velocidade do gogogogo",
+    Mínimo = 1,
+    Máximo = 100,
+    Valor padrão = 10,
+    Incremento = 1,
+    Callback = função(v)
+        velocidade = v
+    fim
+})
+
+--==============================
+-- ALTERNAR
+--==============================
+TrollTab:AdicionarAlternância({
+    Nome = "gogogogo sem jogador +18",
+    Padrão = falso,
+    Callback = função(estado)
+        ativado = estado
+
+        se houver conexão então
+            conexão:Desconectar()
+            conexão = nula
+        fim
+
+        Se não houver estado ou jogador não selecionado, retorne ao fim.
+
+        valorTempo = 0
+
+        conexão = RunService.Heartbeat:Connect(function(dt)
+            Se não estiver habilitado, retorne ao fim.
+
+            alvo local = Jogadores:EncontrarPrimeiroFilho(jogadorSelecionado)
+            Se não for um alvo ou não for um personagem, retorne.
+
+            local tChar = target.Character
+            local tRoot = tChar:FindFirstChild("HumanoidRootPart")
+            local tHead = tChar:FindFirstChild("Head")
+
+            caractere local = plr.Character
+            local hrp = char e char:FindFirstChild("HumanoidRootPart")
+
+            se não (tRoot e tHead e hrp) então retorne fim
+
+            -- ALTURA BASEADA NA SUA CINTURA
+            local myHipHeight = hrp.Size.Y * 0.5
+
+            -- ALTURA FINAL (BOCA + UM POUCO PRA CIMA)
+            local heightOffset = Vector3.new(0, tHead.Size.Y * 0.4 + myHipHeight * 0.15, 0)
+
+            -- CONTROLE REAL DE VAI ↔ VOLTA
+            valorTempo += dt * velocidade
+            local backAndForth = math.sin(timeValue) * 2.5
+
+            -- POSIÇÃO NA FRENTE DO JOGADOR
+            posição final local =
+                tRoot.Posição
+                + tRoot.CFrame.LookVector * (3 + backAndForth)
+                + deslocamento de altura
+
+            -- APLICAR
+            hrp.CFrame = CFrame.lookAt(finalPosition, tHead.Position)
+        fim)
+    fim
+})
+
+
+--// ===============================
+--// ABA SKINS - CÓPIA DO AVATAR REAL
+--// ===============================
+
+Jogadores locais = jogo:ObterServiço("Jogadores")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local plr = Players.LocalPlayer
+
+-- CRIAR ABA
+local SkinsTab = Window:MakeTab({
+    Título = "Skins",
+    Ícone = "rbxassetid://15726694719"
+})
+
+SkinsTab:AddSection({ "Copiar Roupa/Avatar" })
+
+-- ===============================
+--DROPDOWN (MESMO SISTEMA DO TROLL)
+-- ===============================
+
+local selectedSkinPlayer = nulo
+skin local Menu suspenso
+
+função local obterSkinsDosJogadores()
+    local t = {}
+    para _, p em ipairs(Players:GetPlayers()) faça
+        se p ~= plr então
+            tabela.inserir(t, p.Nome)
+        fim
+    fim
+    retornar t
+fim
+
+skinDropdown = SkinsTab:AddDropdown({
+    Nome = "Escolher Player",
+    Opções = {},
+    Callback = função(v)
+        selectedSkinPlayer = v
+    fim
+})
+
+função local refreshSkinDropdown()
+    jogadores locais = obterSkinsDosJogadores()
+    skinDropdown:Definir(jogadores)
+
+    se selectedSkinPlayer e não Players:FindFirstChild(selectedSkinPlayer) então
+        selectedSkinPlayer = nulo
+        skinDropdown:Definir("")
+    fim
+fim
+
+atualizarDropdownDaPele()
+
+SkinsTab:AdicionarBotão({
+    Nome = "Atualizar Lista",
+    Callback = refreshSkinDropdown
+})
+
+-- ===============================
+-- BOTÃO COPY AVATAR (IGUAL AO SCRIPT ORIGINAL)
+-- ===============================
+
+SkinsTab:AdicionarBotão({
+    Nome = "Copiar Avatar",
+    Callback = função()
+        Se não houver SkinPlayer selecionado, retorne ao fim.
+
+        LP local = Players.LocalPlayer
+        local LChar = LP.Character
+        local TPlayer = Players:FindFirstChild(selectedSkinPlayer)
+
+        se não (LChar e TPlayer e TPlayer.Character) então retorne fim
+
+        local LHumanoid = LChar:FindFirstChildOfClass("Humanoid")
+        local THumanoid = TPlayer.Character:FindFirstChildOfClass("Humanoid")
+        se não (LHumanoid e THumanoid) então retorne fim
+
+        -- ==================================
+        -- REDEFINIR TOTAL DO LOCALPLAYER
+        -- ==================================
+        local LDesc = LHumanoid:GetAppliedDescription()
+
+        -- REMOVER ACESSÓRIOS
+        para _, acc em ipairs(LDesc:GetAccessories(true)) faça
+            se acc.AssetId e tonumber(acc.AssetId) então
+                Remotes.Wear:InvokeServer(tonumber(acc.AssetId))
+                tarefa.esperar(0.2)
+            fim
+        fim
+
+        -- REMOVEDOR DE ROUPAS
+        se tonumber(LDesc.Camisa) então
+            Remotes.Wear:InvokeServer(tonumber(LDesc.Shirt))
+            tarefa.esperar(0.2)
+        fim
+
+        se tonumber(LDesc.Pants) então
+            Remotes.Wear:InvokeServer(tonumber(LDesc.Pants))
+            tarefa.esperar(0.2)
+        fim
+
+        -- REMOVEDOR DE ROSTO
+        se tonumber(LDesc.Face) então
+            Remotes.Wear:InvokeServer(tonumber(LDesc.Face))
+            tarefa.esperar(0.2)
+        fim
+
+        -- ==================================
+        -- COPIAR DO PLAYER ALVO
+        -- ==================================
+        local PDesc = THumanoid:GetAppliedDescription()
+
+        -- PARTES DO CORPO (FORMATO EXATO)
+        local argsBody = {
+            [1] = {
+                [1] = PDesc.Torso,
+                [2] = PDesc.BraçoDireito,
+                [3] = PDesc.BraçoEsquerdo,
+                [4] = PDesc.PernaDireita,
+                [5] = PDesc.LeftLeg,
+                [6] = PDesc.Cabeçalho
+            }
+        }
+        Remotes.ChangeCharacterBody:InvokeServer(unpack(argsBody))
+        tarefa.esperar(0.5)
+
+        -- ROUPAS
+        se tonumber(PDesc.Camisa) então
+            Remotes.Wear:InvokeServer(tonumber(PDesc.Shirt))
+            tarefa.esperar(0.3)
+        fim
+
+        se tonumber(PDesc.Pants) então
+            Remotes.Wear:InvokeServer(tonumber(PDesc.Pants))
+            tarefa.esperar(0.3)
+        fim
+
+        -- FACE
+        se tonumber(PDesc.Face) então
+            Remotes.Wear:InvokeServer(tonumber(PDesc.Face))
+            tarefa.esperar(0.3)
+        fim
+
+        -- ACESSÓRIOS
+        para _, v em ipairs(PDesc:GetAccessories(true)) faça
+            se v.AssetId e tonumber(v.AssetId) então
+                Remotes.Wear:InvokeServer(tonumber(v.AssetId))
+                tarefa.esperar(0.3)
+            fim
+        fim
+
+        -- COR DO CORPO
+        local SkinColor = TPlayer.Character:FindFirstChild("Cores do Corpo")
+        se SkinColor então
+            Remotes.ChangeBodyColor:FireServer(tostring(SkinColor.HeadColor))
+            tarefa.esperar(0.3)
+        fim
+
+        -- ANIMAÇÃO IDLE
+        se tonumber(PDesc.IdleAnimation) então
+            Remotes.Wear:InvokeServer(tonumber(PDesc.IdleAnimation))
+            tarefa.esperar(0.3)
+        fim
+    fim
+})
+
+
+--// ===============================
+--// SKINS RÁPIDAS
+--// ===============================
+
+SkinsTab:AddSection({ "Skins Rápidas" })
+
+local WearRemote = Remotes.Wear
+
+função local addSkinButton(nome, id)
+    SkinsTab:AdicionarBotão({
+        Nome = nome,
+        Callback = função()
+            WearRemote:InvokeServer(id)
+        fim
+    })
+fim
+
+-- INDIVÍDUOS
+addSkinButton("Sem Cabeça", 134082579)
+addSkinButton("Sem Perna 1", 115656762149031)
+addSkinButton("Sem Perna 2", 93177286821086)
+addSkinButton("Fada 1", 226189871)
+addSkinButton("Fada 2", 150381051)
+addSkinButton("Fada 3", 141742418)
+addSkinButton("Fada 4", 128217885)
+addSkinButton("Asa de Anjo", 192557913)
+addSkinButton("Abóbora", 132809431)
+addSkinButton("Chapéu", 305888394)
+addSkinButton("Pombo", 134936622364544)
+addSkinButton("Pé Gigante 1", 140311311736304)
+addSkinButton("Pé Gigante 2", 94880807456770)
+addSkinButton("Unhas Grandes", 135726095366567)
+addSkinButton("Mãos Grandes", 12725518393)
+
+-- PACOTE DO MÉDICO NEGRO
+SkinsTab:AdicionarBotão({
+    Nome = "Médico Negro",
+    Callback = função()
+        IDs locais = {
+            134917317332597, 76104684961073, 113280776217715,
+            12134501285, 88423188570127, 94604639662776,
+            134022922877138, 100316015179747, 11743311601,
+            80195816516327, 2510235063
+        }
+        para _, id em ipairs(ids) faça
+            WearRemote:InvokeServer(id)
+            tarefa.esperar(0.15)
+        fim
+    fim
+})
+
+-- PACOTE IR
+SkinsTab:AdicionarBotão({
+    Nome = "Goner",
+    Callback = função()
+        IDs locais = {
+            11274394350, 17822749561, 17812417356,
+            17812415139, 17771175724, 17822722698,
+            17772174303, 17770317484, 892268340,
+            892267099, 2510236649
+        }
+        para _, id em ipairs(ids) faça
+            WearRemote:InvokeServer(id)
+            tarefa.esperar(0.15)
+        fim
+    fim
+})
+
+
+
+--// ABA LIMITADOS
+local LimitedTab = Window:MakeTab({
+    Título = "Limitados",
+    Ícone = "rbxassetid://16181381646"
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+Jogadores locais = jogo:ObterServiço("Jogadores")
+local plr = Players.LocalPlayer
+
+-- seção visual
+LimitedTab:AddSection({ "Ferramentas Limitadas" })
+
+-- Lista de ferramentas
+ferramentas locais = {
+    "Lançador de Ovos",
+    "Canhão",
+    "Planador",
+    "UraniumRod",
+    "Balão de água",
+    "Mangueira de Incêndio",
+    "Canhão de Bolas de Neve",
+    "Termos",
+    "Motosserra",
+    "Presente",
+    "CookieWindowTray",
+    "Planador de Floco de Neve",
+    "Couch" -- novo botão adicionado
+}
+
+-- Função para criar botão que dispara evento
+função local criarBotãoFerramenta(nomeDaFerramenta)
+    AbaLimitada:AdicionarBotão({
+        Nome = nomeDaFerramenta,
+        Callback = função()
+            argumentos locais = {
+                [1] = "AcceptedToolToServer",
+                [2] = nomeDaFerramenta,
+                [3] = plr
+            }
+            evento local = ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t")
+            se evento então
+                evento:FireServer(unpack(args))
+            fim
+        fim
+    })
+fim
+
+-- Criar juntos
+para _, toolName em ipairs(tools) faça
+    criarBotãoFerramenta(nomeDaFerramenta)
+fim
+
+-- Botão "Itens ALL" que dispara todos de uma vez
+AbaLimitada:AdicionarBotão({
+    Nome = "Itens TODOS",
+    Callback = função()
+        evento local = ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t")
+        se evento então
+            para _, toolName em ipairs(tools) faça
+                argumentos locais = {
+                    [1] = "AcceptedToolToServer",
+                    [2] = nomeDaFerramenta,
+                    [3] = plr
+                }
+                evento:FireServer(unpack(args))
+            fim
+        fim
+    fim
+})
+
+--// ===============================
+--// ABA RGB (NOME + BIO)
+--// ===============================
+
+local RGBTab = Window:MakeTab({
+    Nome = "RGB",
+    Ícone = "rbxassetid://12111879608"
+})
+
+-- Remoto
+local RPColorRemote = game:GetService("ReplicatedStorage")
+    :WaitForChild("RE")
+    :WaitForChild("1RPNam1eColo1r")
+
+-- se
+local RGBEnabled = false
+Velocidade RGB local = 0,5 -- padrão
+
+-- Lista de núcleos (organizada, sem alteração necessária)
+local RGBColors = {
+    Color3.new(1, 0, 0.0167),
+    Color3.new(1, 0, 0.2720),
+    Color3.new(1, 0, 0.4329),
+    Color3.new(1, 0, 0.5769),
+    Color3.new(1, 0, 0.6901),
+
+    Color3.new(0.97, 0, 1),
+    Color3.new(0.90, 0.03, 1),
+    Color3.new(0.69, 0.07, 1),
+    Color3.new(0.58, 0.03, 1),
+    Color3.new(0.44, 0.02, 1),
+    Color3.new(0.27, 0.02, 1),
+
+    Color3.new(0, 0.19, 1),
+    Color3.new(0, 0.37, 1),
+    Color3.new(0, 0.70, 1),
+    Color3.new(0.04, 0.89, 1),
+
+    Color3.new(0.13, 1, 0.88),
+    Color3.new(0.11, 1, 0.67),
+    Color3.new(0.07, 1, 0.47),
+    Color3.new(0.12, 1, 0.33),
+    Color3.new(0.06, 1, 0.18),
+
+    Color3.new(0.30, 1, 0),
+    Color3.new(0.46, 1, 0.10),
+    Color3.new(0.63, 1, 0.05),
+    Color3.new(0.78, 1, 0.06),
+    Color3.new(0.97, 1, 0),
+
+    Color3.new(1, 0.89, 0),
+    Color3.new(1, 0.79, 0),
+    Color3.new(1, 0.68, 0),
+    Color3.new(1, 0.50, 0),
+    Color3.new(1, 0.39, 0),
+    Color3.new(1, 0.24, 0),
+
+    Color3.new(1, 0.15, 0.08),
+    Color3.new(1, 0.02, 0.04)
+}
+
+-- Loop RGB
+função local StartRGB()
+    tarefa.spawn(função()
+        enquanto RGBEnabled faça
+            para _, cor em ipairs(RGBColors) faça
+                se não RGBEnabled então interrompa o processo
+
+                pcall(função()
+                    -- Nome
+                    RPColorRemote:FireServer(
+                        "Escolhendo a cor do nome RP",
+                        cor
+                    )
+                    -- Biografia
+                    RPColorRemote:FireServer(
+                        "Escolhendo RPBioColor",
+                        cor
+                    )
+                fim)
+
+                tarefa.aguardar(RGBSpeed)
+            fim
+        fim
+    fim)
+fim
+
+-- Alternar LIGADO/DESLIGADO
+RGBTab:AdicionarAlternância({
+    Nome = "RGB Nome + Biografia",
+    Padrão = falso,
+    Callback = função(estado)
+        RGBEnabled = estado
+        se estado então
+            IniciarRGB()
+        fim
+    fim
+})
+
+-- Slider de Velocidade
+RGBTab:AdicionarSlider({
+    Nome = "Velocidade RGB",
+    Mínimo = 1,
+    Máximo = 100,
+    Valor padrão = 50,
+    Callback = função(valor)
+        -- 1 = lento | 100 = rápido
+        RGBSpeed ​​= math.clamp(1 / valor, 0.01, 1)
+    fim
+})
+
+
+--// RP NAME + BIO TYPE & DELETE (SEM BUG DE SPEED)
+
+local RPTextRemote = game:GetService("ReplicatedStorage")
+    :WaitForChild("RE")
+    :WaitForChild("1RPNam1eTex1t")
+
+local RPNameText = ""
+local RPBioText = ""
+
+local RPNameEnabled = false
+local RPBioEnabled = falso
+
+local NameSpeed ​​= 30
+BioSpeed ​​local = 30
+
+função local getDelay(velocidade)
+    velocidade = math.clamp(velocidade, 1, 60)
+    retornar 0,02 + (60 - velocidade) * 0,003
+fim
+
+-- ================= NOME RP =================
+
+RGBTab:AdicionarCaixaDeTexto({
+    Nome = "RP Nome Texto",
+    Placeholder = "Dígito do Nome do RP",
+    Callback = função(v)
+        RPNameText = v
+    fim
+})
+
+RGBTab:AdicionarSlider({
+    Nome = "Velocidade RP Nome",
+    Mínimo = 1,
+    Máximo = 60,
+    Valor padrão = 30,
+    Callback = função(v)
+        NameSpeed ​​= v
+    fim
+})
+
+RGBTab:AdicionarAlternância({
+    Nome = "RP Nome LIGADO / DESLIGADO",
+    Padrão = falso,
+    Callback = função(estado)
+        RPNameEnabled = estado
+        Se não houver estado ou RPNameText == "", então retorne.
+
+        tarefa.spawn(função()
+            enquanto RPNameEnabled faça
+                -- ESCREVA
+                para i = 1, #RPNameText faça
+                    Se RPNameEnabled não estiver habilitado, retorne o fim.
+                    RPTextRemote:FireServer(
+                        "RolePlayName",
+                        string.sub(RPNameText, 1, i)
+                    )
+                    tarefa.aguardar(obterAtraso(VelocidadeNome))
+                fim
+
+                tarefa.esperar(0.4)
+
+                -- APAGAR (DE TRÁS PRA FRENTE)
+                para i = #RPNameText - 1, 0, -1 faça
+                    Se RPNameEnabled não estiver habilitado, retorne o fim.
+                    RPTextRemote:FireServer(
+                        "RolePlayName",
+                        string.sub(RPNameText, 1, i)
+                    )
+                    tarefa.aguardar(obterAtraso(VelocidadeNome))
+                fim
+
+                tarefa.esperar(0.4)
+            fim
+        fim)
+    fim
+})
+
+-- ================= RP BIO =================
+
+RGBTab:AdicionarCaixaDeTexto({
+    Nome = "RP Bio Texto",
+    Placeholder = "Digite o RP Bio",
+    Callback = função(v)
+        RPBioText = v
+    fim
+})
+
+RGBTab:AdicionarSlider({
+    Nome = "Velocidade RP Bio",
+    Mínimo = 1,
+    Máximo = 60,
+    Valor padrão = 30,
+    Callback = função(v)
+        BioSpeed ​​= v
+    fim
+})
+
+RGBTab:AdicionarAlternância({
+    Nome = "RP Bio LIGADO / DESLIGADO",
+    Padrão = falso,
+    Callback = função(estado)
+        RPBioEnabled = estado
+        Se não houver estado ou RPBioText == "", retorne o fim.
+
+        tarefa.spawn(função()
+            enquanto RPBioEnabled faça
+                -- ESCREVA
+                para i = 1, #RPBioText faça
+                    Se RPBioEnabled não estiver habilitado, retorne o fim.
+                    RPTextRemote:FireServer(
+                        "RolePlayBio",
+                        string.sub(RPBioText, 1, i)
+                    )
+                    tarefa.wait(getDelay(BioSpeed))
+                fim
+
+                tarefa.esperar(0.4)
+
+                -- APAGAR
+                para i = #RPBioText - 1, 0, -1 faça
+                    Se RPBioEnabled não estiver habilitado, retorne o fim.
+                    RPTextRemote:FireServer(
+                        "RolePlayBio",
+                        string.sub(RPBioText, 1, i)
+                    )
+                    tarefa.wait(getDelay(BioSpeed))
+                fim
+
+                tarefa.esperar(0.4)
+            fim
+        fim)
+    fim
+})
+
+
+--// ABA CHAT
+local ChatTab = Window:MakeTab({ Title = "Chat", Icon = "rbxassetid://92345592692449" })
+
+--// CHAT DE SPAM DE SEÇÃO
+ChatTab:AdicionarSeção({ Nome = "Chat de Spam" })
+
+local TextSave = ""
+local tcs = game:GetService("TextChatService")
+local chat = tcs.ChatInputBarConfiguration e tcs.ChatInputBarConfiguration.TargetTextChannel
+
+função local sendchat(msg)
+    se não msg ou msg == "" então retorne fim
+    se tcs.ChatVersion == Enum.ChatVersion.LegacyChatService então
+        sucesso local, erro = pcall(função()
+            jogo:ObterServiço("ArmazenamentoReplicado"):EncontrarPrimeiroFilho("EventosDeChatPadrãoSistemaDeChat").DizerSolicitaçãoDeMensagem:DispararServidor(msg, "Todos")
+        fim)
+        se não for bem-sucedido, então avise(erro) fim
+    senão se bate-papo então
+        sucesso local, erro = pcall(função()
+            chat:EnviarAssíncrono(msg)
+        fim)
+        se não for bem-sucedido, então avise(erro) fim
+    fim
+fim
+
+--// TEXTBOX PARA MENSAGEM DIGITAR
+ChatTab:AdicionarCaixaDeTexto({
+    Nome = "Digite o texto",
+    PlaceholderText = "Digite a mensagem",
+    Callback = função(texto)
+        Salvar texto = texto
+    fim
+})
+
+--// BOTÃO ENVIAR CHAT
+ChatTab:AdicionarBotão({
+    Nome = "Enviar Chat",
+    Callback = função()
+        enviarchat(TextSave)
+    fim
+})
+
+--// SLIDER DE DELAY PARA SPAM
+getgenv().ChaosHubSendDelay = 1
+ChatTab:AdicionarSlider({
+    Nome = "Atraso de Spam",
+    Mínimo = 0,4,
+    Máximo = 10,
+    Padrão = 1,
+    Incremento = 0,1,
+    Callback = função(Valor)
+        getgenv().ChaosHubSendDelay = Valor
+    fim
+})
+
+--//TOGGLE DE SPAM AUTOMÁTICO
+getgenv().ChaosHubSpawnText = false
+ChatTab:AdicionarAlternância({
+    Nome = "Bat de Spam",
+    Padrão = falso,
+    Callback = função(Valor)
+        getgenv().ChaosHubSpawnText = Valor
+        tarefa.spawn(função()
+            enquanto getgenv().ChaosHubSpawnText faça
+                enviarchat(TextSave)
+                tarefa.wait(getgenv().ChaosHubSendDelay)
+            fim
+        fim)
+    fim
+})
+
+--// BOTÃO SPAM HACKEADO
+ChatTab:AdicionarBotão({
+    Nome = "Chat de spam hackeado pela Spectra",
+    Callback = função()
+        se tcs.ChatVersion == Enum.ChatVersion.TextChatService então
+            tcs.TextChannels.RBXGeneral:SendAsync("Servidor: Invadido pelo Spectra HUB")
+        outro
+            imprimir("Nada")
+        fim
+    fim
+})
+
+--// BOTÃO LIMPAR CHAT
+ChatTab:AdicionarBotão({
+    Nome = "Limpar Chat",
+    Callback = função()
+        se tcs.ChatVersion == Enum.ChatVersion.TextChatService então
+            tcs.TextChannels.RBXGeneral:SendAsync("Servidor: Chat Limpo")
+        outro
+            imprimir("Nada")
+        fim
+    fim
+})
+
+
+--==============================
+-- EVENTOS ABA
+--==============================
+local EventosTab = Window:MakeTab({
+    Título = "Eventos",
+    Ícone = "rbxassetid://96262151461460"
+})
+
+EventosTab:AddSection({ Name = "Coletar Estrelas de Natal" })
+
+local eventoEnabled = false
+teletransporte local ThreadEvento
+
+-- Lista de localizações do evento (corrigida)
+localizações locais = {
+    Vector3.new(174.7, 4.4, -172.7),
+    Vector3.new(179.5, 9.5, -231.0),
+    Vector3.new(350.9, 4.7, -409.6),
+    Vector3.new(320.3, 4.7, -436.0),
+    Vector3.new(263.5, 4.7, -435.8),
+    Vector3.new(425.4, 4.8, -268.3),
+    Vector3.new(367.4, 12.7, -251.0),
+    Vector3.new(338.1, 11.3, -214.3),
+    Vector3.new(333.5, 4.8, -150.9),
+    Vector3.new(293.5, 4.3, -144.0),
+    Vector3.new(244.3, 4.3, -172.9),
+    Vector3.new(171.3, 53.3, -263.4),
+    Vector3.new(442.7, 51.0, -368.5),
+    Vector3.new(487.3, 69.4, -333.4),
+    Vector3.new(121.17, 3.74, -117.83),
+    Vector3.new(122.07, 3.02, -179.70),
+    Vector3.new(125.72, 7.27, -241.51),
+    Vector3.new(126.70, 6.33, -291.01),
+    Vector3.new(135.30, 6.01, -336.68),
+    Vector3.new(191.58, 5.90, -344.29),
+    Vector3.new(258.76, 5.04, -336.52),
+    Vector3.new(312.00, 7.85, -321.72),
+    Vector3.new(362.28, 6.83, -334.05),
+    Vector3.new(615.31, 142.10, -419.94),
+    Vector3.new(351.4, 101.9, -168.1),
+    Vector3.new(259.0, 11.3, -204.4),
+    Vector3.new(171.1, 30.4, -278.7),
+    Vector3.new(189.2, -11.1, -256.9),
+    Vector3.new(349.8, 101.9, -168.9)
+}
+
+EventosTab:AdicionarAlternância({
+    Nome = "Evento de Natal",
+    Padrão = falso,
+    Callback = função(estado)
+        eventoHabilitado = estado
+
+        -- DESLIGAR
+        se não especificar então
+            se teleportThreadEvento então task.cancel(teleportThreadEvento) fim
+            retornar
+        fim
+
+        -- Ligar loop de teleporte
+        teleportThreadEvento = task.spawn(function()
+            enquanto eventoHabilitado faça
+                local hrp = plr.Character e plr.Character:FindFirstChild("HumanoidRootPart")
+                se hrp então
+                    para _, pos em ipairs(localizacoes) faça
+                        se não eventoEnabled então interrompa o evento
+                        hrp.CFrame = CFrame.new(pos)
+                        task.wait(2) -- espera 2 segundos em cada posição
+                    fim
+                fim
+                tarefa.esperar()
+            fim
+        fim)
+    fim
+})
+
+--==============================
+-- BOTÕES DE TELEPORTE DIRETO
+--==============================
+local locaisTeletransporte = {
+    ["Loja de Natal"] = Vector3.new(163,30, 4,31, -148,14),
+    ["Monte Everest"] = Vector3.new(614.71, 138.72, -393.17),
+    ["Em cima da Árvore de Natal"] = Vector3.new(356,16, 101,81, -172,04),
+    ["Na frente do evento de Natal"] = Vector3.new(115.82, 4.93, -113.38),
+    ["Festa de Natal"] = Vector3.new(306,78, -20,02, -337,43),
+    ["Túnel de Natal"] = Vector3.new(124,52, -5,64, -163,93)
+}
+
+para nome, pos em pares(locaisTeleporte) faça
+    TabEventos:AdicionarBotão({
+        Nome = nome,
+        Callback = função()
+            local hrp = plr.Character e plr.Character:FindFirstChild("HumanoidRootPart")
+            se hrp então
+                hrp.CFrame = CFrame.new(pos)
+            fim
+        fim
+    })
+fim
+
+--// PROTEÇÃO ABA CRIAR
+local ProtectionTab = Window:MakeTab({
+    Título = "Proteção",
+    Ícone = "rbxassetid://5197571732"
+})
+
+--// REFERÊNCIAS
+local RunService = jogo:GetService("RunService")
+Jogadores locais = jogo:ObterServiço("Jogadores")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+--===============================
+-- FUNÇÃO ANTI-FLING GENÉRICA
+--===============================
+função AntiFlingLoop(nome, localizador)
+    função de retorno(estado)
+        tarefa.spawn(função()
+            enquanto o estado faz
+                alvo local = localizador()
+                se for alvo então
+                    para _, parte em ipairs(target:GetDescendants()) faça
+                        se parte:IsA("BasePart") então
+                            parte.PodeColidir = verdadeiro
+                            parte.Ancorada = verdadeiro
+                        fim
+                    fim
+                fim
+                tarefa.esperar(0.5)
+            fim
+        fim)
+    fim
+fim
+
+--===============================
+-- ALAVANCAS INDIVIDUAIS
+--===============================
+ProtectionTab:AddToggle({Name = "Anti Fling Carros", Default = false, Callback = AntiFlingLoop("Vehicles", function() return Workspace:FindFirstChild("Vehicles") end)})
+ProtectionTab:AddToggle({Name = "Anti Canoe Fling", Default = false, Callback = AntiFlingLoop("Canoes", function() local wc = Workspace:FindFirstChild("WorkspaceCom") return wc and wc:FindFirstChild("001_CanoeStorage") end)})
+ProtectionTab:AddToggle({Name = "Anti Fling Jets", Default = false, Callback = AntiFlingLoop("Jets", function() local f = Workspace:FindFirstChild("WorkspaceCom") if f and f:FindFirstChild("001_Airport") then local s = f["001_Airport"]:FindFirstChild("AirportHanger") if s then return s:FindFirstChild("001_JetStorage") and s["001_JetStorage"]:FindFirstChild("JetAirport") end end end)})
+ProtectionTab:AddToggle({Name = "Anti Fling Helicópteros", Default = false, Callback = AntiFlingLoop("Helis", function() local f = Workspace:FindFirstChild("WorkspaceCom") return f and f:FindFirstChild("001_HeliStorage") and f["001_HeliStorage"]:FindFirstChild("PoliceStationHeli") end)})
+ProtectionTab:AddToggle({Name = "Anti Fling Ball", Default = false, Callback = AntiFlingLoop("Balls", function() local f = Workspace:FindFirstChild("WorkspaceCom") return f and f:FindFirstChild("001_SoccerBalls") end)})
+
+--===============================
+-- Anti Sentar / Sofá / Agarrar
+--===============================
+local antiSitActive = falso
+Aba de proteção:AdicionarAlternância({
+    Nome = "Anti Sentar/Agarrar/Sofá",
+    Padrão = falso,
+    Callback = função(estado)
+        antiSitActive = estado
+        tarefa.spawn(função()
+            enquanto antiSitActive e LocalPlayer.Character fazem
+                local humanoide = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                se humanoide então
+                    humanoide:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+                    se humanoid:GetState() == Enum.HumanoidStateType.Seated então
+                        humanoide:MudarEstado(Enum.HumanoidStateType.Levantando)
+                    fim
+                fim
+                tarefa.esperar(0.05)
+            fim
+        fim)
+    fim
+})
+
+--===============================
+-- Anti Lag / Anti Ferramenta
+--===============================
+Aba de proteção:AdicionarAlternância({
+    Nome = "Anti-Lag / Anti Tool",
+    Padrão = falso,
+    Callback = função(estado)
+        Se não houver estado, retorne ao fim.
+        tarefa.spawn(função()
+            local dedupLock = {}
+            função local isTool(inst) retorna inst:IsA("Tool") fim
+            função local reunir(jogador)
+                itens locais = {}
+                contêineres locais = {}
+                Se player.Character então table.insert(containers, player.Character) fim
+                mochila local = jogador:EncontrarPrimeiroFilhoDaClasse("Mochila")
+                se mochila então tabela.inserir(contêineres, mochila) fim
+                local sg = player:FindFirstChild("StarterGear")
+                se sg então tabela.inserir(containers, sg) fim
+                para _, container em ipairs(containers) faça
+                    para _, filho em ipairs(container:GetChildren()) faça
+                        se isTool(filho) então tabela.inserir(itens, filho) fim
+                    fim
+                fim
+                devolver itens
+            fim
+            função local dedupe(jogador)
+                se dedupLock[jogador] então retorne fim
+                dedupLock[player] = true
+                ferramentas locais = reunir(jogador)
+                se #ferramentas > 1 então
+                    para i = 2, #ferramentas faça pcall(function() ferramentas[i]:Destroy() fim) fim
+                fim
+                dedupLock[player] = falso
+            fim
+            Jogadores.JogadorAdicionado:Conectar(função(plr) deduplicar(plr) fim)
+            para _,plr em ipairs(Players:GetPlayers()) faça dedupe(plr) fim
+            enquanto o estado faz
+                para _,plr em ipairs(Players:GetPlayers()) faça dedupe(plr) fim
+                tarefa.esperar(2)
+            fim
+        fim)
+    fim
+})
+
+--===============================
+-- Anti Fling Portas
+--===============================
+Aba de proteção:AdicionarAlternância({
+    Nome = "Anti Fling Portas",
+    Padrão = falso,
+    Callback = função(estado)
+        se não _G.hiddenDoors então _G.hiddenDoors = {} fim
+        se estado então
+            _G.hiddenDoors = {}
+            para _, obj em ipairs(workspace:GetDescendants()) faça
+                se obj:IsA("BasePart") e obj.Name:lower():find("door") então
+                    local doorData = {door=obj, originalTransparency=obj.Transparency, originalCanCollide=obj.CanCollide, originalCastShadow=obj.CastShadow}
+                    obj.Transparência = 1
+                    obj.CanCollide = false
+                    obj.CastShadow = falso
+                    para _, filho em ipairs(obj:GetChildren()) faça
+                        Se filho:IsA("BasePart") então filho.Transparência = 1; filho.PodeColidir = falso
+                        senão se filho:IsA("SurfaceGui") ou filho:IsA("BillboardGui") então filho.Habilitado = falso fim
+                    fim
+                    tabela.inserir(_G.portasocultas, dadosdaporta)
+                fim
+            fim
+            print("⚡ " .. #_G.hiddenDoors .. " portas escondidas!")
+        outro
+            para _, doorData em ipairs(_G.hiddenDoors ou {}) faça
+                Se doorData.door e doorData.door.Parent então
+                    doorData.door.Transparency = doorData.originalTransparency
+                    portaData.door.CanCollide = portaData.originalCanCollide
+                    doorData.door.CastShadow = doorData.originalCastShadow
+                    para _, filho em ipairs(doorData.door:GetChildren()) faça
+                        Se filho:IsA("BasePart") então filho.Transparência=0; filho.PodeColidir=true
+                        senão se filho:IsA("SurfaceGui") ou filho:IsA("BillboardGui") então filho.Habilitado = verdadeiro fim
+                    fim
+                fim
+            fim
+            print("✔ " .. #(_G.hiddenDoors ou {}) .. " portas restauradas!")
+            _G.hiddenDoors = {}
+        fim
+    fim
+})
+
+--===============================
+-- TOGGLE MASTER – PROTEÇÃO TUDO
+--===============================
+Aba de proteção:AdicionarAlternância({
+    Nome = "🛡️ Proteção Todos",
+    Padrão = falso,
+    Callback = função(estado)
+        para _,toggle em ipairs(ProtectionTab.Toggles) faça
+            if toggle.Name ~= "🛡️ Proteção All" then
+                alternar:DefinirEstado(estado)
+            fim
+        fim
+    fim
+})
+
+--===============================
+-- ALTERNAR ULTRA MÁXIMO / ANTI-MORTE / ANTI-QUEDA
+--===============================
+local UltraEnabled = falso
+Conexões locais = {}
+local lastSafeCFrame = nil
+local lastCheck = tick()
+velocidade_máxima local = 85
+local VELOCIDADE_MÁXIMA_DE_QUEDA = -120
+local MAP_Y_LIMIT = -80
+
+função local desconectarTudo()
+    para _,c em ipairs(Connections) faça pcall(function() c:Disconnect() fim) fim
+    tabela.limpar(Conexões)
+fim
+
+função local getChar() retorna LocalPlayer.Character fim
+função local getHRP() local c=getChar() retorna c e c:FindFirstChild("HumanoidRootPart") fim
+função local getHum() local c=getChar() retorna c e c:FindFirstChildOfClass("Humanoid") fim
+função local restorePosition()
+    local hrp = getHRP()
+    se hrp e lastSafeCFrame então
+        hrp.AssemblyLinearVelocity=Vector3.zero
+        hrp.AssemblyAngularVelocity=Vector3.zero
+        hrp.CFrame=lastSafeCFrame+Vector3.new(0,5,0)
+    fim
+fim
+
+Aba de proteção:AdicionarAlternância({
+    Nome = "🛡️ Proteção Máxima ULTRA++",
+    Padrão = falso,
+    Callback = função(estado)
+        UltraEnabled = estado
+        desconectarTudo()
+        se estado então tarefa.esperar(0.4) fim
+        Se não houver estado, retorne ao fim.
+
+        tabela.inserir(Conexões, RunService.Heartbeat:Conectar(função()
+            local hrp = getHRP()
+            se hrp então últimoCFrameSeguro = hrp.CFrame fim
+        fim))
+
+        tabela.inserir(Conexões, RunService.Heartbeat:Conectar(função()
+            Se não for UltraEnabled, retorne ao fim.
+            caractere local = obterCaractere()
+            local hrp = getHRP()
+            local hum = obterHum()
+            se não (char e hrp e hum) então retorne fim
+            hum:SetStateEnabled(Enum.HumanoidStateType.Seated,false)
+            se hum:GetState()==Enum.HumanoidStateType.Seated então hum:ChangeState(Enum.HumanoidStateType.GettingUp) fim
+            para _,p em ipairs(char:GetDescendants()) faça se p:IsA("BasePart") então p.CanCollide=true; p.Anchored=false fim fim
+            hrp.AssemblyAngularVelocity=Vector3.zero
+            se hrp.AssemblyLinearVelocity.Magnitude>MAX_SPEED então restorePosition() fim
+            hrp.CustomPhysicalProperties=PhysicalProperties.new(0.01,0,0,0,0)
+        fim))
+
+        tabela.inserir(Conexões, RunService.Heartbeat:Conectar(função()
+            Se não for UltraEnabled, retorne ao fim.
+            local hrp=getHRP()
+            se não hrp então retorne fim
+            local agora=tick()
+            Se now-lastCheck<0.15 então retorne fim
+            últimaVerificação=agora
+            local vy=hrp.AssemblyLinearVelocity.Y
+            se vy<MAX_FALL_SPEED ou hrp.Position.Y<MAP_Y_LIMIT então restorePosition() fim
+        fim))
+
+        tarefa.spawn(função()
+            enquanto UltraEnabled
+                para _,obj em ipairs(Workspace:GetDescendants()) faça
+                    se obj:IsA("BodyMover") ou obj:IsA("VectorForce") ou obj:IsA("AngularVelocity") ou obj:IsA("LinearVelocity") então
+                        pcall(function() obj:Destroy() end)
+                    fim
+                fim
+                tarefa.esperar(2)
+            fim
+        fim)
+
+        tabela.inserir(Conexões, JogadorLocal.PersonagemAdicionado:Conectar(função(char)
+            tarefa.esperar(0.6)
+            para _,v em ipairs(char:GetChildren()) faça
+                se v:IsA("Tool") então pcall(function() v:Destroy() fim) fim
+            fim
+        fim))
+    fim
+})
+
+
+
+
+--=================================================
+--// ABA DO SERVIDOR LAG
+--=================================================
+local Tab13 = Janela:CriarAba({
+    Título = "Servidor de Lag",
+    Ícone = "rbxassetid://4483345998"
+})
+
+--=================================================
+-- Desligamento Personalizado
+--=================================================
+local Section = Tab13:AddSection({ Name = "Shutdown Personalizado" })
+
+-- Desligamento Normal
+Tab13:AdicionarBotão({
+    Nome = "Desligar Servidor",
+    Callback = função()
+        para m = 1, 495 faça
+            jogo:ObterServiço("ArmazenamentoReplicado").RE:EncontrarPrimeiroFilho("1Too1l")
+                :InvokeServer("PickingTools", "FireHose")
+
+            jogo.Jogadores.JogadorLocal.Mochila.MangueiraDeIncêndio.SomDeFerramenta
+                :FireServer("FireHose", "DestroyFireHose")
+        fim
+
+        local hrp = game.Players.LocalPlayer.Character.HumanoidRootPart
+        local oldcf = hrp.CFrame
+        hrp.CFrame = CFrame.new(999999999.414, -475, 999999999.414)
+
+        repita task.wait() até que não hrp.Parent
+        game.Players.LocalPlayer.CharacterAdded:Wait()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = oldcf
+
+        jogo:ObterServiço("GuiaInicial"):DefinirNúcleo("EnviarNotificação", {
+            Título = "Script de Dupe",
+            Text = "Desligamento Concluído, Agora Vai Desligar",
+            Duração = 5
+        })
+
+        tarefa.esperar(0.5)
+        hrp.CFrame = CFrame.new(9999, -475, 9999)
+    fim
+})
+
+-- Erro ao desligar a internet
+Tab13:AdicionarBotão({
+    Name = "Desligar Servidor (Erro de Internet)",
+    Callback = função()
+        para m = 1, 535 faça
+            jogo:ObterServiço("ArmazenamentoReplicado").RE:EncontrarPrimeiroFilho("1Too1l")
+                :InvokeServer("PickingTools", "FireHose")
+
+            jogo.Jogadores.JogadorLocal.Mochila.MangueiraDeIncêndio.SomDeFerramenta
+                :FireServer("FireHose", "DestroyFireHose")
+        fim
+    fim
+})
+
+-- Erro de tempo limite de desligamento
+Tab13:AdicionarBotão({
+    Name = "Desligar Servidor (Erro de Conexão Expirada)",
+    Callback = função()
+        para m = 1, 635 faça
+            jogo:ObterServiço("ArmazenamentoReplicado").RE:EncontrarPrimeiroFilho("1Too1l")
+                :InvokeServer("PickingTools", "FireHose")
+
+            jogo.Jogadores.JogadorLocal.Mochila.MangueiraDeIncêndio.SomDeFerramenta
+                :FireServer("FireHose", "DestroyFireHose")
+        fim
+    fim
+})
+
+--=================================================
+-- Atraso com laptop
+--=================================================
+local Section = Tab13:AddSection({ Name = "Lag com Laptop" })
+local toggles = { LagLaptop = false, LagPhone = false }
+
+função local clickNormally(obj)
+    local cd = obj:FindFirstChildWhichIsA("ClickDetector")
+    se cd então fireclickdetector(cd) fim
+fim
+
+função local lagarJogoLaptop(laptop)
+    enquanto alterna.LagLaptop faz
+        se for laptop então
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = laptop.CFrame
+            cliqueNormalmente(laptop)
+        outro
+            warning("Laptop não encontrado.")
+            quebrar
+        fim
+        tarefa.esperar(0.0001)
+    fim
+fim
+
+Tab13:AdicionarAlternância({
+    Nome = "Lag com Laptop",
+    Padrão = falso,
+    Callback = função(estado)
+        toggles.LagLaptop = estado
+        se estado então
+            local laptop = workspace.WorkspaceCom["001_GiveTools"]:FindFirstChild("Laptop")
+            se for laptop então
+                tarefa.spawn(função()
+                    lagarJogoLaptop(laptop)
+                fim)
+            outro
+                warning("Laptop não encontrado.")
+            fim
+        outro
+            print("Lag com Laptop desativado.")
+        fim
+    fim
+})
+
+Tab13:AdicionarParágrafo({
+    "Informação de Lag",
+    "O efeito de lag começa após 35 segundos"
+})
+
+--=================================================
+-- Lag com Telefone
+--=================================================
+local Section = Tab13:AddSection({ Name = "Lag com Telefone" })
+
+função local lagarJogoPhone(telefone)
+    enquanto alterna.LagPhone faz
+        se for telefone então
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = phone.CFrame
+            cliqueNormalmente(telefone)
+        outro
+            warning("Telefone não encontrado.")
+            quebrar
+        fim
+        tarefa.esperar(0.01)
+    fim
+fim
+
+Tab13:AdicionarAlternância({
+    Nome = "Lag com Telefone",
+    Padrão = falso,
+    Callback = função(estado)
+        toggles.LagPhone = estado
+        se estado então
+            telefone local =
+                workspace.WorkspaceCom["001_CommercialStores"]
+                .CommercialStorage1.Store.Tools:FindFirstChild("Iphone")
+
+            se for telefone então
+                tarefa.spawn(função()
+                    lagarJogoPhone(telefone)
+                fim)
+            outro
+                warning("Telefone não encontrado.")
+            fim
+        outro
+            print("Lag com Telefone desativado.")
+        fim
+    fim
+})
+
+Tab13:AdicionarParágrafo({
+    "Informação de Lag",
+    "O script começa a causar lag após 35 segundos"
+})
+
+--=================================================
+-- Lag com Bomba (COMPLETO)
+--=================================================
+local Section = Tab13:AddSection({ Name = "Lag com Bomba" })
+local BombActive = falso
+
+Tab13:AdicionarAlternância({
+    Nome = "Lag com Bomba",
+    Padrão = falso,
+    Callback = função(v)
+        BombActive = v
+        se não v então
+            print("Lag com Bomba desativada.")
+            retornar
+        fim
+
+        Jogador local = jogo.Jogadores.JogadorLocal
+        local Char = Player.Character ou Player.CharacterAdded:Wait()
+        local HRP = Char:WaitForChild("HumanoidRootPart")
+        Bomba local =
+            workspace.WorkspaceCom["001_CriminalWeapons"].GiveTools:FindFirstChild("Bomb")
+
+        se não for Bomba então
+            warning("Bomba não encontrada.")
+            BombActive = falso
+            retornar
+        fim
+
+        tarefa.spawn(função()
+            enquanto BombActive faz
+                se Bomb:FindFirstChild("ClickDetector") então
+                    HRP.CFrame = Bomb.CFrame
+                    detectordecliquesdebomba(Bomb.ClickDetector)
+                fim
+                tarefa.esperar(0.00001)
+            fim
+        fim)
+
+        tarefa.spawn(função()
+            enquanto BombActive faz
+                local VIM = game:GetService("VirtualInputManager")
+                VIM:SendMouseButtonEvent(500, 500, 0, true, game, 0)
+                tarefa.esperar(1.5)
+                VIM:EnviarEventoBotãoDoMouse(500, 500, 0, falso, jogo, 0)
+
+                jogo:GetService("ReplicatedStorage").RE["1Blo1wBomb1sServe1r"]
+                    :FireServer("Bomb" .. Player.Name)
+
+                tarefa.esperar(1.5)
+            fim
+        fim)
+    fim
+})
+
+Tab13:AdicionarParágrafo({
+    "Informação de Lag",
+    "O script começa a causar lag após 35 segundos"
+})
+
+
+
+
+
+--////////////////////////////////////////////////////
+--// ABA DE ADMINISTRAÇÃO
+local AdminTab = Window:MakeTab({
+    Título = "Administrador",
+    Ícone = "rbxassetid://7734053495"
+})
+
+AdminTab:AddSection({ "Comandos Admin" })
+
+--==============================
+-- LISTA DE JOGADORES
+--==============================
+jogadorAdmin local selecionado
+
+função local obterJogadores()
+    local t = {}
+    para _, p em ipairs(Players:GetPlayers()) faça
+        se p ~= plr então
+            tabela.inserir(t, p.Nome)
+        fim
+    fim
+    retornar t
+fim
+
+local adminDropdown = AdminTab:AddDropdown({
+    Nome = "Escolher Player",
+    Opções = obterJogadores(),
+    Callback = função(v)
+        jogadorAdministradorSelecionado = v
+    fim
+})
+
+AdminTab:AdicionarBotão({
+    Nome = "Atualizar Lista",
+    Callback = função()
+        adminDropdown:Set(getPlayers())
+    fim
+})
+
+--==============================
+-- FUNÇÃO PARA ENVIAR COMANDO
+--==============================
+local TextChatService = game:GetService("TextChatService")
+função local EnviarComando(comando, alvo)
+    se não for alvo, retorne fim
+    canal local =
+        TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+        ou TextChatService.TextChannels:GetChildren()[1]
+
+    se for canal então
+        canal:SendAsync(";" .. comando .. " " .. alvo)
+    fim
+fim
+
+--==============================
+-- ADMINISTRADORES DE BOTS
+--==============================
+função local criarBotao(nome, comando)
+    AdminTab:AdicionarBotão({
+        Nome = nome,
+        Callback = função()
+            se não houver AdminPlayer selecionado então
+                warning("Nenhum jogador selecionado")
+                retornar
+            fim
+            EnviarComando(comando, selectAdminPlayer)
+        fim
+    })
+fim
+
+criarBotao("Matar", "matar")
+criarBotao("Fling", "fling")
+criarBotao("Sente-se", "sente-se")
+criarBotao("Congelado", "congelado")
+criarBotao("UnFrozen", "unfrozen")
+criarBotao("Girar", "girar")
+criarBotao("UnSpin", "unspin")
+criarBotao("Caixa", "caixa")
+criarBotão("UnCaixa", "uncaixa")
+
+--==============================
+-- SISTEMA LOCAL
+--==============================
+local SpinPlayers = {}
+local FrozenPlayers = {}
+local CaixaPlayers = {}
+
+função local KillLocal() local hum=plr.Character e plr.Character:FindFirstChildOfClass("Humanoid"); se hum então hum.Health=0 fim fim
+função local FlingLocal() local hrp=plr.Character e plr.Character:FindFirstChild("HumanoidRootPart"); se hrp então hrp.Velocity=Vector3.new(0,2000,0) fim fim
+função local SitLocal() local hum=plr.Character e plr.Character:FindFirstChildOfClass("Humanoid"); se hum então hum.Sit=true fim fim
+função local FrozenLocal() local hum=plr.Character e plr.Character:FindFirstChildOfClass("Humanoid"); se hum então hum.PlatformStand=true; FrozenPlayers[plr.Name]=true fim fim
+função local UnFrozenLocal() local hum=plr.Character e plr.Character:FindFirstChildOfClass("Humanoid"); se hum então hum.PlatformStand=false; FrozenPlayers[plr.Name]=nil fim fim
+função local SpinLocal() SpinPlayers[plr.Name]=true fim
+função local UnSpinLocal() SpinPlayers[plr.Name]=nil fim
+função local CaixaLocal()
+    caractere local=plr.Character
+    se char e não CaixaPlayers[plr.Name] então
+        local hrp=char:FindFirstChild("HumanoidRootPart")
+        se hrp então
+            caixa local=Instance.new("Modelo")
+            caixa.Name="CaixaAdmin"
+            tamanho local=Vector3.novo(6,6,6)
+            local pos=hrp.Position
+            para x=-1,1 faça para y=-1,1 faça para z=-1,1 faça
+                se x==0 e y==0 e z==0 então continue fim
+                local p=Instance.new("Part")
+                p.Size=size/3 p.Anchored=true p.CanCollide=true p.Color=Color3.new(0,0,0)
+                p.Material=Enum.Material.Neon
+                p.CFrame=CFrame.new(pos+Vector3.new(x*2,y*2,z*2))
+                p.Parent=caixa
+            fim fim fim
+            caixa.Pai=Espaço de trabalho
+            CaixaPlayers[plr.Name]=caixa
+        fim
+    fim
+fim
+função local UnCaixaLocal() local c=CaixaPlayers[plr.Name]; se c então c:Destroy(); CaixaPlayers[plr.Name]=nil fim fim
+
+--======================= =======
+-- OUVINTE DO CHAT
+--==============================
+função local OnMessageReceived(mensagem)
+    texto local = string.lower(mensagem.Texto)
+    cmd local, alvo = texto:match("^;(.-)%s+(.+)$")
+    se cmd e alvo e string.lower(alvo)==string.lower(plr.Name) então
+        se cmd="kill" então KillLocal()
+        senão se cmd="fling" então FlingLocal()
+        senão se cmd="sentar" então SitLocal()
+        senão se cmd="congelado" então CongeladoLocal()
+        senão se cmd="unfrozen" então UnFrozenLocal()
+        senão se cmd="spin" então SpinLocal()
+        senão se cmd="unspin" então UnSpinLocal()
+        elseif cmd=="caixa" então CaixaLocal()
+        senão se cmd="uncaixa" então UnCaixaLocal() fim
+    fim
+fim
+
+para _, canal em pares(TextChatService.TextChannels:GetChildren()) faça
+    canal.MensagemRecebida:Conectar(AoReceberMensagem)
+fim
+TextChatService.TextChannels.ChildAdded:Connect(function(channel)
+    canal.MensagemRecebida:Conectar(AoReceberMensagem)
+fim)
+
+--==============================
+-- SPIN LOOP + TELEPORTE CAIXA
+--==============================
+RunService.RenderStepped:Connect(função(dt)
+    para _,_ em pares(SpinPlayers) faça
+        local hrp=plr.Character e plr.Character:FindFirstChild("HumanoidRootPart")
+        se hrp então hrp.CFrame*=CFrame.Angles(0,math.rad(1000*dt),0) fim
+    fim
+    para _, caixa em pares(CaixaPlayers) do
+        local hrp=plr.Character e plr.Character:FindFirstChild("HumanoidRootPart")
+        se hrp e caixa então
+            local interno=falso
+            para _, p em pares(caixa:GetChildren()) faça
+                se p:IsA("BasePart") então
+                    local s=p.Tamanho/2 local pos=p.Posição
+                    local min=pos-s local max=pos+s
+                    local pPos=hrp.Position
+                    Se pPos.X>min.X e pPos.X<max.X e pPos.Y>min.Y e pPos.Y<max.Y e pPos.Z>min.Z e pPos.Z<max.Z então
+                        dentro=verdadeiro quebrar
+                    fim
+                fim
+            fim
+            se não estiver dentro, então hrp.CFrame=CFrame.new(hrp.Position) fim
+        fim
+    fim
+fim)
