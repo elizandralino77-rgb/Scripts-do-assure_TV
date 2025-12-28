@@ -11,12 +11,34 @@ outra library
 loadstring(game:HttpGet("https://pastefy.app/TYVuPNOS/raw"))()
 
 
+outra 
+
+loadstring(game:HttpGet("https://pastefy.app/QrJLAr8A/raw"))()
+
+outra 
 
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Stats = game:GetService("Stats")
+local player = Players.LocalPlayer
+workspace.FallenPartsDestroyHeight = -math.huge
 
+pcall(function()
+    ReplicatedStorage.RE["1RPNam1eTex1t"]:FireServer(table.unpack({[1]="RolePlayBio",[2]="dangerous guy"}))
+    ReplicatedStorage.RE["1RPNam1eTex1t"]:FireServer(table.unpack({[1]="RolePlayName",[2]="chachado Hub user 👾"}))
+    ReplicatedStorage.RE["1RPNam1eColo1r"]:FireServer(table.unpack({[1]="PickingRPBioColor",[2]=Color3.new(0,0,0)}))
+    ReplicatedStorage.RE["1RPNam1eColo1r"]:FireServer(table.unpack({[1]="PickingRPNameColor",[2]=Color3.new(1,1,1)}))
+end)
 
-library universal 
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Yuna-ux/Other-scripts/refs/heads/main/UI-Library.lua"))()
+local Window = redzlib:MakeWindow({
+    Title = "Chachado hub☕",
+    Subtitle = "Brookhaven RP 🏡 - by ixi362",
+    SaveFolder = "ChachadoHub"
+})
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Vovabro46/trash/refs/heads/main/Test.lua"))()
-
-
+Window:AddMinimizeButton({
+    Button = { Image = "rbxassetid://112995768245239", BackgroundTransparency = 0 },
+    Corner = { CornerRadius = UDim.new(0, 35) }
+})
