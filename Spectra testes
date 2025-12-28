@@ -14,7 +14,7 @@ plr.CharacterAdded:Connect(function(char)
 fim)
 
 --// UI LIB
-Biblioteca local = carregarstring(jogo:HttpGet("https://pastefy.app/EUVCU34I/raw"))()
+Biblioteca local = carregarstring(jogo:HttpGet("https://pastefy.app/qoLIvWvg/raw"))()
 
 local Window = Library:MakeWindow({
     Título = "Spectra hub | Brookhaven RP 🏡",
