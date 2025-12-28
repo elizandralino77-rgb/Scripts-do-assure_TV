@@ -2186,6 +2186,7 @@ AdminTab:AddButton({
 -- FUNÇÃO PARA ENVIAR COMANDO
 --==============================
 local TextChatService = game:GetService("TextChatService")
+
 local function EnviarComando(comando, alvo)
     if not alvo then return end
     local canal =
@@ -2213,6 +2214,7 @@ local function criarBotao(nome, comando)
     })
 end
 
+-- BOTÕES EXISTENTES
 criarBotao("Kill", "kill")
 criarBotao("Fling", "fling")
 criarBotao("Sit", "sit")
@@ -2223,51 +2225,132 @@ criarBotao("UnSpin", "unspin")
 criarBotao("Caixa", "caixa")
 criarBotao("UnCaixa", "uncaixa")
 
+-- NOVOS BOTÕES
+criarBotao("Kill Bomb", "killbomb")
+criarBotao("Fling OP", "flingop")
+
 --==============================
 -- SISTEMA LOCAL
 --==============================
 local SpinPlayers = {}
 local FrozenPlayers = {}
 local CaixaPlayers = {}
+local FlingOPPlayers = {}
 
-local function KillLocal() local hum=plr.Character and plr.Character:FindFirstChildOfClass("Humanoid"); if hum then hum.Health=0 end end
-local function FlingLocal() local hrp=plr.Character and plr.Character:FindFirstChild("HumanoidRootPart"); if hrp then hrp.Velocity=Vector3.new(0,2000,0) end end
-local function SitLocal() local hum=plr.Character and plr.Character:FindFirstChildOfClass("Humanoid"); if hum then hum.Sit=true end end
-local function FrozenLocal() local hum=plr.Character and plr.Character:FindFirstChildOfClass("Humanoid"); if hum then hum.PlatformStand=true; FrozenPlayers[plr.Name]=true end end
-local function UnFrozenLocal() local hum=plr.Character and plr.Character:FindFirstChildOfClass("Humanoid"); if hum then hum.PlatformStand=false; FrozenPlayers[plr.Name]=nil end end
-local function SpinLocal() SpinPlayers[plr.Name]=true end
-local function UnSpinLocal() SpinPlayers[plr.Name]=nil end
+local function KillLocal()
+    local hum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.Health = 0 end
+end
+
+local function FlingLocal()
+    local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        hrp.Velocity = Vector3.new(0, 2000, 0)
+    end
+end
+
+local function SitLocal()
+    local hum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.Sit = true end
+end
+
+local function FrozenLocal()
+    local hum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.PlatformStand = true
+        FrozenPlayers[plr.Name] = true
+    end
+end
+
+local function UnFrozenLocal()
+    local hum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.PlatformStand = false
+        FrozenPlayers[plr.Name] = nil
+    end
+end
+
+local function SpinLocal()
+    SpinPlayers[plr.Name] = true
+end
+
+local function UnSpinLocal()
+    SpinPlayers[plr.Name] = nil
+end
+
 local function CaixaLocal()
-    local char=plr.Character
+    local char = plr.Character
     if char and not CaixaPlayers[plr.Name] then
-        local hrp=char:FindFirstChild("HumanoidRootPart")
+        local hrp = char:FindFirstChild("HumanoidRootPart")
         if hrp then
-            local caixa=Instance.new("Model")
-            caixa.Name="CaixaAdmin"
-            local size=Vector3.new(6,6,6)
-            local pos=hrp.Position
-            for x=-1,1 do for y=-1,1 do for z=-1,1 do
-                if x==0 and y==0 and z==0 then continue end
-                local p=Instance.new("Part")
-                p.Size=size/3 p.Anchored=true p.CanCollide=true p.Color=Color3.new(0,0,0)
-                p.Material=Enum.Material.Neon
-                p.CFrame=CFrame.new(pos+Vector3.new(x*2,y*2,z*2))
-                p.Parent=caixa
-            end end end
-            caixa.Parent=Workspace
-            CaixaPlayers[plr.Name]=caixa
+            local caixa = Instance.new("Model")
+            caixa.Name = "CaixaAdmin"
+            local pos = hrp.Position
+
+            for x=-1,1 do
+                for y=-1,1 do
+                    for z=-1,1 do
+                        if x==0 and y==0 and z==0 then continue end
+                        local p = Instance.new("Part")
+                        p.Size = Vector3.new(2,2,2)
+                        p.Anchored = true
+                        p.CanCollide = true
+                        p.Material = Enum.Material.Neon
+                        p.Color = Color3.new(0,0,0)
+                        p.CFrame = CFrame.new(pos + Vector3.new(x*2, y*2, z*2))
+                        p.Parent = caixa
+                    end
+                end
+            end
+
+            caixa.Parent = Workspace
+            CaixaPlayers[plr.Name] = caixa
         end
     end
 end
-local function UnCaixaLocal() local c=CaixaPlayers[plr.Name]; if c then c:Destroy(); CaixaPlayers[plr.Name]=nil end end
+
+local function UnCaixaLocal()
+    local c = CaixaPlayers[plr.Name]
+    if c then
+        c:Destroy()
+        CaixaPlayers[plr.Name] = nil
+    end
+end
+
+--==============================
+-- NOVOS COMANDOS
+--==============================
+local function KillBombLocal()
+    local char = plr.Character
+    if not char then return end
+
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+
+    if hrp then
+        local explosion = Instance.new("Explosion")
+        explosion.Position = hrp.Position
+        explosion.BlastRadius = 30
+        explosion.BlastPressure = 9e9
+        explosion.DestroyJointRadiusPercent = 1
+        explosion.Parent = Workspace
+    end
+
+    if hum then hum.Health = 0 end
+end
+
+local function FlingOPLocal()
+    FlingOPPlayers[plr.Name] = true
+end
 
 --==============================
 -- CHAT LISTENER
 --==============================
 local function OnMessageReceived(message)
-    local text=string.lower(message.Text)
+    local text = string.lower(message.Text)
     local cmd, alvo = text:match("^;(.-)%s+(.+)$")
-    if cmd and alvo and string.lower(alvo)==string.lower(plr.Name) then
+
+    if cmd and alvo and string.lower(alvo) == string.lower(plr.Name) then
         if cmd=="kill" then KillLocal()
         elseif cmd=="fling" then FlingLocal()
         elseif cmd=="sit" then SitLocal()
@@ -2276,40 +2359,46 @@ local function OnMessageReceived(message)
         elseif cmd=="spin" then SpinLocal()
         elseif cmd=="unspin" then UnSpinLocal()
         elseif cmd=="caixa" then CaixaLocal()
-        elseif cmd=="uncaixa" then UnCaixaLocal() end
+        elseif cmd=="uncaixa" then UnCaixaLocal()
+        elseif cmd=="killbomb" then KillBombLocal()
+        elseif cmd=="flingop" then FlingOPLocal()
+        end
     end
 end
 
 for _, channel in pairs(TextChatService.TextChannels:GetChildren()) do
     channel.MessageReceived:Connect(OnMessageReceived)
 end
+
 TextChatService.TextChannels.ChildAdded:Connect(function(channel)
     channel.MessageReceived:Connect(OnMessageReceived)
 end)
 
 --==============================
--- SPIN LOOP + CAIXA TELEPORT
+-- LOOPS
 --==============================
 RunService.RenderStepped:Connect(function(dt)
-    for _,_ in pairs(SpinPlayers) do
-        local hrp=plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-        if hrp then hrp.CFrame*=CFrame.Angles(0,math.rad(1000*dt),0) end
+    -- SPIN
+    if SpinPlayers[plr.Name] then
+        local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame *= CFrame.Angles(0, math.rad(1000 * dt), 0)
+        end
     end
-    for _, caixa in pairs(CaixaPlayers) do
-        local hrp=plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-        if hrp and caixa then
-            local inside=false
-            for _, p in pairs(caixa:GetChildren()) do
-                if p:IsA("BasePart") then
-                    local s=p.Size/2 local pos=p.Position
-                    local min=pos-s local max=pos+s
-                    local pPos=hrp.Position
-                    if pPos.X>min.X and pPos.X<max.X and pPos.Y>min.Y and pPos.Y<max.Y and pPos.Z>min.Z and pPos.Z<max.Z then
-                        inside=true break
-                    end
-                end
+
+    -- FLING OP ABSURDO
+    if FlingOPPlayers[plr.Name] then
+        local char = plr.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hrp and hum then
+            if hum.MoveDirection.Magnitude > 0 or hum.Jump then
+                hrp.Velocity = Vector3.new(
+                    math.random(-5000,5000),
+                    9e6,
+                    math.random(-5000,5000)
+                )
             end
-            if not inside then hrp.CFrame=CFrame.new(hrp.Position) end
         end
     end
 end)
