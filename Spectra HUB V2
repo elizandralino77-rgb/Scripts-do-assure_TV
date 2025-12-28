@@ -1163,6 +1163,8 @@ local tools = {
     "SnowballCannon",
     "Thermos",
     "Chainsaw",
+    "JoustBlue",
+    "WateringCan",
     "Present",
     "CookieWindowTray",
     "SnowflakeGlider",
