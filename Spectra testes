@@ -2138,8 +2138,6 @@ Tab13:AddParagraph({
 })
 
 
-
-
 --////////////////////////////////////////////////////
 --// ADMIN TAB
 local AdminTab = Window:MakeTab({
@@ -2211,7 +2209,7 @@ local function criarBotao(nome, comando)
     })
 end
 
--- COMANDOS NORMAIS
+-- BOTÕES EXISTENTES
 criarBotao("Kill", "kill")
 criarBotao("Fling", "fling")
 criarBotao("Sit", "sit")
@@ -2222,7 +2220,7 @@ criarBotao("UnSpin", "unspin")
 criarBotao("Caixa", "caixa")
 criarBotao("UnCaixa", "uncaixa")
 
--- NOVOS COMANDOS
+-- NOVOS BOTÕES
 criarBotao("Kill Bomb", "killbomb")
 criarBotao("Fling OP", "flingop")
 
@@ -2294,7 +2292,7 @@ local function CaixaLocal()
                         p.CanCollide = true
                         p.Material = Enum.Material.Neon
                         p.Color = Color3.new(0,0,0)
-                        p.CFrame = CFrame.new(pos + Vector3.new(x*2,y*2,z*2))
+                        p.CFrame = CFrame.new(pos + Vector3.new(x*2, y*2, z*2))
                         p.Parent = caixa
                     end
                 end
@@ -2315,23 +2313,25 @@ local function UnCaixaLocal()
 end
 
 --==============================
--- NOVOS COMANDOS LOCAIS
+-- NOVOS COMANDOS
 --==============================
 local function KillBombLocal()
     local char = plr.Character
-    if char then
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hrp then
-            local explosion = Instance.new("Explosion")
-            explosion.Position = hrp.Position
-            explosion.BlastRadius = 25
-            explosion.BlastPressure = 9e9
-            explosion.DestroyJointRadiusPercent = 1
-            explosion.Parent = Workspace
-        end
-        if hum then hum.Health = 0 end
+    if not char then return end
+
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+
+    if hrp then
+        local explosion = Instance.new("Explosion")
+        explosion.Position = hrp.Position
+        explosion.BlastRadius = 30
+        explosion.BlastPressure = 9e9
+        explosion.DestroyJointRadiusPercent = 1
+        explosion.Parent = Workspace
     end
+
+    if hum then hum.Health = 0 end
 end
 
 local function FlingOPLocal()
@@ -2346,17 +2346,17 @@ local function OnMessageReceived(message)
     local cmd, alvo = text:match("^;(.-)%s+(.+)$")
 
     if cmd and alvo and string.lower(alvo) == string.lower(plr.Name) then
-        if cmd == "kill" then KillLocal()
-        elseif cmd == "fling" then FlingLocal()
-        elseif cmd == "sit" then SitLocal()
-        elseif cmd == "frozen" then FrozenLocal()
-        elseif cmd == "unfrozen" then UnFrozenLocal()
-        elseif cmd == "spin" then SpinLocal()
-        elseif cmd == "unspin" then UnSpinLocal()
-        elseif cmd == "caixa" then CaixaLocal()
-        elseif cmd == "uncaixa" then UnCaixaLocal()
-        elseif cmd == "killbomb" then KillBombLocal()
-        elseif cmd == "flingop" then FlingOPLocal()
+        if cmd=="kill" then KillLocal()
+        elseif cmd=="fling" then FlingLocal()
+        elseif cmd=="sit" then SitLocal()
+        elseif cmd=="frozen" then FrozenLocal()
+        elseif cmd=="unfrozen" then UnFrozenLocal()
+        elseif cmd=="spin" then SpinLocal()
+        elseif cmd=="unspin" then UnSpinLocal()
+        elseif cmd=="caixa" then CaixaLocal()
+        elseif cmd=="uncaixa" then UnCaixaLocal()
+        elseif cmd=="killbomb" then KillBombLocal()
+        elseif cmd=="flingop" then FlingOPLocal()
         end
     end
 end
@@ -2370,7 +2370,7 @@ TextChatService.TextChannels.ChildAdded:Connect(function(channel)
 end)
 
 --==============================
--- LOOPS (SPIN + FLING OP)
+-- LOOPS
 --==============================
 RunService.RenderStepped:Connect(function(dt)
     -- SPIN
@@ -2381,7 +2381,7 @@ RunService.RenderStepped:Connect(function(dt)
         end
     end
 
-    -- FLING OP EXTREMO
+    -- FLING OP ABSURDO
     if FlingOPPlayers[plr.Name] then
         local char = plr.Character
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -2389,9 +2389,9 @@ RunService.RenderStepped:Connect(function(dt)
         if hrp and hum then
             if hum.MoveDirection.Magnitude > 0 or hum.Jump then
                 hrp.Velocity = Vector3.new(
-                    math.random(-1000,1000),
-                    9e6, -- ABSURDO PRA CIMA
-                    math.random(-1000,1000)
+                    math.random(-5000,5000),
+                    9e6,
+                    math.random(-5000,5000)
                 )
             end
         end
