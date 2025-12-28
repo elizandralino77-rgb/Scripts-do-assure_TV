@@ -1162,8 +1162,8 @@ local tools = {
     "FireHose",
     "SnowballCannon",
     "Thermos",
-    "Chainsaw",
-    "Present",
+    "toolselected",
+    "toolthatiwanttodupe",
     "CookieWindowTray",
     "SnowflakeGlider",
     "Couch" -- novo botão adicionado
