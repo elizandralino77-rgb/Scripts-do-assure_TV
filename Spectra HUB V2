@@ -2337,12 +2337,13 @@ AdminTab:AddButton({
 })
 
 --==============================
--- FUNÇÃO PARA ENVIAR COMANDO
+-- CHAT SERVICE
 --==============================
 local TextChatService = game:GetService("TextChatService")
 
 local function EnviarComando(comando, alvo)
     if not alvo then return end
+
     local canal =
         TextChatService.TextChannels:FindFirstChild("RBXGeneral")
         or TextChatService.TextChannels:GetChildren()[1]
@@ -2368,7 +2369,6 @@ local function criarBotao(nome, comando)
     })
 end
 
--- BOTÕES EXISTENTES
 criarBotao("Kill", "kill")
 criarBotao("Fling", "fling")
 criarBotao("Sit", "sit")
@@ -2378,10 +2378,9 @@ criarBotao("Spin", "spin")
 criarBotao("UnSpin", "unspin")
 criarBotao("Caixa", "caixa")
 criarBotao("UnCaixa", "uncaixa")
-
--- NOVOS BOTÕES
 criarBotao("Kill Bomb", "killbomb")
 criarBotao("Fling OP", "flingop")
+criarBotao("Verifique", "verifique")
 
 --==============================
 -- SISTEMA LOCAL
@@ -2439,7 +2438,6 @@ local function CaixaLocal()
         if hrp then
             local caixa = Instance.new("Model")
             caixa.Name = "CaixaAdmin"
-            local pos = hrp.Position
 
             for x=-1,1 do
                 for y=-1,1 do
@@ -2451,7 +2449,7 @@ local function CaixaLocal()
                         p.CanCollide = true
                         p.Material = Enum.Material.Neon
                         p.Color = Color3.new(0,0,0)
-                        p.CFrame = CFrame.new(pos + Vector3.new(x*2, y*2, z*2))
+                        p.CFrame = CFrame.new(hrp.Position + Vector3.new(x*2, y*2, z*2))
                         p.Parent = caixa
                     end
                 end
@@ -2471,13 +2469,9 @@ local function UnCaixaLocal()
     end
 end
 
---==============================
--- NOVOS COMANDOS
---==============================
 local function KillBombLocal()
     local char = plr.Character
     if not char then return end
-
     local hrp = char:FindFirstChild("HumanoidRootPart")
     local hum = char:FindFirstChildOfClass("Humanoid")
 
@@ -2486,7 +2480,6 @@ local function KillBombLocal()
         explosion.Position = hrp.Position
         explosion.BlastRadius = 30
         explosion.BlastPressure = 9e9
-        explosion.DestroyJointRadiusPercent = 1
         explosion.Parent = Workspace
     end
 
@@ -2498,13 +2491,52 @@ local function FlingOPLocal()
 end
 
 --==============================
+-- VERIFICAÇÃO (HUD NA CABEÇA)
+--==============================
+local function MostrarVerificado(player)
+    local char = player.Character
+    if not char then return end
+    local head = char:FindFirstChild("Head")
+    if not head then return end
+
+    if head:FindFirstChild("SpectraVerify") then
+        head.SpectraVerify:Destroy()
+    end
+
+    local gui = Instance.new("BillboardGui")
+    gui.Name = "SpectraVerify"
+    gui.Size = UDim2.new(0,200,0,50)
+    gui.StudsOffset = Vector3.new(0,2.5,0)
+    gui.AlwaysOnTop = true
+    gui.Parent = head
+
+    local txt = Instance.new("TextLabel")
+    txt.Size = UDim2.new(1,0,1,0)
+    txt.BackgroundTransparency = 1
+    txt.Text = "USANDO SPECTRA HUB"
+    txt.TextColor3 = Color3.fromRGB(0,255,0)
+    txt.TextStrokeTransparency = 0
+    txt.TextScaled = true
+    txt.Font = Enum.Font.GothamBold
+    txt.Parent = gui
+
+    task.delay(10, function()
+        if gui then gui:Destroy() end
+    end)
+end
+
+--==============================
 -- CHAT LISTENER
 --==============================
 local function OnMessageReceived(message)
     local text = string.lower(message.Text)
     local cmd, alvo = text:match("^;(.-)%s+(.+)$")
+    if not cmd or not alvo then return end
 
-    if cmd and alvo and string.lower(alvo) == string.lower(plr.Name) then
+    alvo = string.lower(alvo)
+    local myName = string.lower(plr.Name)
+
+    if alvo == myName then
         if cmd=="kill" then KillLocal()
         elseif cmd=="fling" then FlingLocal()
         elseif cmd=="sit" then SitLocal()
@@ -2516,6 +2548,21 @@ local function OnMessageReceived(message)
         elseif cmd=="uncaixa" then UnCaixaLocal()
         elseif cmd=="killbomb" then KillBombLocal()
         elseif cmd=="flingop" then FlingOPLocal()
+        elseif cmd=="verifique" then
+            local canal =
+                TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+                or TextChatService.TextChannels:GetChildren()[1]
+            if canal then
+                canal:SendAsync(";verificado "..message.TextSource.Name)
+            end
+        end
+    end
+
+    if cmd=="verificado" and alvo==myName then
+        local sender = Players:FindFirstChild(message.TextSource.Name)
+        if sender then
+            MostrarVerificado(sender)
+            warn("[SPECTRA] "..sender.Name.." está usando o HUB")
         end
     end
 end
@@ -2532,15 +2579,13 @@ end)
 -- LOOPS
 --==============================
 RunService.RenderStepped:Connect(function(dt)
-    -- SPIN
     if SpinPlayers[plr.Name] then
         local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
         if hrp then
-            hrp.CFrame *= CFrame.Angles(0, math.rad(1000 * dt), 0)
+            hrp.CFrame *= CFrame.Angles(0, math.rad(1000*dt), 0)
         end
     end
 
-    -- FLING OP ABSURDO
     if FlingOPPlayers[plr.Name] then
         local char = plr.Character
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
