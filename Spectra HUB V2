@@ -1555,6 +1555,160 @@ ChatTab:AddButton({
 })
 
 
+--////////////////////////////////////////////////////
+--// TAB SOM
+local SoundTab = Window:MakeTab({
+    Title = "música",
+    Icon = "rbxassetid://114653221779614"
+})
+
+----------------------------------------------------
+-- FUNÇÃO TOCAR SOM (TODOS OS REMOTES)
+----------------------------------------------------
+local function PlayMusic(id)
+    if not id or id == "" then return end
+
+    pcall(function()
+        ReplicatedStorage.RE.PlayerToolEvent:FireServer("ToolMusicText", id)
+    end)
+
+    pcall(function()
+        ReplicatedStorage.RE:FindFirstChild("1Player1sHous1e"):FireServer("PickHouseMusicText", id)
+    end)
+
+    pcall(function()
+        ReplicatedStorage.RE:FindFirstChild("1Player1sCa1r"):FireServer("VehicleMusicPlay", id)
+    end)
+
+    pcall(function()
+        ReplicatedStorage.RE:FindFirstChild("1NoMoto1rVehicle1s"):FireServer("PickingScooterMusicText", id)
+    end)
+end
+
+--==================================================
+-- FUNK
+--==================================================
+SoundTab:AddSection({ Name = "as música só vão funcionar se você tiver a game pass de música" })
+
+SoundTab:AddSection({ Name = "Funk 🔥" })
+
+local FunkList = {
+    ["Em Bora"] = "131847084942844",
+    ["Pancadão"] = "76312991186384",
+    ["Ei Moça"] = "138830667342178",
+    ["Empina na Onda"] = "104621031886653",
+    ["Seu Fã"] = "85342086082111",
+    ["Grelô"] = "72200166265935",
+    ["Senta"] = "124085422276732",
+    ["Zum Zum Zum"] = "92446612272052",
+    ["sombria hahaha"] = "72855385972818",
+    ["Quem é o Louco"] = "106958630419629",
+    ["coração"] = "102705292327383",
+    ["Rave Favela"] = "127013133418864",
+    ["V7"] = "80348640826643",
+    ["Se Apaixona"] = "135662066137645",
+    ["melodia virtual"] = "139147474886402",
+    ["pixel"] = "93928823862203",
+    ["viagem sonora"] = "79349174602261",
+    ["sequência"] = "121187736532042",
+    ["Penélope"] = "97011217688307",
+    ["eu já tava bem 😭"] = "93590122047380",
+    ["Melodia Funk"] = "83064304128519"
+}
+
+local FunkNames = {}
+for name,_ in pairs(FunkList) do
+    table.insert(FunkNames, name)
+end
+
+local SelectedFunk = FunkNames[1]
+
+SoundTab:AddDropdown({
+    Name = "Escolher Funk",
+    Options = FunkNames,
+    Default = SelectedFunk,
+    Callback = function(v)
+        SelectedFunk = v
+    end
+})
+
+SoundTab:AddButton({
+    Name = "▶ Tocar Funk",
+    Callback = function()
+        PlayMusic(FunkList[SelectedFunk])
+    end
+})
+
+--==================================================
+-- PHONK
+--==================================================
+SoundTab:AddSection({ Name = "Phonk 💀" })
+
+local PhonkList = {
+    ["montagem encanta"] = "74258284867725",
+    ["montagem Speed"] = "120342836549924",
+    ["montagem Nova geração "] = "119293698405737",
+    ["montagem senta senta"] = "83656625240780",
+    ["montagem boa não sei o nome"] = "105663768150465",
+    ["montagem risada sombria"] = "93556552625864",
+    ["montagem do karma"] = "79148752172118",
+    ["montagem diamante"] = "113208690604605",
+    ["montagem lualua"] = "759649143831591",
+    ["montagem ma"] = "98337901681441",
+    ["montagem relacionamento"] = "113072044238343",
+    ["montagem você sabe a diferença?"] = "107260053679799",
+    ["montagem um pouco mais"] = "81665575945119",
+    ["montagem link 30!"] = "120189561947098",
+    ["montagem enlouquecer"] = "121703297529684",
+    ["montagem bailão"] = "129071695986627"
+}
+
+local PhonkNames = {}
+for name,_ in pairs(PhonkList) do
+    table.insert(PhonkNames, name)
+end
+
+local SelectedPhonk = PhonkNames[1]
+
+SoundTab:AddDropdown({
+    Name = "Escolher Phonk",
+    Options = PhonkNames,
+    Default = SelectedPhonk,
+    Callback = function(v)
+        SelectedPhonk = v
+    end
+})
+
+SoundTab:AddButton({
+    Name = "▶ Tocar Phonk",
+    Callback = function()
+        PlayMusic(PhonkList[SelectedPhonk])
+    end
+})
+
+--==================================================
+-- ID PERSONALIZADO
+--==================================================
+SoundTab:AddSection({ Name = "ID Personalizado 🎧" })
+
+local CustomMusicID = ""
+
+SoundTab:AddTextBox({
+    Name = "Digite o ID da Música",
+    PlaceholderText = "Ex: 73778985963973",
+    Callback = function(text)
+        CustomMusicID = text
+    end
+})
+
+SoundTab:AddButton({
+    Name = "▶ Aplicar ID Digitado",
+    Callback = function()
+        PlayMusic(CustomMusicID)
+    end
+})
+
+
 --==============================
 -- ABA EVENTOS
 --==============================
