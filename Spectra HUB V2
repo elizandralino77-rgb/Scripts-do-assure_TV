@@ -1138,21 +1138,24 @@ SkinsTab:AddButton({
 })
 
 
-
---// ABA LIMITADOS
-local LimitedTab = Window:MakeTab({
-    Title = "Limitados",
+--////////////////////////////////////////////////////
+--// ABA ITENS 🎁
+local ItemTab = Window:MakeTab({
+    Title = "🎁 Itens",
     Icon = "rbxassetid://16181381646"
 })
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-local plr = Players.LocalPlayer
+ItemTab:AddSection({ "✨ Itens Especiais / Limitados 🧰" })
 
--- Adicionar seção visual
-LimitedTab:AddSection({ "Ferramentas Limitadas" })
+--////////////////////////////////////////////////////
+--// REMOTE EVENT
+local RemoteEvent =
+    ReplicatedStorage
+        :WaitForChild("RE")
+        :WaitForChild("1Playe1rTrigge1rEven1t")
 
--- Lista de ferramentas
+--////////////////////////////////////////////////////
+--// LISTA DE ITENS
 local tools = {
     "EggLauncher",
     "Cannon",
@@ -1172,45 +1175,55 @@ local tools = {
     "JoustRed"
 }
 
--- Função para criar botão que dispara evento
-local function createToolButton(toolName)
-    LimitedTab:AddButton({
-        Name = toolName,
+--////////////////////////////////////////////////////
+--// FUNÇÃO PEGAR ITEM
+local function GiveTool(toolName)
+    local args = {
+        [1] = "AcceptedToolToServer",
+        [2] = toolName,
+        [3] = plr
+    }
+    RemoteEvent:FireServer(unpack(args))
+end
+
+--////////////////////////////////////////////////////
+--// CRIAR BOTÃO BONITO 🎁
+local function CreateToolButton(toolName)
+    ItemTab:AddButton({
+        Name = "🎁  "..toolName,
         Callback = function()
-            local args = {
-                [1] = "AcceptedToolToServer",
-                [2] = toolName,
-                [3] = plr
-            }
-            local event = ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t")
-            if event then
-                event:FireServer(unpack(args))
-            end
+            GiveTool(toolName)
         end
     })
 end
 
--- Criar botões individuais
-for _, toolName in ipairs(tools) do
-    createToolButton(toolName)
+--////////////////////////////////////////////////////
+--// BOTÕES DOS ITENS
+for _, tool in ipairs(tools) do
+    CreateToolButton(tool)
 end
 
--- Botão "Itens ALL" que dispara todos de uma vez
-LimitedTab:AddButton({
-    Name = "Itens ALL",
+--////////////////////////////////////////////////////
+--// BOTÃO ALL 🎁
+ItemTab:AddButton({
+    Name = "🎁  PEGAR TODOS OS ITENS",
     Callback = function()
-        local event = ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Playe1rTrigge1rEven1t")
-        if event then
-            for _, toolName in ipairs(tools) do
-                local args = {
-                    [1] = "AcceptedToolToServer",
-                    [2] = toolName,
-                    [3] = plr
-                }
-                event:FireServer(unpack(args))
+        task.spawn(function()
+            for _, tool in ipairs(tools) do
+                GiveTool(tool)
+                task.wait(0.12)
             end
-        end
+        end)
     end
+})
+
+--////////////////////////////////////////////////////
+--// MENSAGEM FINAL EXPLICATIVA
+ItemTab:AddParagraph({
+    "ℹ️ Informação",
+    "Ao clicar em um botão 🎁, o item correspondente será adicionado diretamente ao seu personagem.\n\n" ..
+    "O botão 'PEGAR TODOS OS ITENS' entrega todos os itens disponíveis de uma vez.\n\n" ..
+    "Use com responsabilidade."
 })
 
 --// ===============================
