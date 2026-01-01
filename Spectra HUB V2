@@ -1167,8 +1167,9 @@ local tools = {
     "WateringCan",
     "Present",
     "CookieWindowTray",
+    "Crystal",
     "SnowflakeGlider",
-    "Couch" -- novo botão adicionado
+    "JoustRed"
 }
 
 -- Função para criar botão que dispara evento
