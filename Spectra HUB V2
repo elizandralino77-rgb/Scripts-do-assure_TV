@@ -1257,7 +1257,7 @@ SkinsTab:AddButton({
 --////////////////////////////////////////////////////
 --// ABA ITENS 🎁
 local ItemTab = Window:MakeTab({
-    Title = "🎁 Itens",
+    Title = "ITENS 🎁",
     Icon = "rbxassetid://16181381646"
 })
 
@@ -1280,38 +1280,41 @@ local RemoteEvent =
 --// LISTA DE ITENS
 -- [NOME DO BOTÃO] = "NOME REAL DO ITEM"
 local tools = {
-    ["Lança Ovo"]        = "EggLauncher",
-    ["Canhão"]           = "Cannon",
-    ["Planador"]         = "Glider",
-    ["pedra Nuclear"]  = "UraniumRod",
-    ["Balão de Água "]   = "Water Balloon",
-    ["Mangueira"]       = "FireHose",
-    ["Canhão de Neve"]  = "SnowballCannon",
-    ["Garrafa Térmica"] = "Thermos",
-    ["Motosserra"]      = "Chainsaw",
-    ["Lança Azul"]      = "JoustBlue",
-    ["Regador"]         = "WateringCan",
-    ["Presente"]        = "Present",
-    ["Crystal 2"]         = "Crystals",
-    ["chave de ouro"]         = "OldKey",
-    ["espada de ouro"]         = "SwordGold",
-    ["livro velho"]         = "AgencyBook",
-    ["sacola de diamantes"]         = "DuffleBagDiamonds",
-    ["chave velha"]         = "BankGateKey",
-    ["Bandeja"]         = "CookieWindowTray",
-    ["Cristal"]         = "Crystal",
-    ["Planador de Neve"]   = "SnowflakeGlider",
-    ["Lança Vermelha"]  = "JoustRed"
+    ["Lança Ovo"]             = "EggLauncher",
+    ["Canhão"]                = "Cannon",
+    ["Planador"]              = "Glider",
+    ["Pedra Nuclear"]         = "UraniumRod",
+    ["Balão de Água"]         = "Water Balloon",
+    ["Mangueira"]             = "FireHose",
+    ["Canhão de Neve"]        = "SnowballCannon",
+    ["Garrafa Térmica"]       = "Thermos",
+    ["Motosserra"]            = "Chainsaw",
+    ["Lança Azul"]            = "JoustBlue",
+    ["Regador"]               = "WateringCan",
+    ["Presente"]              = "Present",
+    ["Bandeja"]               = "CookieWindowTray",
+    ["Cristal"]               = "Crystal",
+    ["Cristal 2"]             = "Crystals",
+    ["Chave de Ouro"]         = "OldKey",
+    ["Espada de Ouro"]        = "SwordGold",
+    ["Livro Velho"]           = "AgencyBook",
+    ["Sacola de Diamantes"]   = "DuffleBagDiamonds",
+    ["Chave Velha"]           = "BankGateKey",
+    ["Planador de Neve"]      = "SnowflakeGlider",
+    ["Lança Vermelha"]        = "JoustRed"
 }
 
 --////////////////////////////////////////////////////
---// FUNÇÃO PEGAR ITEM
+--// FUNÇÃO PEGAR ITEM (ESTÁVEL)
 local function GiveTool(toolName)
+    if not toolName then return end
+
     local args = {
         [1] = "AcceptedToolToServer",
         [2] = toolName,
         [3] = plr
     }
+
     RemoteEvent:FireServer(unpack(args))
 end
 
@@ -1334,11 +1337,12 @@ ItemTab:AddButton({
         task.spawn(function()
             for _, realToolName in pairs(tools) do
                 GiveTool(realToolName)
-                task.wait(0.12)
+                task.wait(0.15) -- delay seguro pra não sumir item
             end
         end)
     end
 })
+
 
 --////////////////////////////////////////////////////
 --// MENSAGEM FINAL EXPLICATIVA
