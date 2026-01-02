@@ -1264,6 +1264,12 @@ local ItemTab = Window:MakeTab({
 ItemTab:AddSection({ "✨ Itens Especiais / Limitados 🧰" })
 
 --////////////////////////////////////////////////////
+--// SERVIÇOS
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local plr = Players.LocalPlayer
+
+--////////////////////////////////////////////////////
 --// REMOTE EVENT
 local RemoteEvent =
     ReplicatedStorage
@@ -1272,23 +1278,30 @@ local RemoteEvent =
 
 --////////////////////////////////////////////////////
 --// LISTA DE ITENS
+-- [NOME DO BOTÃO] = "NOME REAL DO ITEM"
 local tools = {
-    "EggLauncher",
-    "Cannon",
-    "Glider",
-    "UraniumRod",
-    "Water Balloon",
-    "FireHose",
-    "SnowballCannon",
-    "Thermos",
-    "Chainsaw",
-    "JoustBlue",
-    "WateringCan",
-    "Present",
-    "CookieWindowTray",
-    "Crystal",
-    "SnowflakeGlider",
-    "JoustRed"
+    ["Lança Ovo"]        = "EggLauncher",
+    ["Canhão"]           = "Cannon",
+    ["Planador"]         = "Glider",
+    ["pedra Nuclear"]  = "UraniumRod",
+    ["Balão de Água "]   = "Water Balloon",
+    ["Mangueira"]       = "FireHose",
+    ["Canhão de Neve"]  = "SnowballCannon",
+    ["Garrafa Térmica"] = "Thermos",
+    ["Motosserra"]      = "Chainsaw",
+    ["Lança Azul"]      = "JoustBlue",
+    ["Regador"]         = "WateringCan",
+    ["Presente"]        = "Present",
+    ["Crystal 2"]         = "Crystals",
+    ["chave de ouro"]         = "OldKey",
+    ["espada de ouro"]         = "SwordGold",
+    ["livro velho"]         = "AgencyBook",
+    ["sacola de diamantes"]         = "DuffleBagDiamonds",
+    ["chave velha"]         = "BankGateKey",
+    ["Bandeja"]         = "CookieWindowTray",
+    ["Cristal"]         = "Crystal",
+    ["Planador de Neve"]   = "SnowflakeGlider",
+    ["Lança Vermelha"]  = "JoustRed"
 }
 
 --////////////////////////////////////////////////////
@@ -1303,30 +1316,24 @@ local function GiveTool(toolName)
 end
 
 --////////////////////////////////////////////////////
---// CRIAR BOTÃO BONITO 🎁
-local function CreateToolButton(toolName)
+--// CRIAR BOTÕES 🎁
+for buttonName, realToolName in pairs(tools) do
     ItemTab:AddButton({
-        Name = "🎁  "..toolName,
+        Name = "🎁  "..buttonName,
         Callback = function()
-            GiveTool(toolName)
+            GiveTool(realToolName)
         end
     })
 end
 
 --////////////////////////////////////////////////////
---// BOTÕES DOS ITENS
-for _, tool in ipairs(tools) do
-    CreateToolButton(tool)
-end
-
---////////////////////////////////////////////////////
---// BOTÃO ALL 🎁
+--// BOTÃO PEGAR TODOS 🎁
 ItemTab:AddButton({
-    Name = "🎁  PEGAR TODOS OS ITENS",
+    Name = "🎁  PEGAR TODOS OS ITENS 😈",
     Callback = function()
         task.spawn(function()
-            for _, tool in ipairs(tools) do
-                GiveTool(tool)
+            for _, realToolName in pairs(tools) do
+                GiveTool(realToolName)
                 task.wait(0.12)
             end
         end)
