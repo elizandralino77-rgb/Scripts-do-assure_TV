@@ -1695,12 +1695,244 @@ ChatTab:AddButton({
     end
 })
 
+--////////////////////////////////////////////////////
+--// ABA SOUND / GUN SIMPLESPY 🔊
+local SoundGunTab = Window:MakeTab({
+    Title = " Sound  ALL",
+    Icon = "rbxassetid://18187351229"
+})
+
+SoundGunTab:AddSection({ "TOQUE O SOM PARA TODO O SERVIDOR" })
+
+--////////////////////////////////////////////////////
+--// SERVIÇOS
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
+
+--////////////////////////////////////////////////////
+--// REMOTES
+local RE = ReplicatedStorage:WaitForChild("RE")
+local GunRemote = RE:WaitForChild("1Gu1n")
+local SoundRemote = RE:WaitForChild("1Gu1nSound1s")
+
+--////////////////////////////////////////////////////
+--// IDS COM NOMES
+local SoundIDs = {
+    ["tu e seco"] = "77058106224586",
+    ["vou te ensinar a respeitar"] = "117685294896990",
+    ["zumbi mini"] = "77774003812009",
+    ["porque essa diferença?"] = "120370340698141",
+    ["meus ataques"] = "126667346252984",
+    ["você quer marretada do Tor?"] = "102037691397539",
+    ["molestado pelo pai"] = "135334987359228",
+    ["Makita"] = "131862097205793",
+    ["ahhhhhhhhhhhhhh"] = "98660719604777",
+    ["aí minha canela"] = "94187671110604",
+    ["se levanta baiano"] = "129456656692974",
+    ["eu sou o melhor"] = "82406273626578",
+    ["aí meu cu"] = "91931550918967"
+}
+
+--////////////////////////////////////////////////////
+--// LISTA DE NOMES
+local SoundNames = {}
+for name,_ in pairs(SoundIDs) do
+    table.insert(SoundNames, name)
+end
+
+local SelectedName = SoundNames[1]
+
+--////////////////////////////////////////////////////
+--// CONTROLES LISTA
+local LoopEnabled = false
+local LoopSpeed = 10
+
+--////////////////////////////////////////////////////
+--// CONTROLES ID DIGITADO
+local CustomID = ""
+local CustomLoopEnabled = false
+local CustomLoopSpeed = 10
+
+--////////////////////////////////////////////////////
+--// DROPDOWN
+SoundGunTab:AddDropdown({
+    Name = " Escolher Som",
+    Options = SoundNames,
+    Default = SelectedName,
+    Callback = function(v)
+        SelectedName = v
+    end
+})
+
+--////////////////////////////////////////////////////
+--// FUNÇÃO SOM LOCAL
+local function PlayLocalSound(id)
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://" .. tostring(id)
+    sound.Volume = 1
+    sound.Looped = false
+    sound.Parent = SoundService
+    sound:Play()
+
+    task.delay(10, function()
+        if sound then
+            sound:Destroy()
+        end
+    end)
+end
+
+--////////////////////////////////////////////////////
+--// FUNÇÃO EXECUTAR SOM + GUN
+local function ExecuteSoundGun(id)
+    id = tostring(id)
+
+    PlayLocalSound(id)
+    SoundRemote:FireServer(workspace, id, 1)
+
+    task.wait(0.05)
+
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp = plr.Character.HumanoidRootPart
+
+            local gunArgs = {
+                hrp,
+                hrp,
+                Vector3.new(0, -1, 0),
+                Vector3.new(0, 0, 0),
+                hrp,
+                hrp,
+                id,
+                id,
+                { true },
+                {
+                    25,
+                    Vector3.new(0.25, 0.25, 100),
+                    BrickColor.new(24),
+                    0.25,
+                    Enum.Material.SmoothPlastic,
+                    0.25
+                },
+                true,
+                false
+            }
+
+            GunRemote:FireServer(unpack(gunArgs))
+        end
+    end
+end
+
+--////////////////////////////////////////////////////
+--// BOTÃO SOM SELECIONADO
+SoundGunTab:AddButton({
+    Name = "🔊 TOCAR SOM SELECIONADO 😈",
+    Callback = function()
+        local id = SoundIDs[SelectedName]
+        if id then
+            ExecuteSoundGun(id)
+        end
+    end
+})
+
+--////////////////////////////////////////////////////
+--// SLIDER LOOP LISTA
+SoundGunTab:AddSlider({
+    Name = "⚡ Velocidade do Loop (Lista)",
+    Min = 1,
+    Max = 50,
+    Default = LoopSpeed,
+    Increment = 1,
+    ValueName = "x",
+    Callback = function(v)
+        LoopSpeed = v
+    end
+})
+
+--////////////////////////////////////////////////////
+--// LOOP LISTA
+SoundGunTab:AddToggle({
+    Name = "🔁 LOOP SOM DA LISTA",
+    Default = false,
+    Callback = function(state)
+        LoopEnabled = state
+
+        if state then
+            task.spawn(function()
+                while LoopEnabled do
+                    local id = SoundIDs[SelectedName]
+                    if id then
+                        ExecuteSoundGun(id)
+                    end
+                    task.wait(1 / LoopSpeed)
+                end
+            end)
+        end
+    end
+})
+
+--////////////////////////////////////////////////////
+--// ID PERSONALIZADO
+SoundGunTab:AddSection({ "🎧 ID Personalizado" })
+
+SoundGunTab:AddTextBox({
+    Name = "Digite o ID",
+    PlaceholderText = "Ex: 73778985963973",
+    Callback = function(text)
+        CustomID = text
+    end
+})
+
+SoundGunTab:AddButton({
+    Name = "▶ TOCAR ID DIGITADO",
+    Callback = function()
+        if CustomID ~= "" then
+            ExecuteSoundGun(CustomID)
+        end
+    end
+})
+
+--////////////////////////////////////////////////////
+--// SLIDER LOOP ID DIGITADO
+SoundGunTab:AddSlider({
+    Name = "⚡ Velocidade do Loop (ID Digitado)",
+    Min = 1,
+    Max = 50,
+    Default = CustomLoopSpeed,
+    Increment = 1,
+    ValueName = "x",
+    Callback = function(v)
+        CustomLoopSpeed = v
+    end
+})
+
+--////////////////////////////////////////////////////
+--// LOOP ID DIGITADO
+SoundGunTab:AddToggle({
+    Name = "🔁 LOOP ID DIGITADO",
+    Default = false,
+    Callback = function(state)
+        CustomLoopEnabled = state
+
+        if state then
+            task.spawn(function()
+                while CustomLoopEnabled do
+                    if CustomID ~= "" then
+                        ExecuteSoundGun(CustomID)
+                    end
+                    task.wait(1 / CustomLoopSpeed)
+                end
+            end)
+        end
+    end
+})
+
 
 --////////////////////////////////////////////////////
 --// TAB SOM
 local SoundTab = Window:MakeTab({
     Title = "música",
-    Icon = "rbxassetid://114653221779614"
+    Icon = "rbxassetid://7059338404"
 })
 
 ----------------------------------------------------
@@ -2442,7 +2674,7 @@ Tab13:AddParagraph({
 --// ADMIN TAB
 local AdminTab = Window:MakeTab({
     Title = "Admin",
-    Icon = "rbxassetid://7734053495"
+    Icon = "rbxassetid://13277794765"
 })
 
 AdminTab:AddSection({ "Comandos Admin" })
