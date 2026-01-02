@@ -473,61 +473,24 @@ PlayerTab:AddToggle({
 })
 
 
-
+--////////////////////////////////////////////////////
+--// TROLL TAB
 local TrollTab = Window:MakeTab({
-    Title = "Troll",
+    Title = "Troll ☠️",
     Icon = "rbxassetid://6862780932"
 })
 
-TrollTab:AddSection({ Name = "Kill Troll" })
+TrollTab:AddSection({ "BUGs 💀" })
 
---==============================
--- VARIÁVEIS
---==============================
+--////////////////////////////////////////////////////
+--// REMOTES
+local ToolRemote = ReplicatedStorage.RE:WaitForChild("1Too1l")
+local CarRemote  = ReplicatedStorage.RE:WaitForChild("1Ca1r")
+
+--////////////////////////////////////////////////////
+--// PLAYER LIST
 local selectedPlayer
-local killEnabled = false
 
-local teleportThread
-local noclipThread
-local monitorThread
-local jumpThread
-local respawnConn
-
---==============================
--- SOFÁ
---==============================
-local function hasCouch()
-    local char = plr.Character
-    local bp = plr:FindFirstChildOfClass("Backpack")
-    if char and char:FindFirstChild("Couch") then return true end
-    if bp and bp:FindFirstChild("Couch") then return true end
-    return false
-end
-
-local function pickCouch()
-    pcall(function()
-        ReplicatedStorage.RE:FindFirstChild("1Too1l")
-            :InvokeServer("PickingTools", "Couch")
-    end)
-end
-
-local function equipCouch()
-    local char = plr.Character
-    local hum = char and char:FindFirstChildOfClass("Humanoid")
-    if not hum then return end
-
-    local tool =
-        (char and char:FindFirstChild("Couch")) or
-        (plr.Backpack and plr.Backpack:FindFirstChild("Couch"))
-
-    if tool then
-        hum:EquipTool(tool)
-    end
-end
-
---==============================
--- PLAYER LIST
---==============================
 local function getPlayers()
     local t = {}
     for _, p in ipairs(Players:GetPlayers()) do
@@ -552,6 +515,159 @@ TrollTab:AddButton({
         dropdown:Set(getPlayers())
     end
 })
+
+--////////////////////////////////////////////////////
+--// CONTROLE DE ITENS (SEM SPAM)
+local requiredTools = { "ShoppingCart", "Couch" }
+local currentIndex = 1
+local equipLoop
+local enabled = false
+
+local function hasTool(toolName)
+    local char = plr.Character
+    local bp = plr:FindFirstChild("Backpack")
+    if not char or not bp then return false end
+    return char:FindFirstChild(toolName) or bp:FindFirstChild(toolName)
+end
+
+local function requestTool(toolName)
+    pcall(function()
+        ToolRemote:InvokeServer("PickingTools", toolName)
+    end)
+end
+
+local function ensureToolsOnce()
+    for _, tool in ipairs(requiredTools) do
+        if not hasTool(tool) then
+            requestTool(tool)
+        end
+    end
+end
+
+local function equipNextTool()
+    local char = plr.Character
+    if not char then return end
+
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+
+    local toolName = requiredTools[currentIndex]
+    local tool =
+        char:FindFirstChild(toolName)
+        or plr.Backpack:FindFirstChild(toolName)
+
+    if tool then
+        hum:EquipTool(tool)
+    end
+
+    currentIndex += 1
+    if currentIndex > #requiredTools then
+        currentIndex = 1
+    end
+end
+
+local function startToolSystem()
+    if equipLoop then return end
+
+    ensureToolsOnce()
+
+    equipLoop = task.spawn(function()
+        while enabled do
+            for _, tool in ipairs(requiredTools) do
+                if not hasTool(tool) then
+                    requestTool(tool)
+                end
+            end
+
+            equipNextTool()
+            task.wait(0.25) -- alternância rápida e estável
+        end
+    end)
+end
+
+local function stopToolSystem()
+    if equipLoop then
+        task.cancel(equipLoop)
+        equipLoop = nil
+    end
+end
+
+--////////////////////////////////////////////////////
+--// SPAWN BUS
+local function spawnBus()
+    pcall(function()
+        CarRemote:FireServer("PickingCar", "Bus")
+    end)
+end
+
+--////////////////////////////////////////////////////
+--// TELEPORTE CAÓTICO AO REDOR DO PLAYER
+local tpConn
+local offsets = {
+    Vector3.new(0, 7, 0),
+    Vector3.new(0, -7, 0),
+    Vector3.new(7, 0, 0),
+    Vector3.new(-7, 0, 0),
+    Vector3.new(0, 0, 7),
+    Vector3.new(0, 0, -7),
+    Vector3.new(5, 5, 5),
+    Vector3.new(-5, 5, -5),
+    Vector3.new(5, -5, -5),
+}
+
+local function startTeleport()
+    if tpConn then tpConn:Disconnect() end
+
+    tpConn = RunService.RenderStepped:Connect(function()
+        if not enabled or not selectedPlayer then return end
+
+        local target = Players:FindFirstChild(selectedPlayer)
+        if not target or not target.Character then return end
+
+        local myHRP = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+        local tHRP = target.Character:FindFirstChild("HumanoidRootPart")
+        if not myHRP or not tHRP then return end
+
+        local offset = offsets[math.random(#offsets)]
+
+        myHRP.CFrame =
+            CFrame.new(tHRP.Position + offset)
+            * CFrame.Angles(
+                math.rad(180),
+                math.rad(math.random(0,360)),
+                0
+            )
+    end)
+end
+
+--////////////////////////////////////////////////////
+--// TOGGLE
+TrollTab:AddToggle({
+    Name = "kill ☠️ ",
+    Default = false,
+    Callback = function(v)
+        enabled = v
+
+        if v then
+            ensureToolsOnce()
+            startToolSystem()
+            spawnBus()
+            startTeleport()
+        else
+            stopToolSystem()
+            if tpConn then tpConn:Disconnect() end
+        end
+    end
+})
+
+--////////////////////////////////////////////////////
+--// AO MORRER
+plr.CharacterAdded:Connect(function()
+    if enabled then
+        task.wait(1)
+        ensureToolsOnce()
+    end
+end)
 
 --==============================
 -- TOGGLE KILL DEMORADO E CHATO
@@ -652,103 +768,83 @@ TrollTab:AddToggle({
 
 
 --==============================
--- SLIDER TELEPORTE INFINITO
+-- SPECTATE ON / OFF
 --==============================
-TrollTab:AddSlider({
-    Name = "Velocidade Teleporte Infinito",
-    Min = 1,
-    Max = 100,
-    Default = 5,
-    Increment = 1,
-    Callback = function(v)
-        tpSpeed = v
-    end
-})
+local Camera = workspace.CurrentCamera
+local spectating = false
+local spectateConn
 
---==============================
--- TOGGLE TELEPORTE INFINITO
---==============================
+local function startSpectate(player)
+    if spectateConn then spectateConn:Disconnect() end
+
+    spectateConn = game:GetService("RunService").RenderStepped:Connect(function()
+        if not spectating then return end
+        if not player or not player.Character then return end
+
+        local hum = player.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            Camera.CameraSubject = hum
+            Camera.CameraType = Enum.CameraType.Custom
+        end
+    end)
+end
+
+local function stopSpectate()
+    if spectateConn then
+        spectateConn:Disconnect()
+        spectateConn = nil
+    end
+
+    local myChar = game.Players.LocalPlayer.Character
+    local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+    if myHum then
+        Camera.CameraSubject = myHum
+        Camera.CameraType = Enum.CameraType.Custom
+    end
+end
+
+-- Toggle (usa selectedPlayer)
 TrollTab:AddToggle({
-    Name = "Teleportar Infinito (On / Off)",
+    Name = "👁️ Spectar Jogador",
     Default = false,
     Callback = function(state)
-        tpEnabled = state
+        spectating = state
 
-        if tpConnection then
-            tpConnection:Disconnect()
-            tpConnection = nil
+        if state then
+            local target = game.Players:FindFirstChild(selectedPlayer)
+            if target then
+                startSpectate(target)
+            end
+        else
+            stopSpectate()
         end
-
-        if not state then return end
-
-        tpConnection = RunService.Heartbeat:Connect(function(dt)
-            if not tpEnabled or not selectedPlayer then return end
-
-            local target = Players:FindFirstChild(selectedPlayer)
-            if not target or not target.Character then return end
-
-            local thrp = target.Character:FindFirstChild("HumanoidRootPart")
-            local char = plr.Character
-            local hrp = char and char:FindFirstChild("HumanoidRootPart")
-
-            if not (thrp and hrp) then return end
-
-            -- teleporta literalmente DENTRO do jogador
-            hrp.CFrame = thrp.CFrame
-
-            task.wait(1 / math.clamp(tpSpeed, 1, 100))
-        end)
     end
 })
 
+
 --==============================
--- BOTÃO TELEPORTE ÚNICO
+-- TELEPORTAR PARA JOGADOR
 --==============================
 TrollTab:AddButton({
-    Name = "Teleportar Uma Vez",
+    Name = "📍 Teleportar no Jogador",
     Callback = function()
         if not selectedPlayer then return end
 
+        local Players = game:GetService("Players")
+        local plr = Players.LocalPlayer
         local target = Players:FindFirstChild(selectedPlayer)
+
         if not target or not target.Character then return end
 
-        local thrp = target.Character:FindFirstChild("HumanoidRootPart")
-        local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+        local myChar = plr.Character
+        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
 
-        if thrp and hrp then
-            hrp.CFrame = thrp.CFrame
+        if myHRP and targetHRP then
+            myHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, -3)
         end
     end
 })
-
---==============================
--- VISUALIZAR JOGADOR
---==============================
-TrollTab:AddToggle({
-    Name = "Visualizar Jogador",
-    Default = false,
-    Callback = function(state)
-        viewing = state
-
-        local cam = workspace.CurrentCamera
-        local target = selectedPlayer and Players:FindFirstChild(selectedPlayer)
-
-        if state and target and target.Character then
-            local hum = target.Character:FindFirstChildOfClass("Humanoid")
-            if hum then
-                cam.CameraSubject = hum
-                cam.CameraType = Enum.CameraType.Custom
-            end
-        else
-            local myHum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
-            if myHum then
-                cam.CameraSubject = myHum
-                cam.CameraType = Enum.CameraType.Custom
-            end
-        end
-    end
-})
-
 
 
 
@@ -899,6 +995,10 @@ TrollTab:AddToggle({
         end)
     end
 })
+
+
+
+
 
 
 --// ===============================
@@ -1069,71 +1169,87 @@ SkinsTab:AddButton({
 })
 
 
---// ===============================
---// SKINS RÁPIDAS
---// ===============================
 
-SkinsTab:AddSection({ "Skins Rápidas" })
+--===============================
+-- DROPDOWN SKINS (UPTOWN / ITENS)
+--===============================
 
-local WearRemote = Remotes.Wear
+local selectedSkinId
 
-local function addSkinButton(name, id)
-    SkinsTab:AddButton({
-        Name = name,
-        Callback = function()
-            WearRemote:InvokeServer(id)
-        end
-    })
+-- Lista nome → ID
+local SkinsList = {
+    ["ENERGETIC HERO HAIR"] = 18724905873,
+    ["BLOGXY BEETLEUIE MASK"] = 18536708029,
+    ["POISONED HORNS"] = 1744060292,
+    ["BIVE INFERNO SKULL"] = 102887469225690,
+    ["SPOOKY PUMPKIN HEAD"] = 14847637885,
+    ["RAINY DAY UMBRELLA"] = 16972760311,
+    ["MOLEN LALA WINGS"] = 17266515535,
+    ["MOLEN LAVA SWORD"] = 17266499353,
+    ["GOLD OOF"] = 8770132654,
+    ["SAMURAI OF INGANDESGENE"] = 18431436143,
+    ["KLEOPHOBETS"] = 17521812774,
+    ["GOLDEN SPARKING WINGS"] = 417456127,
+    ["STAFF OF ROBUX ROYAL"] = 17213230300,
+    ["GOLDEN SCEPTER OF LOVE"] = 18431439532,
+    ["DARK AURA"] = 76292007466829,
+    ["ANCIENT MUMMY MASK"] = 10488323544,
+    ["CHOSDEERI"] = 183468963,
+    ["ICE FIRE RAM SKULL"] = 112243615546468,
+    ["GNARL TREE GHOUL"] = 18148245935,
+    ["STONE HEAD MEDUSA"] = 14291849064,
+    ["GOKU"] = 16972690019,
+    ["FAMING MOHAWK"] = 191101707,
+    ["FIMNG ANME HAIR"] = 119481693055025,
+    ["CABEÇA DE MARSHMALLOW"] = 9862651601,
+    ["HALLOW LALK"] = 15054110920,
+    ["BOBUX BLASTER"] = 13352926142,
+ ["SEM CABEÇA"] = 134082579,
+    ["SEM PERNA 1"] = 115656762149031,
+    ["SEM PERNA 2"] = 93177286821086,
+
+    ["FADA 1"] = 226189871,
+    ["FADA 2"] = 150381051,
+    ["FADA 3"] = 141742418,
+    ["FADA 4"] = 128217885,
+
+    ["ASA DE ANJO"] = 192557913,
+    ["ABÓBORA"] = 132809431,
+    ["CHAPÉU"] = 305888394,
+
+    ["PÉ GIGANTE 1"] = 140311311736304,
+    ["PÉ GIGANTE 2"] = 94880807456770,
+
+    ["UNHAS GRANDES"] = 135726095366567,
+    ["MÃOS GRANDES"] = 12725518393,
+
+    ["AURA"] = 125290933021110
+}
+
+-- Converter nomes para dropdown
+local skinNames = {}
+for name,_ in pairs(SkinsList) do
+    table.insert(skinNames, name)
 end
 
--- INDIVIDUAIS
-addSkinButton("Sem Cabeça", 134082579)
-addSkinButton("Sem Perna 1", 115656762149031)
-addSkinButton("Sem Perna 2", 93177286821086)
-addSkinButton("Fada 1", 226189871)
-addSkinButton("Fada 2", 150381051)
-addSkinButton("Fada 3", 141742418)
-addSkinButton("Fada 4", 128217885)
-addSkinButton("Asa de Anjo", 192557913)
-addSkinButton("Abóbora", 132809431)
-addSkinButton("Chapéu", 305888394)
-addSkinButton("Pombo", 134936622364544)
-addSkinButton("Pé Gigante 1", 140311311736304)
-addSkinButton("Pé Gigante 2", 94880807456770)
-addSkinButton("Unhas Grandes", 135726095366567)
-addSkinButton("Mãos Grandes", 12725518393)
-
--- PACK BLACK DOCTOR
-SkinsTab:AddButton({
-    Name = "Black Doctor",
-    Callback = function()
-        local ids = {
-            134917317332597, 76104684961073, 113280776217715,
-            12134501285, 88423188570127, 94604639662776,
-            134022922877138, 100316015179747, 11743311601,
-            80195816516327, 2510235063
-        }
-        for _, id in ipairs(ids) do
-            WearRemote:InvokeServer(id)
-            task.wait(0.15)
-        end
+-- Dropdown
+SkinsTab:AddDropdown({
+    Name = "Selecionar Skin / Item",
+    Options = skinNames,
+    Callback = function(choice)
+        selectedSkinId = SkinsList[choice]
     end
 })
 
--- PACK GONER
+-- Botão aplicar
 SkinsTab:AddButton({
-    Name = "Goner",
+    Name = "✅ Aplicar Skin",
     Callback = function()
-        local ids = {
-            11274394350, 17822749561, 17812417356,
-            17812415139, 17771175724, 17822722698,
-            17772174303, 17770317484, 892268340,
-            892267099, 2510236649
-        }
-        for _, id in ipairs(ids) do
-            WearRemote:InvokeServer(id)
-            task.wait(0.15)
-        end
+        if not selectedSkinId then return end
+
+        pcall(function()
+            Remotes.Wear:InvokeServer(selectedSkinId)
+        end)
     end
 })
 
