@@ -1255,7 +1255,7 @@ SkinsTab:AddButton({
 
 
 --// ===============================
---// OPÇÕES DE SKIN
+--// OPÇÕES DE SKIN (DROPDOWN)
 --// ===============================
 
 local SkinOptions = {
@@ -1279,11 +1279,11 @@ SkinsTab:AddDropdown({
 })
 
 --// ===============================
---// BOTÃO APLICAR
+--// BOTÃO APLICAR (DROPDOWN)
 --// ===============================
 
 SkinsTab:AddButton({
-    Name = "Aplicar corpo",
+    Name = "Aplicar Skin",
     Callback = function()
 
         -- PERNA DE GELO + ZUMBI
@@ -1317,6 +1317,50 @@ SkinsTab:AddButton({
 
             Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
         end
+    end
+})
+
+--// ===============================
+--// BOTÕES EXTRAS
+--// ===============================
+
+SkinsTab:AddSection({ "Skins Extras 💪👁️" })
+
+-- MUSCULOSO
+SkinsTab:AddButton({
+    Name = "Musculoso 💪",
+    Callback = function()
+        local args = {
+            [1] = {
+                [1] = 18178775358,
+                [2] = 18178775182,
+                [3] = 18178775725,
+                [4] = 96815508293389,
+                [5] = 121515016872144,
+                [6] = 0
+            }
+        }
+
+        Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+    end
+})
+
+-- 1x1x1
+SkinsTab:AddButton({
+    Name = "1x1x1 👁️",
+    Callback = function()
+        local args = {
+            [1] = {
+                [1] = 87108996849145,
+                [2] = 89124612345294,
+                [3] = 84431523780379,
+                [4] = 104281326156987,
+                [5] = 94645302037763,
+                [6] = 0
+            }
+        }
+
+        Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
     end
 })
 
