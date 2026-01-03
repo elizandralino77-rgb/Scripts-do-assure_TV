@@ -1254,6 +1254,73 @@ SkinsTab:AddButton({
 })
 
 
+--// ===============================
+--// OPÇÕES DE SKIN
+--// ===============================
+
+local SkinOptions = {
+    "Perna de Gelo + Perna de Zumbi",
+    "Pequeno"
+}
+
+local SelectedSkin = SkinOptions[1]
+
+--// ===============================
+--// DROPDOWN
+--// ===============================
+
+SkinsTab:AddDropdown({
+    Name = "Escolher Skin",
+    Options = SkinOptions,
+    Default = SelectedSkin,
+    Callback = function(v)
+        SelectedSkin = v
+    end
+})
+
+--// ===============================
+--// BOTÃO APLICAR
+--// ===============================
+
+SkinsTab:AddButton({
+    Name = "Aplicar corpo",
+    Callback = function()
+
+        -- PERNA DE GELO + ZUMBI
+        if SelectedSkin == "Perna de Gelo + Perna de Zumbi" then
+            local args = {
+                [1] = {
+                    [1] = 376532000,
+                    [2] = 376531012,
+                    [3] = 376530220,
+                    [4] = 37754710,
+                    [5] = 139572789,
+                    [6] = 0
+                }
+            }
+
+            Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+        end
+
+        -- PEQUENO
+        if SelectedSkin == "Pequeno" then
+            local args = {
+                [1] = {
+                    [1] = 120973199097564,
+                    [2] = 112849465115864,
+                    [3] = 118345433416023,
+                    [4] = 0,
+                    [5] = 0,
+                    [6] = 134082579
+                }
+            }
+
+            Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+        end
+    end
+})
+
+
 --////////////////////////////////////////////////////
 --// ABA ITENS 🎁
 local ItemTab = Window:MakeTab({
