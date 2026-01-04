@@ -476,7 +476,7 @@ PlayerTab:AddToggle({
 --////////////////////////////////////////////////////
 --// TROLL TAB
 local TrollTab = Window:MakeTab({
-    Title = "Troll ☠️",
+    Title = "Troll",
     Icon = "rbxassetid://6862780932"
 })
 
@@ -1410,7 +1410,7 @@ end
 
 -- 🔘 BOTÃO — DUAS PERNAS
 SkinsTab:AddButton({
-    Name = "Trocar DUAS Pernas",
+    Name = "as duas pernas de gelo e de zumbi ",
     Callback = function()
         applyLegs(true, true)
     end
@@ -1418,7 +1418,7 @@ SkinsTab:AddButton({
 
 -- 🔘 BOTÃO — PERNA DIREITA
 SkinsTab:AddButton({
-    Name = "Trocar Perna Direita",
+    Name = "perna de zumbi",
     Callback = function()
         applyLegs(true, false)
     end
@@ -1426,7 +1426,7 @@ SkinsTab:AddButton({
 
 -- 🔘 BOTÃO — PERNA ESQUERDA
 SkinsTab:AddButton({
-    Name = "Trocar Perna Esquerda",
+    Name = "perna de gelo",
     Callback = function()
         applyLegs(false, true)
     end
