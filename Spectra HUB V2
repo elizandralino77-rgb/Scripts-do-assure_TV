@@ -1287,21 +1287,6 @@ SkinsTab:AddButton({
     Name = "Aplicar Skin",
     Callback = function()
 
-        -- PERNA DE GELO + ZUMBI
-        if SelectedSkin == "Perna de Gelo + Perna de Zumbi" then
-            local args = {
-                [1] = {
-                    [1] = 376532000,
-                    [2] = 376531012,
-                    [3] = 376530220,
-                    [4] = 37754710,
-                    [5] = 139572789,
-                    [6] = 0
-                }
-            }
-            Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
-        end
-
         -- PEQUENO
         if SelectedSkin == "Pequeno" then
             local args = {
@@ -1391,6 +1376,60 @@ SkinsTab:AddButton({
             }
             Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
         end
+    end
+})
+
+
+AvatarTab:AddSection({ "Trocar Pernas" })
+
+--==============================
+-- AVATAR | TROCAR PERNAS
+--==============================
+
+-- IDs das pernas
+local NEW_RIGHT_LEG = 37754710
+local NEW_LEFT_LEG  = 139572789
+
+local function applyLegs(changeRight, changeLeft)
+    if not humanoid then return end
+
+    local desc = humanoid:GetAppliedDescription()
+
+    local args = {
+        [1] = {
+            [1] = desc.Torso,
+            [2] = desc.RightArm,
+            [3] = desc.LeftArm,
+            [4] = changeRight and NEW_RIGHT_LEG or desc.RightLeg,
+            [5] = changeLeft  and NEW_LEFT_LEG  or desc.LeftLeg,
+            [6] = 0
+        }
+    }
+
+    ReplicatedStorage.Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+end
+
+-- 🔘 BOTÃO — DUAS PERNAS
+AvatarTab:AddButton({
+    Name = "as tuas pernas de gelo e de zumbi",
+    Callback = function()
+        applyLegs(true, true)
+    end
+})
+
+-- 🔘 BOTÃO — PERNA DIREITA
+AvatarTab:AddButton({
+    Name = "perna de zumbi",
+    Callback = function()
+        applyLegs(true, false)
+    end
+})
+
+-- 🔘 BOTÃO — PERNA ESQUERDA
+AvatarTab:AddButton({
+    Name = "perna de gelo",
+    Callback = function()
+        applyLegs(false, true)
     end
 })
 
