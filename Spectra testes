@@ -133,98 +133,84 @@ Tab1:AddButton({
 })
 
 
---====================================================
--- GLOBAL
---====================================================
+--// ===============================
+--// TAB HOUSES
+--// ===============================
+
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
-local LocalPlayer = Players.LocalPlayer
+local plr = Players.LocalPlayer
 
-local isUnbanActive = true
-local SelectHouse = nil
-local NoclipDoor = nil
-
---====================================================
--- TAB
---====================================================
+--// CREATE TAB
 local HouseTab = Window:MakeTab({
     Title = "Houses",
-    Icon = "home"
+    Icon = "rbxassetid://7734053495"
 })
 
---====================================================
--- GET HOUSE LIST (LOTS)
---====================================================
+HouseTab:AddSection({ "House Controls" })
+
+--// ===============================
+--// GLOBAL VARIABLES
+--// ===============================
+
+local SelectedHouse = nil
+local NoclipDoor = nil
+local isUnbanActive = true
+
+--// ===============================
+--// GET HOUSE LIST
+--// ===============================
+
 local function getHouseList()
     local houseTable = {}
     local lots = Workspace:FindFirstChild("001_Lots")
     if lots then
-        for _, House in ipairs(lots:GetChildren()) do
-            if House:IsA("Model") and House.Name ~= "For Sale" then
-                table.insert(houseTable, House.Name)
+        for _, house in ipairs(lots:GetChildren()) do
+            if house:IsA("Model") and house.Name ~= "For Sale" then
+                table.insert(houseTable, house.Name)
             end
         end
     end
     return houseTable
 end
 
---====================================================
--- DROPDOWN SELECT HOUSE (MAIN)
---====================================================
-pcall(function()
-    HouseTab:AddDropdown({
-        Name = "Select House (Owned)",
-        Options = getHouseList(),
-        Default = "...",
-        Callback = function(Value)
-            SelectHouse = Value
-            if NoclipDoor then
-                NoclipDoor:Set(false)
-            end
+--// ===============================
+--// DROPDOWN - SELECT HOUSE
+--// ===============================
+
+local HouseList = getHouseList()
+SelectedHouse = HouseList[1]
+
+HouseTab:AddDropdown({
+    Name = "Select House",
+    Options = HouseList,
+    Default = SelectedHouse,
+    Callback = function(v)
+        SelectedHouse = v
+        if NoclipDoor then
+            NoclipDoor:Set(false)
         end
-    })
-end)
+    end
+})
 
---====================================================
--- REFRESH HOUSE LIST
---====================================================
-local function DropdownHouseUpdate()
-    pcall(function()
-        HouseTab:ClearDropdown("Select House (Owned)")
-        HouseTab:AddDropdown({
-            Name = "Select House (Owned)",
-            Options = getHouseList(),
-            Default = "...",
-            Callback = function(Value)
-                SelectHouse = Value
-                if NoclipDoor then
-                    NoclipDoor:Set(false)
-                end
-            end
-        })
-    end)
-end
+--// ===============================
+--// BUTTONS
+--// ===============================
 
-pcall(DropdownHouseUpdate)
-
---====================================================
--- BUTTONS
---====================================================
 HouseTab:AddButton({
     Name = "Refresh House List",
     Callback = function()
-        DropdownHouseUpdate()
+        HouseList = getHouseList()
     end
 })
 
 HouseTab:AddButton({
     Name = "Teleport to House",
     Callback = function()
-        if not SelectHouse then return end
-        local House = Workspace["001_Lots"]:FindFirstChild(SelectHouse)
-        if House and LocalPlayer.Character then
-            LocalPlayer.Character.HumanoidRootPart.CFrame =
-                CFrame.new(House.WorldPivot.Position)
+        local house = Workspace["001_Lots"]:FindFirstChild(tostring(SelectedHouse))
+        if house and plr.Character then
+            plr.Character.HumanoidRootPart.CFrame =
+                CFrame.new(house.WorldPivot.Position)
         end
     end
 })
@@ -232,33 +218,34 @@ HouseTab:AddButton({
 HouseTab:AddButton({
     Name = "Teleport to Safe",
     Callback = function()
-        if not SelectHouse then return end
-        local House = Workspace["001_Lots"]:FindFirstChild(SelectHouse)
-        if House and House:FindFirstChild("HousePickedByPlayer") then
-            local safe = House.HousePickedByPlayer.HouseModel:FindFirstChild("001_Safe")
-            if safe and LocalPlayer.Character then
-                LocalPlayer.Character.HumanoidRootPart.CFrame =
+        local house = Workspace["001_Lots"]:FindFirstChild(tostring(SelectedHouse))
+        if house and house:FindFirstChild("HousePickedByPlayer") and plr.Character then
+            local safe =
+                house.HousePickedByPlayer.HouseModel:FindFirstChild("001_Safe")
+            if safe then
+                plr.Character.HumanoidRootPart.CFrame =
                     CFrame.new(safe.WorldPivot.Position)
             end
         end
     end
 })
 
---====================================================
--- NOCLIP DOOR
---====================================================
+--// ===============================
+--// TOGGLES
+--// ===============================
+
 NoclipDoor = HouseTab:AddToggle({
     Name = "Noclip House Door",
     Default = false,
-    Callback = function(Value)
-        if not SelectHouse then return end
-        local House = Workspace["001_Lots"]:FindFirstChild(SelectHouse)
-        if House and House:FindFirstChild("HousePickedByPlayer") then
-            local doors = House.HousePickedByPlayer.HouseModel:FindFirstChild("001_HouseDoors")
+    Callback = function(state)
+        local house = Workspace["001_Lots"]:FindFirstChild(tostring(SelectedHouse))
+        if house and house:FindFirstChild("HousePickedByPlayer") then
+            local doors =
+                house.HousePickedByPlayer.HouseModel:FindFirstChild("001_HouseDoors")
             if doors and doors:FindFirstChild("HouseDoorFront") then
-                for _, v in ipairs(doors.HouseDoorFront:GetChildren()) do
-                    if v:IsA("BasePart") then
-                        v.CanCollide = not Value
+                for _, part in ipairs(doors.HouseDoorFront:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = not state
                     end
                 end
             end
@@ -266,23 +253,22 @@ NoclipDoor = HouseTab:AddToggle({
     end
 })
 
---====================================================
--- RING DOORBELL
---====================================================
 HouseTab:AddToggle({
     Name = "Ring Doorbell",
     Default = false,
-    Callback = function(Value)
-        getgenv().ChaosHubAutoSpawnDoorbellValue = Value
+    Callback = function(state)
+        getgenv().AutoDoorBell = state
         task.spawn(function()
-            while getgenv().ChaosHubAutoSpawnDoorbellValue do
-                if SelectHouse then
-                    local House = Workspace["001_Lots"]:FindFirstChild(SelectHouse)
-                    if House and House:FindFirstChild("HousePickedByPlayer") then
-                        local bell = House.HousePickedByPlayer.HouseModel:FindFirstChild("001_DoorBell")
-                        if bell and bell:FindFirstChild("TouchBell") then
+            while getgenv().AutoDoorBell do
+                local house =
+                    Workspace["001_Lots"]:FindFirstChild(tostring(SelectedHouse))
+                if house and house:FindFirstChild("HousePickedByPlayer") then
+                    local bell =
+                        house.HousePickedByPlayer.HouseModel:FindFirstChild("001_DoorBell")
+                    if bell and bell:FindFirstChild("TouchBell") then
+                        pcall(function()
                             fireclickdetector(bell.TouchBell.ClickDetector)
-                        end
+                        end)
                     end
                 end
                 task.wait(0.5)
@@ -291,26 +277,25 @@ HouseTab:AddToggle({
     end
 })
 
---====================================================
--- KNOCK DOOR
---====================================================
 HouseTab:AddToggle({
     Name = "Knock on Door",
     Default = false,
-    Callback = function(Value)
-        getgenv().ChaosHubAutoSpawnDoorValue = Value
+    Callback = function(state)
+        getgenv().AutoKnock = state
         task.spawn(function()
-            while getgenv().ChaosHubAutoSpawnDoorValue do
-                if SelectHouse then
-                    local House = Workspace["001_Lots"]:FindFirstChild(SelectHouse)
-                    if House and House:FindFirstChild("HousePickedByPlayer") then
-                        local doors = House.HousePickedByPlayer.HouseModel:FindFirstChild("001_HouseDoors")
-                        if doors and doors:FindFirstChild("HouseDoorFront")
-                            and doors.HouseDoorFront:FindFirstChild("Knock") then
+            while getgenv().AutoKnock do
+                local house =
+                    Workspace["001_Lots"]:FindFirstChild(tostring(SelectedHouse))
+                if house and house:FindFirstChild("HousePickedByPlayer") then
+                    local doors =
+                        house.HousePickedByPlayer.HouseModel:FindFirstChild("001_HouseDoors")
+                    if doors and doors:FindFirstChild("HouseDoorFront")
+                        and doors.HouseDoorFront:FindFirstChild("Knock") then
+                        pcall(function()
                             fireclickdetector(
                                 doors.HouseDoorFront.Knock.TouchBell.ClickDetector
                             )
-                        end
+                        end)
                     end
                 end
                 task.wait(0.5)
@@ -319,69 +304,17 @@ HouseTab:AddToggle({
     end
 })
 
---====================================================
--- TELEPORT SECTION
---====================================================
-HouseTab:AddSection({ Name = "Teleport to Houses" })
+--// ===============================
+--// AUTO UNBAN
+--// ===============================
 
-local casas = {
-    ["House 1"] = Vector3.new(260.29,4.37,209.32),
-    ["House 2"] = Vector3.new(234.49,4.37,228.00),
-    ["House 3"] = Vector3.new(262.79,21.37,210.84),
-    ["House 4"] = Vector3.new(229.60,21.37,225.40),
-    ["House 5"] = Vector3.new(173.44,21.37,228.11),
-    ["House 6"] = Vector3.new(-43,21,-137),
-    ["House 7"] = Vector3.new(-40,36,-137),
-    ["House 11"] = Vector3.new(-21,40,436),
-    ["House 12"] = Vector3.new(155,37,433),
-    ["House 13"] = Vector3.new(255,35,431),
-    ["House 14"] = Vector3.new(254,38,394),
-    ["House 15"] = Vector3.new(148,39,387),
-    ["House 16"] = Vector3.new(-17,42,395),
-    ["House 17"] = Vector3.new(-189,37,-247),
-    ["House 18"] = Vector3.new(-354,37,-244),
-    ["House 19"] = Vector3.new(-456,36,-245),
-    ["House 20"] = Vector3.new(-453,38,-295),
-    ["House 21"] = Vector3.new(-356,38,-294),
-    ["House 22"] = Vector3.new(-187,37,-295),
-    ["House 23"] = Vector3.new(-410,68,-447),
-    ["House 24"] = Vector3.new(-348,69,-496),
-    ["House 28"] = Vector3.new(-103,12,1087),
-    ["House 29"] = Vector3.new(-730,6,808),
-    ["House 30"] = Vector3.new(-245,7,822),
-    ["House 31"] = Vector3.new(639,76,-361),
-    ["House 32"] = Vector3.new(-908,6,-361),
-    ["House 33"] = Vector3.new(-111,70,-417),
-    ["House 34"] = Vector3.new(230,38,569),
-    ["House 35"] = Vector3.new(-30,13,2209)
-}
-
-local houseNames = {}
-for k in pairs(casas) do table.insert(houseNames, k) end
-table.sort(houseNames)
-
-HouseTab:AddDropdown({
-    Name = "Teleport Houses",
-    Options = houseNames,
-    Callback = function(v)
-        if LocalPlayer.Character then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(casas[v])
-        end
-    end
-})
-
-HouseTab:AddLabel("Teleport to any house you want")
-
---====================================================
--- AUTO UNBAN (BOTÃO MANTIDO)
---====================================================
-HouseTab:AddSection({ Name = "Auto Unban" })
+HouseTab:AddSection({ "Auto Unban" })
 
 HouseTab:AddButton({
     Name = "Unban All Houses",
     Callback = function()
         local removed = 0
-        for _, v in ipairs(Workspace:GetDescendants()) do
+        for _, v in pairs(Workspace:GetDescendants()) do
             if v.Name:match("^BannedBlock") then
                 pcall(function()
                     v:Destroy()
@@ -389,39 +322,55 @@ HouseTab:AddButton({
                 end)
             end
         end
-        game.StarterGui:SetCore("SendNotification",{
+
+        game.StarterGui:SetCore("SendNotification", {
             Title = "Unban",
-            Text = "Bans removidos: "..removed,
+            Text = "Removed bans from " .. removed .. " houses",
             Duration = 5
         })
     end
 })
 
-HouseTab:AddLabel("Automatically unbans you from houses")
-
---====================================================
--- HOUSE RGB (BUG CORRIGIDO)
---====================================================
-HouseTab:AddSection({ Name = "House RGB" })
-
-local function toggleHouseRGB(state)
-    if not SelectHouse then return end
-    local House = Workspace["001_Lots"]:FindFirstChild(SelectHouse)
-    if House then
-        for _, v in ipairs(House:GetDescendants()) do
-            if v:IsA("BasePart") then
-                v.Color = state and Color3.fromHSV(tick()%5/5,1,1) or Color3.new(1,1,1)
+HouseTab:AddToggle({
+    Name = "Auto Unban Loop",
+    Default = false,
+    Callback = function(state)
+        isUnbanActive = state
+        task.spawn(function()
+            while isUnbanActive do
+                for _, v in pairs(
+                    Workspace:WaitForChild("001_Lots"):GetDescendants()
+                ) do
+                    if v.Name:match("^BannedBlock%d+$") then
+                        pcall(function()
+                            v:Destroy()
+                        end)
+                    end
+                end
+                task.wait(1)
             end
-        end
+        end)
     end
-end
+})
+
+--// ===============================
+--// HOUSE RGB
+--// ===============================
+
+HouseTab:AddSection({ "House RGB" })
 
 HouseTab:AddToggle({
     Name = "House RGB",
     Default = false,
-    Callback = function(v)
-        toggleHouseRGB(v)
+    Callback = function(state)
+        local house =
+            Workspace["001_Lots"]:FindFirstChild(tostring(SelectedHouse))
+        if not house then return end
+
+        for _, v in ipairs(house:GetDescendants()) do
+            if v:IsA("BasePart") and state then
+                v.Color = Color3.fromHSV((tick() % 5) / 5, 1, 1)
+            end
+        end
     end
 })
-
-HouseTab:AddLabel("Makes your house RGB")
