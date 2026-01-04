@@ -133,9 +133,250 @@ Tab1:AddButton({
 })
 
 
---// PLAYER TAB
-local PlayerTab = Window:MakeTab({ Title = "Player", Icon = "rbxassetid://17132521951" })
-PlayerTab:AddSection({ "Movement" })
+--////////////////////////////////////////////////////
+--// ABA HOUSES
+local HouseTab = Window:MakeTab({
+    Title = "Houses",
+    Icon = "home"
+})
+
+--////////////////////////////////////////////////////
+-- VARIÁVEIS GLOBAIS
+local isUnbanActive = true
+local SelectHouse = nil
+local NoclipDoor = nil
+
+--////////////////////////////////////////////////////
+-- FUNÇÃO PEGAR LISTA DE CASAS
+local function getHouseList()
+    local houseTable = {}
+    local lots = workspace:FindFirstChild("001_Lots")
+    if lots then
+        for _, House in ipairs(lots:GetChildren()) do
+            if House.Name ~= "For Sale" and House:IsA("Model") then
+                table.insert(houseTable, House.Name)
+            end
+        end
+    end
+    return houseTable
+end
+
+--////////////////////////////////////////////////////
+-- DROPDOWN SELECIONAR CASA
+pcall(function()
+    HouseTab:AddDropdown({
+        Name = "Select House",
+        Options = getHouseList(),
+        Default = "...",
+        Callback = function(Value)
+            SelectHouse = Value
+            if NoclipDoor then
+                NoclipDoor:Set(false)
+            end
+        end
+    })
+end)
+
+--////////////////////////////////////////////////////
+-- ATUALIZAR DROPDOWN
+local function DropdownHouseUpdate()
+    local houseTable = getHouseList()
+    pcall(function()
+        HouseTab:ClearDropdown("Select House")
+        HouseTab:AddDropdown({
+            Name = "Select House",
+            Options = houseTable,
+            Default = "...",
+            Callback = function(Value)
+                SelectHouse = Value
+                if NoclipDoor then
+                    NoclipDoor:Set(false)
+                end
+            end
+        })
+    end)
+end
+
+pcall(DropdownHouseUpdate)
+
+--////////////////////////////////////////////////////
+-- BOTÃO ATUALIZAR LISTA
+pcall(function()
+    HouseTab:AddButton({
+        Name = "Refresh House List",
+        Callback = function()
+            pcall(DropdownHouseUpdate)
+        end
+    })
+end)
+
+--////////////////////////////////////////////////////
+-- TELEPORTAR PARA CASA
+pcall(function()
+    HouseTab:AddButton({
+        Name = "Teleport to House",
+        Callback = function()
+            local House = workspace["001_Lots"]:FindFirstChild(tostring(SelectHouse))
+            if House and game.Players.LocalPlayer.Character then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame =
+                    CFrame.new(House.WorldPivot.Position)
+            end
+        end
+    })
+end)
+
+--////////////////////////////////////////////////////
+-- TELEPORTAR PARA COFRE
+pcall(function()
+    HouseTab:AddButton({
+        Name = "Teleport to Safe",
+        Callback = function()
+            local House = workspace["001_Lots"]:FindFirstChild(tostring(SelectHouse))
+            if House and House:FindFirstChild("HousePickedByPlayer") then
+                local safe = House.HousePickedByPlayer.HouseModel:FindFirstChild("001_Safe")
+                if safe and game.Players.LocalPlayer.Character then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame =
+                        CFrame.new(safe.WorldPivot.Position)
+                end
+            end
+        end
+    })
+end)
+
+--////////////////////////////////////////////////////
+-- NOCLIP PORTA
+pcall(function()
+    NoclipDoor = HouseTab:AddToggle({
+        Name = "Noclip House Door",
+        Default = false,
+        Callback = function(Value)
+            pcall(function()
+                local House = workspace["001_Lots"]:FindFirstChild(tostring(SelectHouse))
+                if House and House:FindFirstChild("HousePickedByPlayer") then
+                    local doors = House.HousePickedByPlayer.HouseModel
+                        :FindFirstChild("001_HouseDoors")
+                    if doors and doors:FindFirstChild("HouseDoorFront") then
+                        for _, Base in ipairs(doors.HouseDoorFront:GetChildren()) do
+                            if Base:IsA("BasePart") then
+                                Base.CanCollide = not Value
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    })
+end)
+
+--////////////////////////////////////////////////////
+-- CAMPAINHA
+pcall(function()
+    HouseTab:AddToggle({
+        Name = "Ring Doorbell",
+        Default = false,
+        Callback = function(Value)
+            getgenv().ChaosHubAutoSpawnDoorbellValue = Value
+            task.spawn(function()
+                while getgenv().ChaosHubAutoSpawnDoorbellValue do
+                    local House = workspace["001_Lots"]:FindFirstChild(tostring(SelectHouse))
+                    if House and House:FindFirstChild("HousePickedByPlayer") then
+                        local doorbell = House.HousePickedByPlayer.HouseModel
+                            :FindFirstChild("001_DoorBell")
+                        if doorbell and doorbell:FindFirstChild("TouchBell") then
+                            fireclickdetector(doorbell.TouchBell.ClickDetector)
+                        end
+                    end
+                    task.wait(0.5)
+                end
+            end)
+        end
+    })
+end)
+
+--////////////////////////////////////////////////////
+-- BATER NA PORTA
+pcall(function()
+    HouseTab:AddToggle({
+        Name = "Knock on Door",
+        Default = false,
+        Callback = function(Value)
+            getgenv().ChaosHubAutoSpawnDoorValue = Value
+            task.spawn(function()
+                while getgenv().ChaosHubAutoSpawnDoorValue do
+                    local House = workspace["001_Lots"]:FindFirstChild(tostring(SelectHouse))
+                    if House and House:FindFirstChild("HousePickedByPlayer") then
+                        local doors = House.HousePickedByPlayer.HouseModel
+                            :FindFirstChild("001_HouseDoors")
+                        if doors and doors:FindFirstChild("HouseDoorFront")
+                            and doors.HouseDoorFront:FindFirstChild("Knock") then
+                            fireclickdetector(
+                                doors.HouseDoorFront.Knock.TouchBell.ClickDetector
+                            )
+                        end
+                    end
+                    task.wait(0.5)
+                end
+            end)
+        end
+    })
+end)
+
+--////////////////////////////////////////////////////
+-- SEÇÃO TELEPORT CASAS FIXAS
+HouseTab:AddSection({ Name = "Teleport to Houses" })
+
+local casas = {
+    ["House 1"] = Vector3.new(260.29, 4.37, 209.32),
+    ["House 2"] = Vector3.new(234.49, 4.37, 228.00),
+    ["House 3"] = Vector3.new(262.79, 21.37, 210.84),
+    ["House 4"] = Vector3.new(229.60, 21.37, 225.40),
+    ["House 5"] = Vector3.new(173.44, 21.37, 228.11),
+    ["House 6"] = Vector3.new(-43, 21, -137),
+    ["House 7"] = Vector3.new(-40, 36, -137),
+    ["House 11"] = Vector3.new(-21, 40, 436),
+    ["House 12"] = Vector3.new(155, 37, 433),
+    ["House 13"] = Vector3.new(255, 35, 431),
+    ["House 14"] = Vector3.new(254, 38, 394),
+    ["House 15"] = Vector3.new(148, 39, 387),
+    ["House 16"] = Vector3.new(-17, 42, 395),
+    ["House 17"] = Vector3.new(-189, 37, -247),
+    ["House 18"] = Vector3.new(-354, 37, -244),
+    ["House 19"] = Vector3.new(-456, 36, -245),
+    ["House 20"] = Vector3.new(-453, 38, -295),
+    ["House 21"] = Vector3.new(-356, 38, -294),
+    ["House 22"] = Vector3.new(-187, 37, -295),
+    ["House 23"] = Vector3.new(-410, 68, -447),
+    ["House 24"] = Vector3.new(-348, 69, -496),
+    ["House 28"] = Vector3.new(-103, 12, 1087),
+    ["House 29"] = Vector3.new(-730, 6, 808),
+    ["House 30"] = Vector3.new(-245, 7, 822),
+    ["House 31"] = Vector3.new(639, 76, -361),
+    ["House 32"] = Vector3.new(-908, 6, -361),
+    ["House 33"] = Vector3.new(-111, 70, -417),
+    ["House 34"] = Vector3.new(230, 38, 569),
+    ["House 35"] = Vector3.new(-30, 13, 2209)
+}
+
+local houseNames = {}
+for name in pairs(casas) do
+    table.insert(houseNames, name)
+end
+
+table.sort(houseNames, function(a, b)
+    return tonumber(a:match("%d+")) < tonumber(b:match("%d+"))
+end)
+
+HouseTab:AddDropdown({
+    Name = "Teleport House",
+    Options = houseNames,
+    Callback = function(house)
+        local plr = game.Players.LocalPlayer
+        if plr.Character then
+            plr.Character.HumanoidRootPart.CFrame =
+                CFrame.new(casas[house])
+        end
+    end
+})
 
 
 
