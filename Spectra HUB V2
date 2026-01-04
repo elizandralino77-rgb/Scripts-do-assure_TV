@@ -1255,7 +1255,6 @@ SkinsTab:AddButton({
 --// ===============================
 
 local SkinOptions = {
-    "Perna de Gelo + Perna de Zumbi",
     "Pequeno",
     "Musculoso",
     "1x1x1",
@@ -1380,10 +1379,10 @@ SkinsTab:AddButton({
 })
 
 
-AvatarTab:AddSection({ "Trocar Pernas" })
+SkinsTab:AddSection({ "Trocar Pernas" })
 
 --==============================
--- AVATAR | TROCAR PERNAS
+-- SKINS | TROCAR PERNAS
 --==============================
 
 -- IDs das pernas
@@ -1410,24 +1409,24 @@ local function applyLegs(changeRight, changeLeft)
 end
 
 -- 🔘 BOTÃO — DUAS PERNAS
-AvatarTab:AddButton({
-    Name = "as tuas pernas de gelo e de zumbi",
+SkinsTab:AddButton({
+    Name = "Trocar DUAS Pernas",
     Callback = function()
         applyLegs(true, true)
     end
 })
 
 -- 🔘 BOTÃO — PERNA DIREITA
-AvatarTab:AddButton({
-    Name = "perna de zumbi",
+SkinsTab:AddButton({
+    Name = "Trocar Perna Direita",
     Callback = function()
         applyLegs(true, false)
     end
 })
 
 -- 🔘 BOTÃO — PERNA ESQUERDA
-AvatarTab:AddButton({
-    Name = "perna de gelo",
+SkinsTab:AddButton({
+    Name = "Trocar Perna Esquerda",
     Callback = function()
         applyLegs(false, true)
     end
