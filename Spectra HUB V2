@@ -1255,14 +1255,17 @@ SkinsTab:AddButton({
 
 
 --// ===============================
---// OPÇÕES DE SKIN (TODAS NO DROPDOWN)
+--// SKIN OPTIONS (ALL IN DROPDOWN)
 --// ===============================
 
 local SkinOptions = {
     "Perna de Gelo + Perna de Zumbi",
     "Pequeno",
     "Musculoso",
-    "1x1x1"
+    "1x1x1",
+    "Nome Fofo",
+    "Musculoso 2",
+    "Auto"
 }
 
 local SelectedSkin = SkinOptions[1]
@@ -1275,13 +1278,13 @@ SkinsTab:AddDropdown({
     Name = "Escolher Skin",
     Options = SkinOptions,
     Default = SelectedSkin,
-    Callback = function(v)
-        SelectedSkin = v
+    Callback = function(Value)
+        SelectedSkin = Value
     end
 })
 
 --// ===============================
---// BOTÃO APLICAR
+--// APPLY SKIN
 --// ===============================
 
 SkinsTab:AddButton({
@@ -1290,62 +1293,100 @@ SkinsTab:AddButton({
 
         -- PERNA DE GELO + ZUMBI
         if SelectedSkin == "Perna de Gelo + Perna de Zumbi" then
-            local args = {
-                [1] = {
-                    [1] = 376532000,
-                    [2] = 376531012,
-                    [3] = 376530220,
-                    [4] = 37754710,
-                    [5] = 139572789,
-                    [6] = 0
+            Remotes.ChangeCharacterBody:InvokeServer({
+                {
+                    376532000,
+                    376531012,
+                    376530220,
+                    37754710,
+                    139572789,
+                    0
                 }
-            }
-            Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+            })
         end
 
         -- PEQUENO
         if SelectedSkin == "Pequeno" then
-            local args = {
-                [1] = {
-                    [1] = 120973199097564,
-                    [2] = 112849465115864,
-                    [3] = 118345433416023,
-                    [4] = 0,
-                    [5] = 0,
-                    [6] = 134082579
+            Remotes.ChangeCharacterBody:InvokeServer({
+                {
+                    120973199097564,
+                    112849465115864,
+                    118345433416023,
+                    0,
+                    0,
+                    134082579
                 }
-            }
-            Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+            })
         end
 
         -- MUSCULOSO
         if SelectedSkin == "Musculoso" then
-            local args = {
-                [1] = {
-                    [1] = 18178775358,
-                    [2] = 18178775182,
-                    [3] = 18178775725,
-                    [4] = 96815508293389,
-                    [5] = 121515016872144,
-                    [6] = 0
+            Remotes.ChangeCharacterBody:InvokeServer({
+                {
+                    18178775358,
+                    18178775182,
+                    18178775725,
+                    96815508293389,
+                    121515016872144,
+                    0
                 }
-            }
-            Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+            })
         end
 
         -- 1x1x1
         if SelectedSkin == "1x1x1" then
-            local args = {
-                [1] = {
-                    [1] = 87108996849145,
-                    [2] = 89124612345294,
-                    [3] = 84431523780379,
-                    [4] = 104281326156987,
-                    [5] = 94645302037763,
-                    [6] = 0
+            Remotes.ChangeCharacterBody:InvokeServer({
+                {
+                    87108996849145,
+                    89124612345294,
+                    84431523780379,
+                    104281326156987,
+                    94645302037763,
+                    0
                 }
-            }
-            Remotes.ChangeCharacterBody:InvokeServer(unpack(args))
+            })
+        end
+
+        -- NOME FOFO
+        if SelectedSkin == "Nome Fofo" then
+            Remotes.ChangeCharacterBody:InvokeServer({
+                {
+                    376532000,
+                    376531012,
+                    376530220,
+                    0,
+                    0,
+                    71993263971199
+                }
+            })
+        end
+
+        -- MUSCULOSO 2
+        if SelectedSkin == "Musculoso 2" then
+            Remotes.ChangeCharacterBody:InvokeServer({
+                {
+                    84053421838284,
+                    116266039925754,
+                    115931454049085,
+                    96815508293389,
+                    121515016872144,
+                    76568859580605
+                }
+            })
+        end
+
+        -- AUTO
+        if SelectedSkin == "Auto" then
+            Remotes.ChangeCharacterBody:InvokeServer({
+                {
+                    32336059,
+                    4416788553,
+                    4416785861,
+                    2517207746,
+                    2517204456,
+                    0
+                }
+            })
         end
     end
 })
